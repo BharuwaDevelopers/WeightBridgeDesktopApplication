@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="C:/Users/LENOVO/Desktop/mechine/WeightMachineDesktopApplication/WeightMachineDesktopApplication/WeightMachineDesktopApplication/Resources/commons-beanutils-1.9.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/LENOVO/Desktop/mechine/WeightMachineDesktopApplication/WeightMachineDesktopApplication/WeightMachineDesktopApplication/Resources/commons-collections-3.2.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/LENOVO/Desktop/mechine/WeightMachineDesktopApplication/WeightMachineDesktopApplication/WeightMachineDesktopApplication/Resources/commons-digester-2.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/LENOVO/Desktop/mechine/WeightMachineDesktopApplication/WeightMachineDesktopApplication/WeightMachineDesktopApplication/Resources/commons-logging-1.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/LENOVO/Desktop/mechine/WeightMachineDesktopApplication/WeightMachineDesktopApplication/WeightMachineDesktopApplication/Resources/groovy-all-3.0.9-groovydoc.jar"/>
+	<classpathentry kind="lib" path="C:/Users/LENOVO/Desktop/mechine/WeightMachineDesktopApplication/WeightMachineDesktopApplication/WeightMachineDesktopApplication/Resources/iText-2.1.7.js2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/LENOVO/Desktop/mechine/WeightMachineDesktopApplication/WeightMachineDesktopApplication/WeightMachineDesktopApplication/Resources/jasperreports-5.6.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/LENOVO/Desktop/mechine/WeightMachineDesktopApplication/WeightMachineDesktopApplication/WeightMachineDesktopApplication/Resources/jSerialComm-2.11.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/LENOVO/Desktop/mechine/WeightMachineDesktopApplication/WeightMachineDesktopApplication/WeightMachineDesktopApplication/Resources/ojdbc7-12.1.0.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/LENOVO/Desktop/mechine/WeightMachineDesktopApplication/WeightMachineDesktopApplication/WeightMachineDesktopApplication/Resources/org.json.jar"/>
+	<classpathentry kind="lib" path="C:/Users/LENOVO/Desktop/mechine/gsonjar/gson-2.2.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/LENOVO/Desktop/mechine/gsonjar/jackson-databind-2.17.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/LENOVO/Desktop/mechine/WeightMachineDesktopApplication/WeightMachineDesktopApplication/WeightMachineDesktopApplication/Resources/commons-io-2.11.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/LENOVO/Desktop/mechine/WeightMachineDesktopApplication/WeightMachineDesktopApplication/WeightMachineDesktopApplication/Resources/log4j-api-2.20.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/LENOVO/Desktop/mechine/WeightMachineDesktopApplication/WeightMachineDesktopApplication/WeightMachineDesktopApplication/Resources/log4j-core-2.20.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/LENOVO/Desktop/mechine/WeightMachineDesktopApplication/WeightMachineDesktopApplication/WeightMachineDesktopApplication/Resources/poi-5.2.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/LENOVO/Desktop/mechine/WeightMachineDesktopApplication/WeightMachineDesktopApplication/WeightMachineDesktopApplication/Resources/poi-ooxml-5.2.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/LENOVO/Desktop/mechine/WeightMachineDesktopApplication/WeightMachineDesktopApplication/WeightMachineDesktopApplication/Resources/poi-ooxml-schemas-4.1.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/LENOVO/Desktop/mechine/WeightMachineDesktopApplication/WeightMachineDesktopApplication/WeightMachineDesktopApplication/Resources/xmlbeans-5.1.1.jar"/>
+	<classpathentry kind="output" path="classes"/>
+</classpath>
