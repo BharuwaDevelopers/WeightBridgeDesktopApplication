@@ -277,7 +277,8 @@ public class ReportsJFrame extends javax.swing.JFrame {
     }
 
     public void callApiForReports() throws ProtocolException, MalformedURLException, JSONException {
-         String url = "http://10.0.6.204:7003/RestApiWeightBridge/resources/reports";
+        // String url = "http://10.0.6.204:7003/RestApiWeightBridge/resources/reports";
+        String url = "http://10.0.6.171:9090/RestApiWeightBridge/resources/reports";
         //String url = "http://127.0.0.1:7101/RestApiWeightBridge/resources/reports";
         // Try-catch block to handle potential IOExceptions and other exceptions
         List<VehicleDetails> filteredList = null;

@@ -13,7 +13,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.URL;
+
+import java.net.UnknownHostException;
 
 import java.sql.Connection;
 
@@ -27,6 +30,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import javax.swing.JOptionPane;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -235,8 +239,8 @@ public class LoginJFrame extends javax.swing.JFrame {
     }//GEN-END:initComponents
 
     private void BtnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnLoginActionPerformed
-   // checkLoginDetails();     
-   loginApiCall();
+        // checkLoginDetails();
+        loginApiCall();
     }//GEN-LAST:event_BtnLoginActionPerformed
 
     private void BtnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnExitActionPerformed
@@ -246,7 +250,7 @@ public class LoginJFrame extends javax.swing.JFrame {
     private void TXT_PASSKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TXT_PASSKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             System.out.println("Enter key pressed!");
-           // checkLoginDetails();
+            // checkLoginDetails();
             loginApiCall();
         } // TODO add your handling code here:
     }//GEN-LAST:event_TXT_PASSKeyPressed
@@ -291,8 +295,8 @@ public class LoginJFrame extends javax.swing.JFrame {
 
 
     }
-    
-    public void checkLoginDetails(){
+
+    public void checkLoginDetails() {
         if (TXT_USERNAME.getText().isEmpty() || TXT_USERNAME.getText() == null || TXT_USERNAME.getText() == "") {
             JOptionPane.showMessageDialog(null, "Please Enter User Name", "Message", JOptionPane.INFORMATION_MESSAGE);
             return;
@@ -335,7 +339,7 @@ public class LoginJFrame extends javax.swing.JFrame {
                 WeightMechineJFrame weightFrame = new WeightMechineJFrame(userName);
                 weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 weightFrame.setSize(900, 400);
-               // weightFrame.setVisible(true);
+                // weightFrame.setVisible(true);
                 // super.setVisible(false);
                 super.dispose();
 
@@ -353,8 +357,9 @@ public class LoginJFrame extends javax.swing.JFrame {
             }
         }
     }
-    
-    public void loginApiCall(){
+
+    public void loginApiCall() {
+        InetAddress inetAddress=null;
         if (TXT_USERNAME.getText().isEmpty() || TXT_USERNAME.getText() == null || TXT_USERNAME.getText() == "") {
             JOptionPane.showMessageDialog(null, "Please Enter User Name", "Message", JOptionPane.INFORMATION_MESSAGE);
             return;
@@ -370,14 +375,16 @@ public class LoginJFrame extends javax.swing.JFrame {
             return;
         }
         try {
-          //  URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/Login");
-            URL url = new URL("http://10.0.6.204:7003/RestApiWeightBridge/resources/Login");
+            //  URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/Login");
+            // URL url = new URL("http://10.0.6.204:7003/RestApiWeightBridge/resources/Login");
+            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/Login");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
             con.setRequestProperty("Accept", "application/json");
             con.setDoOutput(true);
-            String jsonInputString = "{\"empCode\":\"" + TXT_USERNAME.getText() + "\",\"pass\":\"" + passwordString + "\"}";
+            String jsonInputString =
+                "{\"empName\":\"" + TXT_USERNAME.getText() + "\",\"empPass\":\"" + passwordString + "\"}";
             try (OutputStream os = con.getOutputStream()) {
                 byte[] input = jsonInputString.getBytes("utf-8");
                 os.write(input, 0, input.length);
@@ -394,27 +401,42 @@ public class LoginJFrame extends javax.swing.JFrame {
                 // Check response status
                 int status = responseObject.getInt("statusCode");
                 String message = responseObject.getString("msg");
-              
+
                 System.out.println("Response Status: " + status);
                 System.out.println("Response Message: " + message);
                 if (status == 200) {
+                    try {
+                        // Get the local machine's IP address
+                         inetAddress = InetAddress.getLocalHost();
+                        // Print the IP address
+                        System.out.println("IP Address: " + inetAddress.getHostAddress());
+                    } catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    }
                     String userName = responseObject.getString("empname");
-                    System.out.println("Response Message: " + message);
-                    WeightMechineJFrame weightFrame = new WeightMechineJFrame(userName);
-                    weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                    weightFrame.setSize(1200, 730);
-                    weightFrame.setVisible(true);
-                    // super.setVisible(false);
-                    super.dispose();
-                }
-                else{
+                    String ipAddress = responseObject.getString("ipAddress");
+                    if (ipAddress.trim().equalsIgnoreCase(inetAddress.getHostAddress().toString())) {
+                        System.out.println("Response Message: " + message);
+                        WeightMechineJFrame weightFrame = new WeightMechineJFrame(userName);
+                        weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                        weightFrame.setSize(1200, 730);
+                        weightFrame.setVisible(true);
+                        // super.setVisible(false);
+                        super.dispose();
+                    }
+                    else{
+                        JOptionPane.showMessageDialog(null, "you are not an authorized user", "Message",
+                                                      JOptionPane.INFORMATION_MESSAGE);
+                    }
+                   
+                } else {
                     JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
                 }
 
 
             }
         } catch (Exception ex) {
-           
+
         }
     }
 

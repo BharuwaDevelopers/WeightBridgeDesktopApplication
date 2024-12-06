@@ -599,9 +599,11 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
         jLabel17.setText("Final Entered Time");
 
+        TXT_FinealEnterTime.setDisabledTextColor(new java.awt.Color(51, 51, 51));
         TXT_FinealEnterTime.setEnabled(false);
         jScrollPane7.setViewportView(TXT_FinealEnterTime);
 
+        TXT_FinealEnterBy.setDisabledTextColor(new java.awt.Color(51, 51, 51));
         TXT_FinealEnterBy.setEnabled(false);
 
         jLabel16.setText("Final Entered Date");
@@ -618,6 +620,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
         jLabel13.setText("Process");
 
+        TXT_Machine.setDisabledTextColor(new java.awt.Color(51, 51, 51));
         TXT_Machine.setEnabled(false);
 
         jLabel6.setText("Machine");
@@ -626,6 +629,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         jScrollPane6.setViewportView(TXT_FinealEnterDate);
 
         TXT_Charge.setEditable(false);
+        TXT_Charge.setDisabledTextColor(new java.awt.Color(51, 51, 51));
         TXT_Charge.setEnabled(false);
 
         jLabel11.setText("Charge");
@@ -705,6 +709,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
         TXT_CreateTime.setEditable(false);
         TXT_CreateTime.setBackground(new java.awt.Color(204, 204, 204));
+        TXT_CreateTime.setDisabledTextColor(new java.awt.Color(51, 51, 51));
         TXT_CreateTime.setEnabled(false);
         jScrollPane5.setViewportView(TXT_CreateTime);
 
@@ -712,17 +717,20 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
         TXT_CreateDate.setEditable(false);
         TXT_CreateDate.setBackground(new java.awt.Color(204, 204, 204));
+        TXT_CreateDate.setDisabledTextColor(new java.awt.Color(51, 51, 51));
         TXT_CreateDate.setEnabled(false);
         jScrollPane4.setViewportView(TXT_CreateDate);
 
         jLabel5.setText("Token No");
 
         TXT_CreateBy.setEditable(false);
+        TXT_CreateBy.setDisabledTextColor(new java.awt.Color(51, 51, 51));
         TXT_CreateBy.setEnabled(false);
 
         jLabel7.setText("Create By");
 
         TXT_TokenNo.setEditable(false);
+        TXT_TokenNo.setDisabledTextColor(new java.awt.Color(51, 51, 51));
         TXT_TokenNo.setEnabled(false);
         jScrollPane3.setViewportView(TXT_TokenNo);
 
@@ -832,19 +840,21 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
         TXT_GrossWeight.setEditable(false);
         TXT_GrossWeight.setBackground(new java.awt.Color(248, 245, 245));
-        TXT_GrossWeight.setDisabledTextColor(new java.awt.Color(204, 204, 204));
+        TXT_GrossWeight.setDisabledTextColor(new java.awt.Color(51, 51, 51));
         TXT_GrossWeight.setEnabled(false);
         jScrollPane8.setViewportView(TXT_GrossWeight);
 
         jLabel19.setText("Tare Weight");
 
         TXT_TareWeight.setEditable(false);
+        TXT_TareWeight.setDisabledTextColor(new java.awt.Color(51, 51, 51));
         TXT_TareWeight.setEnabled(false);
         jScrollPane9.setViewportView(TXT_TareWeight);
 
         jLabel20.setText("Net Weight");
 
         TXT_NetWeight.setEditable(false);
+        TXT_NetWeight.setDisabledTextColor(new java.awt.Color(51, 51, 51));
         TXT_NetWeight.setEnabled(false);
         jScrollPane10.setViewportView(TXT_NetWeight);
 
@@ -1165,7 +1175,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     public void insertdateCallApi() {
         try {
            // URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/insert");
-           URL url = new URL("http://10.0.6.204:7003/RestApiWeightBridge/resources/insert");
+           URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/insert");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
@@ -1242,7 +1252,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     public void updatedateCallApi() {
         try {
            // URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/update");
-            URL url = new URL("http://10.0.6.204:7003/RestApiWeightBridge/resources/update");
+            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/update");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
@@ -2222,7 +2232,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         suggestionsListPoduct = new ArrayList<>();
         suggestionsListRemarks = new ArrayList<>();
        // String url = "http://182.16.9.100:7003/RestApiWeightBridge/resources/vehicleType";
-        String url = "http://10.0.6.204:7003/RestApiWeightBridge/resources/vehicleType";
+        String url = "http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleType";
         // Try-catch block to handle potential IOExceptions and other exceptions
         try {
             // Create a URL object from the URL string
@@ -2287,7 +2297,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
     public void oncallApiVehicleSlipNo(String vechileNo, String slipNo) {
        // String url = "http://182.16.9.100:7003/RestApiWeightBridge/resources/vehicleDetails";
-        String url = "http://10.0.6.204:7003/RestApiWeightBridge/resources/vehicleDetails";
+        String url = "http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleDetails";
         // Try-catch block to handle potential IOExceptions and other exceptions
         List<VehicleDetails> filteredList = null;
         try {
