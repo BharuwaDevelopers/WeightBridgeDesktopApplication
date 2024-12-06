@@ -3,6 +3,17 @@ package com.bspl.bean;
 public class LoginBean {
    private String empname;
     private int statusCode;
+    private boolean success;
+    private String msg;
+    private String ipAddress;
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
+
+    public String getIpAddress() {
+        return ipAddress;
+    }
+   
 
     public void setMsg(String msg) {
         this.msg = msg;
@@ -11,8 +22,7 @@ public class LoginBean {
     public String getMsg() {
         return msg;
     }
-    private boolean success;
-    private String msg;
+  
     public void setStatusCode(int statusCode) {
         this.statusCode = statusCode;
     }

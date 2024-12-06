@@ -54,11 +54,11 @@ public class RestAdapter {
                     String query = "{? = call DEC_PASSWORD_POST(?,?)}";
                     CallableStatement callableStatement = conn.prepareCall(query);
                     callableStatement.registerOutParameter(1, Types.VARCHAR);
-                    callableStatement.setString(2, mJson.getString("empCode").trim());
-                    callableStatement.setString(3, mJson.getString("pass").trim());
+                    callableStatement.setString(2, mJson.getString("empName").trim());
+                    callableStatement.setString(3, mJson.getString("empPass").trim());
                     callableStatement.execute();
                     //System.out.println("callableStatement.getString(1)--->" + callableStatement.getString(1).toString());
-                    if (!callableStatement.getString(1).equals(mJson.getString("pass").trim())) {
+                    if (!callableStatement.getString(1).equals(mJson.getString("empPass").trim())) {
                         logindetails.setStatusCode(500);
                         logindetails.setSuccess(false);
                         logindetails.setMsg("Invalid username or password Login Failed");
@@ -66,13 +66,19 @@ public class RestAdapter {
                         stmt = conn.createStatement();
                         stmt1 = conn.createStatement();
                         ResultSet rs =
-                            stmt.executeQuery("select user_id,user_name,user_fname,emp_id,unit_cd,valid_to,validity  from user_master where user_name='" +
-                                              mJson.getString("empCode").trim() + "'");
+                            stmt.executeQuery("SELECT  u.user_id, u.user_name, u.user_fname,    u.emp_id,    u.unit_cd,    u.valid_to,    u.validity,    w.machine_code,    w.ip_address FROM \n" + 
+                            "    user_master u JOIN     public.weighing_machine_user_map w ON     u.user_id = w.user_id where u.user_name='" +
+                                              mJson.getString("empName").trim() + "'");
                         if (rs.next()) {
                             logindetails.setStatusCode(200);
                             logindetails.setSuccess(true);
                             user_name = rs.getString("USER_NAME");
                             logindetails.setEmpname(user_name);
+                            if(rs.getString("ip_address")==null||rs.getString("ip_address")=="" || rs.getString("ip_address").isEmpty()){
+                                logindetails.setIpAddress("NA"); 
+                            }else{
+                                logindetails.setIpAddress(rs.getString("ip_address")); 
+                            }
                             logindetails.setMsg("Login Successfully");
                         } else {
                             logindetails.setStatusCode(500);
