@@ -510,9 +510,9 @@ public class RestAdapter {
                 preparedStatement.setString(5, vehicleNo);
                 preparedStatement.setString(6, vehTypeCode);
                 preparedStatement.setString(7, rcNo.toUpperCase());
-                preparedStatement.setString(8, grossWeight);
-                preparedStatement.setString(9, tereWeight);
-                preparedStatement.setString(10, netWeight);
+                preparedStatement.setInt(8, Integer.parseInt(grossWeight));
+                preparedStatement.setInt(9, Integer.parseInt(tereWeight));
+                preparedStatement.setInt(10, Integer.parseInt(netWeight));
                 preparedStatement.setString(11, createdBy.toUpperCase());
                 preparedStatement.setString(12, createdBy.toUpperCase());
                 preparedStatement.setString(13, trolleyNo);

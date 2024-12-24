@@ -1190,9 +1190,12 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             jsonObject.addProperty("vehicle_no", TXT_VechileNo.getText().toUpperCase());
             jsonObject.addProperty("veh_type_code", vechileCode);
             jsonObject.addProperty("rc_no", TXT_RC_NO.getText());
-            jsonObject.addProperty("gross_weight", TXT_GrossWeight.getText());
-            jsonObject.addProperty("tere_weight", TXT_TareWeight.getText());
-            jsonObject.addProperty("net_weight", TXT_NetWeight.getText());
+            int grossWeight = Integer.parseInt(TXT_GrossWeight.getText());
+            jsonObject.addProperty("gross_weight", grossWeight);
+            int tareWeight = Integer.parseInt(TXT_TareWeight.getText());
+            jsonObject.addProperty("tere_weight", tareWeight);
+            int netWeight = Integer.parseInt(TXT_NetWeight.getText());
+            jsonObject.addProperty("net_weight", netWeight);
             jsonObject.addProperty("entered_by", TXT_CreateBy.getText().toUpperCase());
             jsonObject.addProperty("final_entered_by", TXT_CreateBy.getText().toUpperCase());
             jsonObject.addProperty("trolley_no", TXT_TrollyNo.getText());
@@ -1316,147 +1319,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     }
 
     private void BtnSubmitActionPerformedold(java.awt.event.ActionEvent evt) { //GEN-FIRST:event_BtnSubmitActionPerformed
-        if (TXT_GrossWeight.getText().equalsIgnoreCase("0") && TXT_TareWeight.getText().equalsIgnoreCase("0")) {
-            JOptionPane.showMessageDialog(null, "Gross Weight/ Tare Weight 0", "Message",
-                                          JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-        if (TXT_TokenNo.getText().isEmpty() || TXT_TokenNo.getText() == null || TXT_TokenNo.getText() == "") {
-            JOptionPane.showMessageDialog(null, "Token number not found", "Message", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-        Integer netWeight = Integer.parseInt(TXT_NetWeight.getText());
-        if (netWeight < 0) {
-            JOptionPane.showMessageDialog(null, "Net Weight must be greater than zero", "Message",
-                                          JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-        String selectedItem = (String) VechileTypejComboBox.getSelectedItem();
-        System.out.println("Selected Item: " + selectedItem);
-        if (selectedItem.equalsIgnoreCase("Please Select")) {
-            JOptionPane.showMessageDialog(null, "please select vehicle type", "Message",
-                                          JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-        PreparedStatement preparedStatement = null;
-        WeightBridgeDao obj = new WeightBridgeDao();
-        Connection connection = null;
-        CallableStatement callableStatement = null;
-        String chargeApplied = "N";
-        String SlipNo = null;
-        String sqlInsertUpdate = null;
-        String updateFlage = "N";
-        try {
-            connection = obj.getStartConnection();
-
-            if (TXT_SlipNo.getText().isEmpty() || TXT_SlipNo.getText() == null || TXT_SlipNo.getText() == "") {
-                System.out.println("The value is greater than zero.");
-                String sqlFuncation = "{ ? = call FN_GEN_WBRIDGE_SLIP_NO(?,?) }";
-                callableStatement = connection.prepareCall(sqlFuncation);
-                callableStatement.registerOutParameter(1,
-                                                       java.sql.Types.VARCHAR); // Update type based on the return type
-                // Set the input parameters
-                callableStatement.setString(2, unitCode); // Replace "inputParameter1" with actual value
-                callableStatement.setString(3, TXT_Machine.getText()); // Replace "inputParameter2" with actual value
-                // Execute the function
-                callableStatement.execute();
-                // Retrieve the result
-                SlipNo = callableStatement.getString(1);
-                System.out.println("Generated Slip Number: " + SlipNo);
-                sqlInsertUpdate =
-                    "INSERT INTO WEIGHING_BRIDGE (SLIP_NO,MACHINE_NO,TOKEN_NO,PROCESS_CODE,VEHICLE_NO,VEH_TYPE_CODE,RC_NO,GROSS_WEIGHT,TERE_WEIGHT,NET_WEIGHT,ENTERED_BY,FINAL_ENTERED_BY," +
-                    "TROLLEY_NO,CHARGE,CHARGE_APPLICABLE,PARTY,PRODUCT,GATE_ENTRY_NUMBER,REMARKS,CREATED_BY,UNIT_CD) VALUES (?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?)";
-                preparedStatement = connection.prepareStatement(sqlInsertUpdate);
-                preparedStatement.setString(1, SlipNo.toUpperCase());
-                preparedStatement.setString(2, TXT_Machine.getText().toUpperCase());
-                preparedStatement.setString(3, TXT_TokenNo.getText().toUpperCase());
-                preparedStatement.setString(4, TXT_Process.getText().toUpperCase());
-                preparedStatement.setString(5, TXT_VechileNo.getText());
-                preparedStatement.setString(6, vechileCode);
-                preparedStatement.setString(7, TXT_RC_NO.getText());
-                preparedStatement.setString(8, TXT_GrossWeight.getText());
-                preparedStatement.setString(9, TXT_TareWeight.getText());
-                preparedStatement.setString(10, TXT_NetWeight.getText());
-                preparedStatement.setString(11, TXT_CreateBy.getText().toUpperCase());
-                preparedStatement.setString(12, TXT_CreateBy.getText().toUpperCase());
-                preparedStatement.setString(13, TXT_TrollyNo.getText());
-                preparedStatement.setString(14, TXT_Charge.getText());
-                if (ComboBoxChargeApplied.getSelectedItem().toString().equalsIgnoreCase("Yes")) {
-                    chargeApplied = "Y";
-                }
-                preparedStatement.setString(15, chargeApplied);
-                preparedStatement.setString(16, TXT_Part.getText().toUpperCase());
-                preparedStatement.setString(17, TXT_Product.getText().toUpperCase());
-                preparedStatement.setString(18, TXT_GateEntry.getText().toUpperCase());
-                preparedStatement.setString(19, TXT_REMARKS.getText().toUpperCase());
-                preparedStatement.setString(20, TXT_CreateBy.getText().toUpperCase());
-                preparedStatement.setString(21, "60001");
-            } else {
-                LocalDateTime currentDateTime = LocalDateTime.now();
-                DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("dd-MM-yy h:mm:ss.SSSSSSSSS a");
-                todayDateTime = currentDateTime.format(formatter1);
-                updateFlage = "Y";
-                SlipNo = TXT_SlipNo.getText();
-                sqlInsertUpdate =
-                    "UPDATE  WEIGHING_BRIDGE set GROSS_WEIGHT=?,TERE_WEIGHT=?,NET_WEIGHT=?,FINAL_ENTERED_BY=?,FINAL_ENTERED_DATE=?,REMARKS=?, LAST_UPDATED_BY=?,LAST_UPDATE_DATE=?,CHARGE_APPLICABLE=?,CHARGE=?,VEH_TYPE_CODE=?,PARTY=?,PRODUCT=?,RC_NO=? where SLIP_NO=? ";
-                preparedStatement = connection.prepareStatement(sqlInsertUpdate);
-                preparedStatement.setString(1, TXT_GrossWeight.getText()); // PROCESS_COD
-                preparedStatement.setString(2, TXT_TareWeight.getText()); // GROSS_WEIGHT
-                preparedStatement.setString(3, TXT_NetWeight.getText()); // TERE_WEIGHT
-                preparedStatement.setString(4, TXT_FinealEnterBy.getText().toUpperCase());
-                preparedStatement.setString(5, todayDateTime); //
-                preparedStatement.setString(6, TXT_REMARKS.getText().toUpperCase()); // REMARKS
-                preparedStatement.setString(7, TXT_CreateBy.getText().toUpperCase());
-                preparedStatement.setString(8, todayDateTime);
-                if (ComboBoxChargeApplied.getSelectedItem().toString().equalsIgnoreCase("Yes")) {
-                    chargeApplied = "Y";
-                }
-                preparedStatement.setString(9, chargeApplied);
-                preparedStatement.setString(10, TXT_Charge.getText());
-                preparedStatement.setString(11, vechileCode);
-                preparedStatement.setString(12, TXT_Part.getText().toUpperCase());
-                preparedStatement.setString(13, TXT_Product.getText().toUpperCase());
-                preparedStatement.setString(14, TXT_RC_NO.getText());
-                preparedStatement.setString(15, SlipNo); // SLIP_NO (WHERE clause)
-
-            }
-            int rowsAffected = preparedStatement.executeUpdate();
-            System.out.println("Rows affected: " + rowsAffected);
-            if (updateFlage == "Y" && rowsAffected > 0) {
-                forPrint();
-                JOptionPane.showMessageDialog(null, "Record Save Successfully", "Message",
-                                              JOptionPane.INFORMATION_MESSAGE);
-                TXT_SlipNo.setText(SlipNo);
-                disableValueAfterSave();
-            } else if (updateFlage == "N" && rowsAffected > 0) {
-                forPrint();
-                JOptionPane.showMessageDialog(null, "Record Save Successfully", "Message",
-                                              JOptionPane.INFORMATION_MESSAGE);
-                TXT_SlipNo.setText(SlipNo);
-                resetValue();
-            } else {
-                JOptionPane.showMessageDialog(null, "Something want to wrong! Please try Again", "Message",
-                                              JOptionPane.INFORMATION_MESSAGE);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace(); // Print any SQL errors
-            JOptionPane.showMessageDialog(null, "Record Not Save", "Message", JOptionPane.ERROR_MESSAGE);
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, ex.toString(), "Message", JOptionPane.ERROR_MESSAGE);
-        } finally {
-            // Close resources
-            try {
-                if (preparedStatement != null) {
-                    preparedStatement.close();
-                }
-                if (connection != null) {
-                    connection.close();
-                }
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, ex.toString(), "Message", JOptionPane.ERROR_MESSAGE);
-            }
-        }
     } //GEN-LAST:event_BtnSubmitActionPerformed
 
 
