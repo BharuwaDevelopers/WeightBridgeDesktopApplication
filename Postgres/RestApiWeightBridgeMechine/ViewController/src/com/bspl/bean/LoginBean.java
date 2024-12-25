@@ -5,6 +5,15 @@ public class LoginBean {
     private int statusCode;
     private boolean success;
     private String msg;
+    private String unitCd;
+
+    public void setUnitCd(String unitCd) {
+        this.unitCd = unitCd;
+    }
+
+    public String getUnitCd() {
+        return unitCd;
+    }
     private String ipAddress;
     public void setIpAddress(String ipAddress) {
         this.ipAddress = ipAddress;

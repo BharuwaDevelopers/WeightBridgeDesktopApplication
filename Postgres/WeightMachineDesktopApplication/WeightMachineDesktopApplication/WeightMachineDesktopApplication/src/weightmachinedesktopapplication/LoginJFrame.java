@@ -296,67 +296,7 @@ public class LoginJFrame extends javax.swing.JFrame {
 
     }
 
-    public void checkLoginDetails() {
-        if (TXT_USERNAME.getText().isEmpty() || TXT_USERNAME.getText() == null || TXT_USERNAME.getText() == "") {
-            JOptionPane.showMessageDialog(null, "Please Enter User Name", "Message", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-        char[] password = TXT_PASS.getPassword();
-        // Convert to String if needed
-        String passwordString = new String(password);
-
-
-        //System.out.println("Entered Password: " + passwordString);
-        if (passwordString.equals(null) || passwordString == null || passwordString == "" || passwordString.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Please Enter Password", "Message", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-        //        if(passwordString.equals("Admin1") && TXT_USERNAME.getText().equals("Admin")){
-        //            WeightMechineJFrame weightFrame = new WeightMechineJFrame("Admin");
-        //            weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        //            weightFrame.setSize(1200, 700);
-        //            weightFrame.setVisible(true);
-        //            // super.setVisible(false);
-        //            super.dispose();
-        //
-        //        }
-        //        else{
-        //            return;
-        //        }
-        Connection conn = null;
-        Statement stmt = null;
-        WeightBridgeDao obj = new WeightBridgeDao();
-        try {
-            conn = obj.getStartConnection();
-            stmt = conn.createStatement();
-
-            ResultSet rs =
-                stmt.executeQuery("select user_id,user_name,user_fname,emp_id,unit_cd,valid_to,validity  from user_master where user_name='" +
-                                  TXT_USERNAME.getText().toString() + "'  and F_DECRYPT(USER_PASS)= '" +
-                                  passwordString + "'");
-            if (rs.next()) {
-                String userName = rs.getString("USER_NAME");
-                WeightMechineJFrame weightFrame = new WeightMechineJFrame(userName);
-                weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                weightFrame.setSize(900, 400);
-                // weightFrame.setVisible(true);
-                // super.setVisible(false);
-                super.dispose();
-
-            } else {
-                // JOptionPane.showMessageDialog(null, "Please Enter Vaild User Name/Password", "Message", JOptionPane.INFORMATION_MESSAGE);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                stmt.close();
-                conn.close();
-            } catch (Exception ex) {
-
-            }
-        }
-    }
+ 
 
     public void loginApiCall() {
         InetAddress inetAddress=null;
@@ -415,9 +355,10 @@ public class LoginJFrame extends javax.swing.JFrame {
                     }
                     String userName = responseObject.getString("empname");
                     String ipAddress = responseObject.getString("ipAddress");
+                    String unitCode = responseObject.getString("unitCd");
                     if (ipAddress.trim().equalsIgnoreCase(inetAddress.getHostAddress().toString())) {
                         System.out.println("Response Message: " + message);
-                        WeightMechineJFrame weightFrame = new WeightMechineJFrame(userName);
+                        WeightMechineJFrame weightFrame = new WeightMechineJFrame(userName,unitCode);
                         weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                         weightFrame.setSize(1200, 730);
                         weightFrame.setVisible(true);
@@ -425,7 +366,7 @@ public class LoginJFrame extends javax.swing.JFrame {
                         super.dispose();
                     }
                     else{
-                        JOptionPane.showMessageDialog(null, "you are not an authorized user", "Message",
+                        JOptionPane.showMessageDialog(null, "you are not an authorized user, ip address is- "+ipAddress, "Message",
                                                       JOptionPane.INFORMATION_MESSAGE);
                     }
                    

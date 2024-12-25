@@ -97,7 +97,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     int StopBits = SerialPort.ONE_STOP_BIT;
     int Parity = SerialPort.NO_PARITY;
     String userNamevalue = null;
-    String unitCode = "60001";
+    String unitCode = "80001";
     String slipNo = null, tokenNo = null, gateNo = null, grossWeight = null, tareWeight = null, netWeight =
         null, party = null, vechileNo = null, vechileType = null, create = null, finaldate = null, charge =
         null, product = null, remarks = null;
@@ -109,12 +109,13 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     private List<String> suggestionsListRemarks;
 
     /** Creates new form WeightMechineJFrame */
-    public WeightMechineJFrame(String userName) {
+    public WeightMechineJFrame(String userName,String unitCd) {
         System.out.println("userName----" + userName);
         if (userName == null || userName.isEmpty() || userName == "") {
             userName = "E-001";
         }
         userNamevalue = userName;
+        unitCode=unitCd;
         initComponents();
         //comPoartMechineConnection();
         // vachileDetailsWithAutoSugest();
@@ -1206,7 +1207,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             jsonObject.addProperty("gate_entry_number", TXT_GateEntry.getText().toUpperCase());
             jsonObject.addProperty("remarks", TXT_REMARKS.getText().toUpperCase());
             jsonObject.addProperty("created_by", TXT_CreateBy.getText().toUpperCase());
-            jsonObject.addProperty("unit_cd", "60001");
+            jsonObject.addProperty("unit_cd", unitCode);
 
             // Convert JsonObject to JSON string
             String jsonInputString = jsonObject.toString();
@@ -1602,7 +1603,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new WeightMechineJFrame("").setVisible(true);
+                new WeightMechineJFrame("","").setVisible(true);
             }
         });
 

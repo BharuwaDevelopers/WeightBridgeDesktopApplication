@@ -71,7 +71,7 @@ public class RestAdapter {
                         stmt = conn.createStatement();
                         stmt1 = conn.createStatement();
                         ResultSet rs =
-                            stmt.executeQuery("SELECT  u.user_id, u.user_name, u.user_fname,    u.emp_id,    u.unit_cd,    u.valid_to,    u.validity,    w.machine_code,    w.ip_address FROM \n" + 
+                            stmt.executeQuery("SELECT  u.user_id,u.unit_cd, u.user_name, u.user_fname,    u.emp_id,    u.unit_cd,    u.valid_to,    u.validity,    w.machine_code,    w.ip_address FROM \n" + 
                             "    user_master u JOIN     public.weighing_machine_user_map w ON     u.user_id = w.user_id where u.user_name='" +
                                               mJson.getString("empName").trim() + "'");
                         if (rs.next()) {
@@ -82,7 +82,8 @@ public class RestAdapter {
                             if(rs.getString("ip_address")==null||rs.getString("ip_address")=="" || rs.getString("ip_address").isEmpty()){
                                 logindetails.setIpAddress("NA"); 
                             }else{
-                                logindetails.setIpAddress(rs.getString("ip_address")); 
+                                logindetails.setIpAddress(rs.getString("ip_address"));
+                                logindetails.setUnitCd(rs.getString("unit_cd")); 
                             }
                             logindetails.setMsg("Login Successfully");
                         } else {
