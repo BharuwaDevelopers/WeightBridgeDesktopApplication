@@ -22,6 +22,7 @@ import java.sql.SQLException;
 
 import java.sql.Statement;
 
+import java.sql.Timestamp;
 import java.sql.Types;
 
 import java.time.LocalDateTime;
@@ -599,6 +600,7 @@ public class RestAdapter {
         if (jsonString == null || jsonString == "") {
             jsonString = "Invalid Json";
         } else {
+            String grossWeight=null;
             ErrorMsg objError = new ErrorMsg();
             JSONObject responseObject = new JSONObject(jsonString);
 
@@ -606,7 +608,11 @@ public class RestAdapter {
             String slipNo = responseObject.getString("slip_no");
             String vehTypeCode = responseObject.getString("veh_type_code");
             String rcNo = responseObject.getString("rc_no");
-            String grossWeight = responseObject.getString("gross_weight");
+            try{
+             grossWeight = responseObject.getString("gross_weight");
+            }catch(Exception ex){
+                ex.printStackTrace();
+            }
             String tereWeight = responseObject.getString("tere_weight");
             String netWeight = responseObject.getString("net_weight");
             String finalEnteredBy = responseObject.getString("final_entered_by");
@@ -641,9 +647,9 @@ public class RestAdapter {
                 stmt = conn.createStatement();
 
                 LocalDateTime currentDateTime = LocalDateTime.now();
-                DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("dd-MM-yy h:mm:ss.SSSSSSSSS a");
+                DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 String todayDateTime = currentDateTime.format(formatter1);
-
+                Timestamp timestamp = Timestamp.valueOf(todayDateTime);
                 String sqlInsertUpdate =
                     "UPDATE  WEIGHING_BRIDGE set GROSS_WEIGHT=?,TERE_WEIGHT=?,NET_WEIGHT=?,FINAL_ENTERED_BY=?,FINAL_ENTERED_DATE=?,REMARKS=?, LAST_UPDATED_BY=?,LAST_UPDATE_DATE=?,CHARGE_APPLICABLE=?,CHARGE=?,VEH_TYPE_CODE=?,PARTY=?,PRODUCT=?,RC_NO=? where SLIP_NO=? ";
                 preparedStatement = conn.prepareStatement(sqlInsertUpdate);
@@ -651,10 +657,10 @@ public class RestAdapter {
                 preparedStatement.setInt(2, Integer.parseInt(tereWeight)); // GROSS_WEIGHT
                 preparedStatement.setInt(3, Integer.parseInt(netWeight)); // TERE_WEIGHT
                 preparedStatement.setString(4, finalEnteredBy);
-                preparedStatement.setString(5, todayDateTime); //
+                preparedStatement.setTimestamp(5, timestamp); //
                 preparedStatement.setString(6, remarks.toUpperCase()); // REMARKS
                 preparedStatement.setString(7, finalEnteredBy.toUpperCase());
-                preparedStatement.setString(8, todayDateTime);
+                preparedStatement.setTimestamp(8, timestamp);
                 if (chargeApplicable.equalsIgnoreCase("Yes")) {
                     chargeApplied = "Y";
                 }
