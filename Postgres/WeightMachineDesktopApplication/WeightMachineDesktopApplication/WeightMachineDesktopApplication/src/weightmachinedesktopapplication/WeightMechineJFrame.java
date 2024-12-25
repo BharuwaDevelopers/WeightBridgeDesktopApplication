@@ -1255,10 +1255,10 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
     public void updatedateCallApi() {
         try {
-            URL url = new URL(" http://127.0.0.1:7101/RestApiWeightBridge/resources/update");
+           // URL url = new URL(" http://127.0.0.1:7101/RestApiWeightBridge/resources/update");
            
            // URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/update");
-           // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/update");
+            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/update");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
