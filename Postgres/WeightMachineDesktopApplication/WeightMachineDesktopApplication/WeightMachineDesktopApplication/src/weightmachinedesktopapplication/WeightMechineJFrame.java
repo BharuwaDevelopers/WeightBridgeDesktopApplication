@@ -1266,9 +1266,9 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             jsonObject.addProperty("process_code", TXT_Process.getText().toUpperCase());
             jsonObject.addProperty("veh_type_code", vechileCode);
             jsonObject.addProperty("rc_no", TXT_RC_NO.getText());
-            jsonObject.addProperty("gross_weight", TXT_GrossWeight.getText());
-            jsonObject.addProperty("tere_weight", TXT_TareWeight.getText());
-            jsonObject.addProperty("net_weight", TXT_NetWeight.getText());
+            jsonObject.addProperty("gross_weight", Integer.parseInt(TXT_GrossWeight.getText()));
+            jsonObject.addProperty("tere_weight", Integer.parseInt(TXT_TareWeight.getText()));
+            jsonObject.addProperty("net_weight", Integer.parseInt(TXT_NetWeight.getText()));
             jsonObject.addProperty("final_entered_by", TXT_FinealEnterBy.getText().toUpperCase());
             jsonObject.addProperty("trolley_no", TXT_TrollyNo.getText());
             jsonObject.addProperty("charge", TXT_Charge.getText());

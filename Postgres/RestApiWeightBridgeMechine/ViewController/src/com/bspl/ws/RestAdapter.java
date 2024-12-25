@@ -36,6 +36,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class RestAdapter {
+    
+   
+    
     public String getLoginDetails(String empLoginDetails) throws JSONException, Exception {
         Connection conn = null;
         Statement stmt = null;
@@ -57,6 +60,8 @@ public class RestAdapter {
                     callableStatement.setString(2, mJson.getString("empName").trim());
                     callableStatement.setString(3, mJson.getString("empPass").trim());
                     callableStatement.execute();
+                    
+                    
                     //System.out.println("callableStatement.getString(1)--->" + callableStatement.getString(1).toString());
                     if (!callableStatement.getString(1).equals(mJson.getString("empPass").trim())) {
                         logindetails.setStatusCode(500);
@@ -516,7 +521,7 @@ public class RestAdapter {
                 preparedStatement.setString(11, createdBy.toUpperCase());
                 preparedStatement.setString(12, createdBy.toUpperCase());
                 preparedStatement.setString(13, trolleyNo);
-                preparedStatement.setString(14, charge);
+                preparedStatement.setInt(14, Integer.parseInt(charge));
                 if (chargeApplicable.equalsIgnoreCase("Yes")) {
                     chargeApplied = "Y";
                 }
@@ -641,9 +646,9 @@ public class RestAdapter {
                 String sqlInsertUpdate =
                     "UPDATE  WEIGHING_BRIDGE set GROSS_WEIGHT=?,TERE_WEIGHT=?,NET_WEIGHT=?,FINAL_ENTERED_BY=?,FINAL_ENTERED_DATE=?,REMARKS=?, LAST_UPDATED_BY=?,LAST_UPDATE_DATE=?,CHARGE_APPLICABLE=?,CHARGE=?,VEH_TYPE_CODE=?,PARTY=?,PRODUCT=?,RC_NO=? where SLIP_NO=? ";
                 preparedStatement = conn.prepareStatement(sqlInsertUpdate);
-                preparedStatement.setString(1, grossWeight); // PROCESS_COD
-                preparedStatement.setString(2, tereWeight); // GROSS_WEIGHT
-                preparedStatement.setString(3, netWeight); // TERE_WEIGHT
+                preparedStatement.setInt(1,Integer.parseInt( grossWeight)); // PROCESS_COD
+                preparedStatement.setInt(2, Integer.parseInt(tereWeight)); // GROSS_WEIGHT
+                preparedStatement.setInt(3, Integer.parseInt(netWeight)); // TERE_WEIGHT
                 preparedStatement.setString(4, finalEnteredBy);
                 preparedStatement.setString(5, todayDateTime); //
                 preparedStatement.setString(6, remarks.toUpperCase()); // REMARKS
@@ -653,7 +658,7 @@ public class RestAdapter {
                     chargeApplied = "Y";
                 }
                 preparedStatement.setString(9, chargeApplied);
-                preparedStatement.setString(10, charge);
+                preparedStatement.setInt(10, Integer.parseInt(charge));
                 preparedStatement.setString(11, vehTypeCode);
                 preparedStatement.setString(12, party.toUpperCase());
                 preparedStatement.setString(13, product.toUpperCase());
