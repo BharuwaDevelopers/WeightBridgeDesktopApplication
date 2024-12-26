@@ -1161,6 +1161,23 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                                           JOptionPane.INFORMATION_MESSAGE);
             return;
         }
+        if (TXT_Part.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Please Enter Party Details", "Message",
+                                          JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        if (TXT_Product.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Please Enter Product Details", "Message",
+                                          JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        if (TXT_REMARKS.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Please Enter Remark", "Message",
+                                          JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
 
         System.out.println("TXT_SlipNo.getText()--" + TXT_SlipNo.getText().toString().length());
         if (TXT_SlipNo.getText().isEmpty() || TXT_SlipNo.getText() == null || TXT_SlipNo.getText() == "") {
