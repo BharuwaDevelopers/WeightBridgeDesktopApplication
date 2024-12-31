@@ -2224,6 +2224,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     filteredList =
                         vehicleDetailsList.stream().filter(vehicle -> vehicle.getVehicleNo().equals(vechileNo)).collect(Collectors.toList());
                 }
+               // TXT_SlipNo.setEnabled(false);
             }
 
             if (slipNo != null) {
@@ -2231,6 +2232,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     filteredList =
                         vehicleDetailsList.stream().filter(vehicle -> vehicle.getSlipNo().equals(slipNo)).collect(Collectors.toList());
                 }
+               // TXT_VechileNo.setEnabled(false);
             }
 
 
@@ -2243,12 +2245,16 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
                 if (rs.getVehicleNo() != null) {
                     TXT_VechileNo.setText(rs.getVehicleNo().toUpperCase());
+                    if(vechileNo != null){
+                        TXT_SlipNo.setEnabled(false); 
+                    }
                 }
 
                 if (slipNo == null) {
                     if (rs.getSlipNo().equalsIgnoreCase("0")) {
                     } else {
                         TXT_SlipNo.setText(rs.getSlipNo());
+                        TXT_VechileNo.setEnabled(false);
                     }
                 }
 
