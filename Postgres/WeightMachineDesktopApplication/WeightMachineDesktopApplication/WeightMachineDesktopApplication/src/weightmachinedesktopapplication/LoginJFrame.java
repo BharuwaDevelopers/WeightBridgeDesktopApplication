@@ -356,9 +356,14 @@ public class LoginJFrame extends javax.swing.JFrame {
                     String userName = responseObject.getString("empname");
                     String ipAddress = responseObject.getString("ipAddress");
                     String unitCode = responseObject.getString("unitCd");
+                    String machine_code = responseObject.getString("machine_code");
+                    if(machine_code==null ||machine_code.isEmpty()||machine_code==""){
+                        JOptionPane.showMessageDialog(null, "Please maintain machine code", "Message",
+                                                      JOptionPane.INFORMATION_MESSAGE);
+                    }
                     if (ipAddress.trim().equalsIgnoreCase(inetAddress.getHostAddress().toString())) {
                         System.out.println("Response Message: " + message);
-                        WeightMechineJFrame weightFrame = new WeightMechineJFrame(userName,unitCode);
+                        WeightMechineJFrame weightFrame = new WeightMechineJFrame(userName,unitCode,machine_code);
                         weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                         weightFrame.setSize(1200, 730);
                         weightFrame.setVisible(true);

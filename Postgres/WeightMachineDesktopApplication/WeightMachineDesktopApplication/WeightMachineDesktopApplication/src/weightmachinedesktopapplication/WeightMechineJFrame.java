@@ -97,7 +97,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     int StopBits = SerialPort.ONE_STOP_BIT;
     int Parity = SerialPort.NO_PARITY;
     String userNamevalue = null;
-    String unitCode = "80001";
+    String unitCode = null;
     String slipNo = null, tokenNo = null, gateNo = null, grossWeight = null, tareWeight = null, netWeight =
         null, party = null, vechileNo = null, vechileType = null, create = null, finaldate = null, charge =
         null, product = null, remarks = null;
@@ -109,7 +109,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     private List<String> suggestionsListRemarks;
 
     /** Creates new form WeightMechineJFrame */
-    public WeightMechineJFrame(String userName,String unitCd) {
+    public WeightMechineJFrame(String userName,String unitCd,String machine_code) {
         System.out.println("userName----" + userName);
         if (userName == null || userName.isEmpty() || userName == "") {
             userName = "E-001";
@@ -125,7 +125,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         onLoadApiVehicleTypeAutoSugest();
 
         onLoadDate();
-        TXT_Machine.setText("L2");
+        TXT_Machine.setText(machine_code);
        // TXT_CreateBy.setText(userName);
 
         autoSugestParty();
@@ -555,6 +555,9 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         setSize(new java.awt.Dimension(900, 400));
 
         WeightBridgeJpanel.setBackground(new java.awt.Color(255, 255, 255));
+
+        TXT_AutoWeight.setEditable(false);
+        TXT_AutoWeight.setBackground(new java.awt.Color(248, 245, 245));
 
         BtnTare.setBackground(new java.awt.Color(102, 204, 255));
         BtnTare.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
@@ -1355,6 +1358,9 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
     private void BtnTareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnTareActionPerformed
         comPoartMechineConnection();
+        if(TXT_SlipNo.getText()==null||TXT_SlipNo.getText().isEmpty()){
+            TXT_GrossWeight.setText("0");
+        }
         TXT_TareWeight.setText(TXT_AutoWeight.getText().toString());
         int netWeight = netWeightCalculate();
         TXT_NetWeight.setText(String.valueOf(netWeight)); 
@@ -1572,6 +1578,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         TXT_FinealEnterDate.setText(null);
         TXT_FinealEnterTime.setText(null);
         TXT_SlipNo.setText(null);
+        TXT_VechileNo.setEnabled(true);
+        TXT_VechileNo.setEnabled(true);
     }//GEN-LAST:event_BtnActionClearActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
@@ -1625,7 +1633,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new WeightMechineJFrame("","").setVisible(true);
+                new WeightMechineJFrame("","","").setVisible(true);
             }
         });
 
