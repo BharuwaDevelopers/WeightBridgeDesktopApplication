@@ -348,6 +348,7 @@ public class LoginJFrame extends javax.swing.JFrame {
                     try {
                         // Get the local machine's IP address
                          inetAddress = InetAddress.getLocalHost();
+                        System.out.println("IP Address details--: " +inetAddress);
                         // Print the IP address
                         System.out.println("IP Address: " + inetAddress.getHostAddress());
                     } catch (UnknownHostException e) {
@@ -357,13 +358,14 @@ public class LoginJFrame extends javax.swing.JFrame {
                     String ipAddress = responseObject.getString("ipAddress");
                     String unitCode = responseObject.getString("unitCd");
                     String machine_code = responseObject.getString("machine_code");
-                    if(machine_code==null ||machine_code.isEmpty()||machine_code==""){
-                        JOptionPane.showMessageDialog(null, "Please maintain machine code", "Message",
+                    String comport = responseObject.getString("comport");
+                    if(machine_code==null ||machine_code.isEmpty()||machine_code==""||comport==""){
+                        JOptionPane.showMessageDialog(null, "Please maintain machine code,com port", "Message",
                                                       JOptionPane.INFORMATION_MESSAGE);
                     }
                     if (ipAddress.trim().equalsIgnoreCase(inetAddress.getHostAddress().toString())) {
                         System.out.println("Response Message: " + message);
-                        WeightMechineJFrame weightFrame = new WeightMechineJFrame(userName,unitCode,machine_code);
+                        WeightMechineJFrame weightFrame = new WeightMechineJFrame(userName,unitCode,machine_code,comport);
                         weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                         weightFrame.setSize(1200, 730);
                         weightFrame.setVisible(true);
@@ -371,7 +373,7 @@ public class LoginJFrame extends javax.swing.JFrame {
                         super.dispose();
                     }
                     else{
-                        JOptionPane.showMessageDialog(null, "you are not an authorized user, ip address is- "+ipAddress, "Message",
+                        JOptionPane.showMessageDialog(null, "you are not an authorized user, ip address is- "+inetAddress.getHostAddress(), "Message",
                                                       JOptionPane.INFORMATION_MESSAGE);
                     }
                    

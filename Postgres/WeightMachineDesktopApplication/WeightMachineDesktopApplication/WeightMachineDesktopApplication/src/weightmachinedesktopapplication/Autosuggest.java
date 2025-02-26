@@ -4,6 +4,7 @@ public class Autosuggest {
     private String party;
        private String product;
        private String remarks;
+    private String vehicleNo;
 
     public void setParty(String party) {
         this.party = party;
@@ -27,5 +28,13 @@ public class Autosuggest {
 
     public String getRemarks() {
         return remarks;
+    }
+
+    public void setVehicleNo(String vehicleNo) {
+        this.vehicleNo = vehicleNo;
+    }
+
+    public String getVehicleNo() {
+        return vehicleNo;
     }
 }

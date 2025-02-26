@@ -98,24 +98,28 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     int Parity = SerialPort.NO_PARITY;
     String userNamevalue = null;
     String unitCode = null;
+    String btnEventName = "N";
     String slipNo = null, tokenNo = null, gateNo = null, grossWeight = null, tareWeight = null, netWeight =
         null, party = null, vechileNo = null, vechileType = null, create = null, finaldate = null, charge =
-        null, product = null, remarks = null;
+        null, product = null, remarks = null, comport_no = null;
     private JPopupMenu suggestionMenuPart;
     private JPopupMenu suggestionMenuProduct;
     private JPopupMenu suggestionMenuRemarks;
+    private JPopupMenu suggestionMenuVehicleNo;
     private List<String> suggestionsListParty;
     private List<String> suggestionsListPoduct;
     private List<String> suggestionsListRemarks;
+    private List<String> suggestionsListVehicleNo;
 
     /** Creates new form WeightMechineJFrame */
-    public WeightMechineJFrame(String userName,String unitCd,String machine_code) {
+    public WeightMechineJFrame(String userName, String unitCd, String machine_code, String comPort) {
         System.out.println("userName----" + userName);
         if (userName == null || userName.isEmpty() || userName == "") {
             userName = "E-001";
         }
         userNamevalue = userName;
-        unitCode=unitCd;
+        unitCode = unitCd;
+        comport_no = comPort;
         initComponents();
         //comPoartMechineConnection();
         // vachileDetailsWithAutoSugest();
@@ -126,11 +130,12 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
         onLoadDate();
         TXT_Machine.setText(machine_code);
-       // TXT_CreateBy.setText(userName);
+        // TXT_CreateBy.setText(userName);
 
         autoSugestParty();
         autoSugestProduct();
         autoSugestRemarks();
+        autoSugestVehicleNo();
 
 
         //
@@ -406,6 +411,79 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             suggestionMenuRemarks.setVisible(false);
         }
     }
+    //----------------------------------------------------------------------
+
+    public void autoSugestVehicleNo() {
+        suggestionMenuVehicleNo = new JPopupMenu();
+        TXT_VechileNo.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateVehicleNoSuggestions();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateVehicleNoSuggestions();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateVehicleNoSuggestions();
+            }
+        });
+
+        TXT_VechileNo.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    suggestionMenuVehicleNo.setVisible(false);
+                }
+            }
+        });
+
+    }
+
+
+    private void updateVehicleNoSuggestions() {
+        String input = TXT_VechileNo.getText();
+        if (input.isEmpty() || input.equalsIgnoreCase(null) || input.equals("")) {
+            // JOptionPane.showMessageDialog(null, "Please enter at least 4 characters", "Message", JOptionPane.ERROR_MESSAGE);
+            return;
+        } else {
+            System.out.println("input.length()--" + input.length());
+            if (input.length() < 4) {
+                System.out.println("input.length()-1-" + input.length());
+                // JOptionPane.showMessageDialog(null, "Please enter at least 4 characters", "Message", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+        suggestionMenuVehicleNo.removeAll();
+
+        if (input.isEmpty()) {
+            suggestionMenuVehicleNo.setVisible(false);
+            return;
+        }
+
+        for (String suggestion : suggestionsListVehicleNo) {
+            if (suggestion.toLowerCase().contains(input.toLowerCase())) {
+                JMenuItem item = new JMenuItem(suggestion);
+                item.addActionListener(e -> {
+                        TXT_VechileNo.setText(suggestion);
+                        suggestionMenuVehicleNo.setVisible(false);
+                    });
+                suggestionMenuVehicleNo.add(item);
+            }
+        }
+
+        if (suggestionMenuVehicleNo.getComponentCount() > 0) {
+            suggestionMenuVehicleNo.show(TXT_VechileNo, 0, TXT_VechileNo.getHeight());
+        } else {
+            suggestionMenuVehicleNo.setVisible(false);
+        }
+    }
+
+
+    //----------------------------------------------------------------------
 
     public void onLoad() {
         TXT_AutoWeight.setText("0");
@@ -734,6 +812,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         jLabel7.setText("Create By");
 
         TXT_TokenNo.setEditable(false);
+        TXT_TokenNo.setBackground(new java.awt.Color(248, 245, 245));
         TXT_TokenNo.setDisabledTextColor(new java.awt.Color(51, 51, 51));
         TXT_TokenNo.setEnabled(false);
         jScrollPane3.setViewportView(TXT_TokenNo);
@@ -776,12 +855,12 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                 .addComponent(jLabel10)
-                                .addComponent(LBL_CreateTime)
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel7)
                                     .addComponent(jLabel8)
                                     .addComponent(jLabel5)
-                                    .addComponent(jLabel4)))
+                                    .addComponent(jLabel4)
+                                    .addComponent(LBL_CreateTime)))
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addGap(3, 3, 3)
                                 .addComponent(jLabel3)))
@@ -821,12 +900,12 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     .addComponent(jLabel7))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel8))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(LBL_CreateTime, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(LBL_CreateTime))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel10)
@@ -1142,11 +1221,14 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     }//GEN-END:initComponents
 
     private void BtnSubmitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnSubmitActionPerformed
+       
+        System.out.println("btnEventName---" + btnEventName);
         if (TXT_GrossWeight.getText().equalsIgnoreCase("0") && TXT_TareWeight.getText().equalsIgnoreCase("0")) {
             JOptionPane.showMessageDialog(null, "Gross Weight/ Tare Weight 0", "Message",
                                           JOptionPane.INFORMATION_MESSAGE);
             return;
         }
+
         if (TXT_TokenNo.getText().isEmpty() || TXT_TokenNo.getText() == null || TXT_TokenNo.getText() == "") {
             JOptionPane.showMessageDialog(null, "Token number not found", "Message", JOptionPane.INFORMATION_MESSAGE);
             return;
@@ -1154,6 +1236,12 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         Integer netWeight = Integer.parseInt(TXT_NetWeight.getText());
         if (netWeight < 0) {
             JOptionPane.showMessageDialog(null, "Net Weight must be greater than zero", "Message",
+                                          JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        String flage = comPoartMechineConnection("SaveBtn");
+        if (flage.equalsIgnoreCase("N")) {
+            JOptionPane.showMessageDialog(null, "Weight-bridge weight not match", "Message",
                                           JOptionPane.INFORMATION_MESSAGE);
             return;
         }
@@ -1169,23 +1257,21 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                                           JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        
+
         if (TXT_Product.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Please Enter Product Details", "Message",
                                           JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        if (TXT_REMARKS.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Please Enter Remark", "Message",
-                                          JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
         
-
         System.out.println("TXT_SlipNo.getText()--" + TXT_SlipNo.getText().toString().length());
         if (TXT_SlipNo.getText().isEmpty() || TXT_SlipNo.getText() == null || TXT_SlipNo.getText() == "") {
             insertdateCallApi();
         } else {
+            if (TXT_REMARKS.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Please Enter Remark", "Message", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
             updatedateCallApi();
         }
         
@@ -1195,8 +1281,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     
     public void insertdateCallApi() {
         try {
-           // URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/insert");
-           URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/insert");
+            // URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/insert");
+            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/insert");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
@@ -1275,9 +1361,9 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
     public void updatedateCallApi() {
         try {
-           // URL url = new URL(" http://127.0.0.1:7101/RestApiWeightBridge/resources/update");
-           
-           // URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/update");
+            // URL url = new URL(" http://127.0.0.1:7101/RestApiWeightBridge/resources/update");
+
+            // URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/update");
             URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/update");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
@@ -1327,7 +1413,29 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     System.out.println("Response SlipNojson: " + SlipNojson);
                     JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
 
-                   
+                    LocalDateTime currentDateTime = LocalDateTime.now();
+                    DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("dd-MM-yy h:mm:ss.SSSSSSSSS a");
+                    todayDateTime = currentDateTime.format(formatter1);
+                    System.out.println("Current Date and Time: " + todayDateTime); // Example: 2024-10-16 13:32:43
+                    LocalDate currentDate = LocalDate.now();
+                    System.out.println("Current Date: " + currentDate);
+                    DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                    DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                    // Parse the input date
+                    LocalDate date = LocalDate.parse(currentDate.toString(), inputFormatter);
+                    // Format the date to the desired output format
+                    String outputDate = date.format(outputFormatter);
+                    System.out.println("outputDate--" + outputDate);
+                    TXT_CreateDate.setText(outputDate);
+                    LocalDateTime now = LocalDateTime.now();
+                    // Format the date and time
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+                    String timeOnly = now.format(formatter);
+                    // Print the current date and time
+                    System.out.println("Current date and time: " + timeOnly);
+                    TXT_FinealEnterBy.setText(userNamevalue);
+                    TXT_FinealEnterDate.setText(outputDate);
+                    TXT_FinealEnterTime.setText(timeOnly);
                     forPrint();
                     TXT_SlipNo.setText(TXT_SlipNo.getText());
                     disableValueAfterSave();
@@ -1339,8 +1447,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(null,  ex.toString(), "Message", JOptionPane.INFORMATION_MESSAGE);
-           
+            JOptionPane.showMessageDialog(null, ex.toString(), "Message", JOptionPane.INFORMATION_MESSAGE);
+
         }
     }
 
@@ -1349,7 +1457,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
 
     private void BtnGrossActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnGrossActionPerformed
-        comPoartMechineConnection();
+        btnEventName = "grossBtncall";
+        comPoartMechineConnection("GrossBtn");
         TXT_GrossWeight.setText(TXT_AutoWeight.getText().toString());
         int netWeight = netWeightCalculate();
         TXT_NetWeight.setText(String.valueOf(netWeight)); 
@@ -1357,8 +1466,9 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_BtnGrossActionPerformed
 
     private void BtnTareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnTareActionPerformed
-        comPoartMechineConnection();
-        if(TXT_SlipNo.getText()==null||TXT_SlipNo.getText().isEmpty()){
+        btnEventName = "tareBtncall";
+        comPoartMechineConnection("TareBtn");
+        if (TXT_SlipNo.getText() == null || TXT_SlipNo.getText().isEmpty()) {
             TXT_GrossWeight.setText("0");
         }
         TXT_TareWeight.setText(TXT_AutoWeight.getText().toString());
@@ -1376,9 +1486,10 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         System.out.println("call jasper----");
         InputStream input;
         try {
-           // input = new FileInputStream("C:/Users/LENOVO/Desktop/mechine/Bridge_Entry.jasper");
-            // input = new FileInputStream("C:/Users/Patanjali/Desktop/mechine/Bridge_Entry.jasper");
-            input = new FileInputStream("C:/Users/SHUBHAM/Desktop/WB/Bridge_Entry.jasper");
+            // input = new FileInputStream("C:/Users/LENOVO/Desktop/mechine/Bridge_Entry.jasper");
+            // String path=  getClass().getResource("/weightmachinedesktopapplication/shutdown (1).png");
+            //input = new FileInputStream("C:/Users/Patanjali/Desktop/mechine/Bridge_Entry.jasper");
+            input = new FileInputStream("C:/jasperfile/Bridge_Entry.jasper");
             JasperReport design = (JasperReport) JRLoader.loadObject(input);
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("SlipNo", slipNo);
@@ -1633,7 +1744,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new WeightMechineJFrame("","","").setVisible(true);
+                new WeightMechineJFrame("", "", "", "").setVisible(true);
             }
         });
 
@@ -1669,7 +1780,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 suggestionsListParty.add(rs1.getString("PARTY"));
                 suggestionsListPoduct.add(rs1.getString("PRODUCT"));
                 suggestionsListRemarks.add(rs1.getString("REMARKS"));
-
             }
 
 
@@ -2046,12 +2156,20 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
     
     
-    public String comPoartMechineConnection() {
+    public String comPoartMechineConnection(String callBy) {
 
         try {
-            SerialPort port = SerialPort.getCommPort("COM5");
+            //  yavraj
+            // SerialPort port = SerialPort.getCommPort("COM5");
+            //Lokande
+            System.out.println("comport_no--->" + comport_no);
+            SerialPort port = SerialPort.getCommPort(comport_no);
+            //kartik
+            // SerialPort port = SerialPort.getCommPort("COM9");
             if (port.openPort()) {
                 System.out.println("Port " + port.getSystemPortName() + " opened successfully.");
+                JOptionPane.showMessageDialog(null, "Port Number--" + port.getSystemPortName(), "Message",
+                                              JOptionPane.INFORMATION_MESSAGE);
             } else {
                 System.out.println("Failed to open port.");
                 return "N";
@@ -2075,7 +2193,30 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                         int value = Integer.parseInt(firstValue);
                         if (value > 0) {
                             System.out.println("weight---" + value);
-                            TXT_AutoWeight.setText(firstValue);
+                            if (callBy.equalsIgnoreCase("SaveBtn")) {
+                                if (btnEventName.equalsIgnoreCase("grossBtncall")) {
+                                    int grossWeightnew = Integer.valueOf(TXT_GrossWeight.getText().toString());
+                                    if (grossWeightnew != value) {
+                                        TXT_GrossWeight.setText("0");
+                                        //                                        JOptionPane.showMessageDialog(null, "Weight bridge weight not match", "Message",
+                                        //                                                                      JOptionPane.INFORMATION_MESSAGE);
+                                        return "N";
+                                    }
+                                }
+                                if (btnEventName.equalsIgnoreCase("tareBtncall")) {
+                                    int tareWeightnew = Integer.valueOf(TXT_TareWeight.getText().toString());
+                                    if (tareWeightnew != value) {
+                                        TXT_TareWeight.setText("0");
+                                        //                                        JOptionPane.showMessageDialog(null, "Weight bridge weight not match", "Message",
+                                        //                                                                      JOptionPane.INFORMATION_MESSAGE);
+                                        return "N";
+                                    }
+                                }
+
+                            } else {
+                                TXT_AutoWeight.setText(firstValue);
+                            }
+
                         } else {
                             System.out.println("weight-0--" + value);
                             TXT_AutoWeight.setText("0");
@@ -2124,7 +2265,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         suggestionsListParty = new ArrayList<>();
         suggestionsListPoduct = new ArrayList<>();
         suggestionsListRemarks = new ArrayList<>();
-       // String url = "http://182.16.9.100:7003/RestApiWeightBridge/resources/vehicleType";
+        suggestionsListVehicleNo = new ArrayList<>();
+        // String url = "http://182.16.9.100:7003/RestApiWeightBridge/resources/vehicleType";
         String url = "http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleType";
         // Try-catch block to handle potential IOExceptions and other exceptions
         try {
@@ -2171,10 +2313,10 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             System.out.println("\nAutosuggest List:");
             for (Autosuggest autosuggest : apiResponse.getAutosuggestList()) {
                 System.out.println(autosuggest.getParty() + " - " + autosuggest.getProduct());
-
                 suggestionsListParty.add(autosuggest.getParty());
                 suggestionsListPoduct.add(autosuggest.getProduct());
                 suggestionsListRemarks.add(autosuggest.getRemarks());
+                suggestionsListVehicleNo.add(autosuggest.getVehicleNo());
             }
 
         } catch (IOException e) {
@@ -2189,7 +2331,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
 
     public void oncallApiVehicleSlipNo(String vechileNo, String slipNo) {
-       // String url = "http://182.16.9.100:7003/RestApiWeightBridge/resources/vehicleDetails";
+        // String url = "http://182.16.9.100:7003/RestApiWeightBridge/resources/vehicleDetails";
         String url = "http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleDetails";
         // Try-catch block to handle potential IOExceptions and other exceptions
         List<VehicleDetails> filteredList = null;
@@ -2232,7 +2374,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     filteredList =
                         vehicleDetailsList.stream().filter(vehicle -> vehicle.getVehicleNo().equals(vechileNo)).collect(Collectors.toList());
                 }
-               // TXT_SlipNo.setEnabled(false);
+                // TXT_SlipNo.setEnabled(false);
             }
 
             if (slipNo != null) {
@@ -2240,7 +2382,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     filteredList =
                         vehicleDetailsList.stream().filter(vehicle -> vehicle.getSlipNo().equals(slipNo)).collect(Collectors.toList());
                 }
-               // TXT_VechileNo.setEnabled(false);
+                // TXT_VechileNo.setEnabled(false);
             }
 
 
@@ -2249,12 +2391,23 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
             for (VehicleDetails rs : filteredList) {
                 System.out.println(rs.getVehicleNo() + " - " + rs.getTokenNo());
+                if (rs.getMachineNo().equalsIgnoreCase("0")) {
 
+                } else {
+                    if (rs.getMachineNo().equalsIgnoreCase(TXT_Machine.getText())) {
+                        TXT_Machine.setText(rs.getMachineNo().toUpperCase());
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Please Enter Valid Vehicle no / Slip No", "Message",
+                                                      JOptionPane.INFORMATION_MESSAGE);
+                        return;
+                    }
+
+                }
 
                 if (rs.getVehicleNo() != null) {
                     TXT_VechileNo.setText(rs.getVehicleNo().toUpperCase());
-                    if(vechileNo != null){
-                        TXT_SlipNo.setEnabled(false); 
+                    if (vechileNo != null) {
+                        TXT_SlipNo.setEnabled(false);
                     }
                 }
 
@@ -2365,11 +2518,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 } else {
                     TXT_REMARKS.setText(rs.getRemarks().toUpperCase());
                 }
-                if (rs.getMachineNo().equalsIgnoreCase("0")) {
 
-                } else {
-                    TXT_Machine.setText(rs.getMachineNo().toUpperCase());
-                }
                 if (rs.getGateEntryNumber().equalsIgnoreCase("0")) {
 
                 } else {

@@ -6,6 +6,8 @@ public class LoginBean {
     private boolean success;
     private String msg;
     private String unitCd;
+    private String machine_code;
+    private String comport;
 
     public void setUnitCd(String unitCd) {
         this.unitCd = unitCd;
@@ -59,5 +61,20 @@ public class LoginBean {
         return empname;
     }
 
-   
+
+    public void setMachine_code(String machine_code) {
+        this.machine_code = machine_code;
+    }
+
+    public String getMachine_code() {
+        return machine_code;
+    }
+
+    public void setComport(String comport) {
+        this.comport = comport;
+    }
+
+    public String getComport() {
+        return comport;
+    }
 }

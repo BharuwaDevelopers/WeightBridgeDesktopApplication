@@ -72,7 +72,7 @@ public class RestAdapter {
                         stmt = conn.createStatement();
                         stmt1 = conn.createStatement();
                         ResultSet rs =
-                            stmt.executeQuery("SELECT  u.user_id,u.unit_cd, u.user_name, u.user_fname,    u.emp_id,    u.unit_cd,    u.valid_to,    u.validity,    w.machine_code,    w.ip_address FROM \n" + 
+                            stmt.executeQuery("SELECT  u.user_id,u.unit_cd, u.user_name, u.user_fname,    u.emp_id,    u.unit_cd,    u.valid_to,    u.validity,    w.machine_code,    w.ip_address,w.mode, w.comport, w.setting FROM \n" + 
                             "    user_master u JOIN     public.weighing_machine_user_map w ON     u.user_id = w.user_id where u.user_name='" +
                                               mJson.getString("empName").trim() + "'");
                         if (rs.next()) {
@@ -85,6 +85,8 @@ public class RestAdapter {
                             }else{
                                 logindetails.setIpAddress(rs.getString("ip_address"));
                                 logindetails.setUnitCd(rs.getString("unit_cd")); 
+                                logindetails.setMachine_code(rs.getString("machine_code"));
+                                logindetails.setComport(rs.getString("comport")); 
                             }
                             logindetails.setMsg("Login Successfully");
                         } else {
@@ -173,28 +175,26 @@ public class RestAdapter {
                 vehicleTypeDetailsList.add(vehicleTypesDetailsObj);
             }
 
-            ResultSet rs2 = stmt.executeQuery("select distinct PARTY,PRODUCT,REMARKS from WEIGHING_BRIDGE");
+            ResultSet rs2 = stmt.executeQuery("select distinct PARTY,'PARTY'  AS COLUMN_NAME from WEIGHING_BRIDGE union all select distinct PRODUCT,'PRODUCT'  AS COLUMN_NAME from WEIGHING_BRIDGE union all select distinct REMARKS,'REMARKS'  AS COLUMN_NAME from WEIGHING_BRIDGE union all select distinct vehicle_no,'vehicle_no'  AS COLUMN_NAME from WEIGHING_BRIDGE");
             while (rs2.next()) {
 
                 autoSuggestDetailsobj = new AutoSuggestDetails();
-                if (rs2.getString("PARTY") == null) {
-                    autoSuggestDetailsobj.setParty("0");
-                } else {
+                if (rs2.getString("COLUMN_NAME").equalsIgnoreCase("PARTY")) {
                     autoSuggestDetailsobj.setParty(rs2.getString("PARTY"));
                 }
-                if (rs2.getString("PRODUCT") == null) {
-                    autoSuggestDetailsobj.setProduct("0");
-                } else {
-                    autoSuggestDetailsobj.setProduct(rs2.getString("PRODUCT"));
+                if (rs2.getString("COLUMN_NAME").equalsIgnoreCase("PRODUCT")) {
+                    autoSuggestDetailsobj.setProduct(rs2.getString("PARTY"));
                 }
-                if (rs2.getString("REMARKS") == null) {
-                    autoSuggestDetailsobj.setRemarks("0");
-                } else {
-                    autoSuggestDetailsobj.setRemarks(rs2.getString("REMARKS"));
+                if (rs2.getString("COLUMN_NAME").equalsIgnoreCase("REMARKS")) {
+                    autoSuggestDetailsobj.setRemarks(rs2.getString("PARTY"));
+                }
+                if (rs2.getString("COLUMN_NAME").equalsIgnoreCase("vehicle_no")) {
+                    autoSuggestDetailsobj.setVehicleNo(rs2.getString("PARTY"));
                 }
                 autoSuggestDetailsList.add(autoSuggestDetailsobj);
 
             }
+            
 
         } catch (Exception e) {
             e.printStackTrace();

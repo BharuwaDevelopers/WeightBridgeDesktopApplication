@@ -788,7 +788,7 @@ public class PrintSlip extends javax.swing.JFrame {
         InputStream input;
         try {
            // input = new FileInputStream("C:/Users/LENOVO/Desktop/mechine/Bridge_Entry.jasper");
-            input = new FileInputStream("C:/Users/SHUBHAM/Desktop/WB/Bridge_Entry.jasper");
+            input = new FileInputStream("C:\\jasperfile\\Bridge_Entry.jasper");
             // input = new FileInputStream("C:/Users/Patanjali/Desktop/mechine/Bridge_Entry.jasper");
             JasperReport design = (JasperReport) JRLoader.loadObject(input);
             Map<String, Object> parameters = new HashMap<>();

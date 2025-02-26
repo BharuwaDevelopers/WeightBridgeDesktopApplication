@@ -13,7 +13,9 @@ import javax.sql.DataSource;
 public class RestAdapterDao {
     public Connection getConnection() throws SQLException, NamingException {
         InitialContext initialContext = new InitialContext();
-        DataSource ds = (DataSource) initialContext.lookup("java:comp/env/jdbc/APPLICATIONDBDS");
+      //  DataSource ds = (DataSource) initialContext.lookup("java:comp/env/jdbc/APPLICATIONDBDS");
+       // DataSource ds = (DataSource) initialContext.lookup("jdbc/APPLICATIONDBBWD");
+       DataSource ds = (DataSource) initialContext.lookup("jdbc/APPLICATIONDBDP1");
         java.sql.Connection conn = ds.getConnection();
         return conn;
     }

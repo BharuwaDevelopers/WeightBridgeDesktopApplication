@@ -1,7 +1,7 @@
 package com.bspl.bean;
 
 public class AutoSuggestDetails {
-    private String party,product,remarks;
+    private String party,product,remarks,vehicleNo;
 
     public void setParty(String party) {
         this.party = party;
@@ -25,5 +25,13 @@ public class AutoSuggestDetails {
 
     public String getRemarks() {
         return remarks;
+    }
+
+    public void setVehicleNo(String vehicleNo) {
+        this.vehicleNo = vehicleNo;
+    }
+
+    public String getVehicleNo() {
+        return vehicleNo;
     }
 }
