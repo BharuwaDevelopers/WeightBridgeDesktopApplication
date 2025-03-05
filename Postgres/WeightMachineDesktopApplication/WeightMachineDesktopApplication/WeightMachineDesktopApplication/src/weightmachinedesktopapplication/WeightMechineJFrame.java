@@ -101,7 +101,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     String btnEventName = "N";
     String slipNo = null, tokenNo = null, gateNo = null, grossWeight = null, tareWeight = null, netWeight =
         null, party = null, vechileNo = null, vechileType = null, create = null, finaldate = null, charge =
-        null, product = null, remarks = null, comport_no = null;
+        null, product = null, remarks = null, comport_no = null, machinecode = null;
     private JPopupMenu suggestionMenuPart;
     private JPopupMenu suggestionMenuProduct;
     private JPopupMenu suggestionMenuRemarks;
@@ -120,6 +120,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         userNamevalue = userName;
         unitCode = unitCd;
         comport_no = comPort;
+        machinecode = machine_code;
         initComponents();
         //comPoartMechineConnection();
         // vachileDetailsWithAutoSugest();
@@ -135,7 +136,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         autoSugestParty();
         autoSugestProduct();
         autoSugestRemarks();
-        autoSugestVehicleNo();
+       autoSugestVehicleNo();
 
 
         //
@@ -634,7 +635,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
         WeightBridgeJpanel.setBackground(new java.awt.Color(255, 255, 255));
 
-        TXT_AutoWeight.setEditable(false);
         TXT_AutoWeight.setBackground(new java.awt.Color(248, 245, 245));
 
         BtnTare.setBackground(new java.awt.Color(102, 204, 255));
@@ -1263,7 +1263,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                                           JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        
+
         System.out.println("TXT_SlipNo.getText()--" + TXT_SlipNo.getText().toString().length());
         if (TXT_SlipNo.getText().isEmpty() || TXT_SlipNo.getText() == null || TXT_SlipNo.getText() == "") {
             insertdateCallApi();
@@ -1695,7 +1695,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         System.out.println("hello");
-        PrintSlip weightFrame = new PrintSlip();
+        //(String userName,String unitCode,String machinecode,String comport)
+        PrintSlip weightFrame = new PrintSlip(userNamevalue, unitCode, machinecode, comport_no);
         weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         weightFrame.setSize(1150, 700);
         weightFrame.setVisible(true);
@@ -1704,7 +1705,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
         System.out.println("hello");
-        ReportsJFrame weightFrame = new ReportsJFrame();
+        ReportsJFrame weightFrame = new ReportsJFrame(userNamevalue, unitCode, machinecode, comport_no);
         weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         weightFrame.setSize(1150, 700);
         weightFrame.setVisible(true);
@@ -2156,6 +2157,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
     
     
+   
+
     public String comPoartMechineConnection(String callBy) {
 
         try {
@@ -2168,11 +2171,11 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             // SerialPort port = SerialPort.getCommPort("COM9");
             if (port.openPort()) {
                 System.out.println("Port " + port.getSystemPortName() + " opened successfully.");
-                JOptionPane.showMessageDialog(null, "Port Number--" + port.getSystemPortName(), "Message",
-                                              JOptionPane.INFORMATION_MESSAGE);
+                //                JOptionPane.showMessageDialog(null, "Port Number--" + port.getSystemPortName(), "Message",
+                //                                              JOptionPane.INFORMATION_MESSAGE);
             } else {
                 System.out.println("Failed to open port.");
-                return "N";
+              //  return "N";
             }
             port.setComPortParameters(9600, 8, 1, 0); // Adjust these parameters as necessary
             port.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING, 1000, 0);
@@ -2197,9 +2200,10 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                                 if (btnEventName.equalsIgnoreCase("grossBtncall")) {
                                     int grossWeightnew = Integer.valueOf(TXT_GrossWeight.getText().toString());
                                     if (grossWeightnew != value) {
+                                        JOptionPane.showMessageDialog(null, "Weight bridge weight not match-->"+grossWeightnew, "Message",
+                                                                      JOptionPane.INFORMATION_MESSAGE);
                                         TXT_GrossWeight.setText("0");
-                                        //                                        JOptionPane.showMessageDialog(null, "Weight bridge weight not match", "Message",
-                                        //                                                                      JOptionPane.INFORMATION_MESSAGE);
+                                      
                                         return "N";
                                     }
                                 }
@@ -2207,8 +2211,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                                     int tareWeightnew = Integer.valueOf(TXT_TareWeight.getText().toString());
                                     if (tareWeightnew != value) {
                                         TXT_TareWeight.setText("0");
-                                        //                                        JOptionPane.showMessageDialog(null, "Weight bridge weight not match", "Message",
-                                        //                                                                      JOptionPane.INFORMATION_MESSAGE);
+                                        JOptionPane.showMessageDialog(null, "Weight bridge weight not match", "Message",
+                                                                      JOptionPane.INFORMATION_MESSAGE);
                                         return "N";
                                     }
                                 }
@@ -2227,12 +2231,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 }
             } else {
                 System.out.println("Failed to open port");
-            }
-            port.closePort();
-            if (port.closePort()) {
-                System.out.println("Port closed successfully.");
-            } else {
-                System.out.println("Failed to close port.");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -2312,11 +2310,31 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
             System.out.println("\nAutosuggest List:");
             for (Autosuggest autosuggest : apiResponse.getAutosuggestList()) {
-                System.out.println(autosuggest.getParty() + " - " + autosuggest.getProduct());
-                suggestionsListParty.add(autosuggest.getParty());
-                suggestionsListPoduct.add(autosuggest.getProduct());
-                suggestionsListRemarks.add(autosuggest.getRemarks());
-                suggestionsListVehicleNo.add(autosuggest.getVehicleNo());
+                if(autosuggest.getParty()==null){
+                }
+                else{
+                    System.out.println(autosuggest.getParty() );
+                    suggestionsListParty.add(autosuggest.getParty());
+                }
+                if(autosuggest.getProduct()==null ){
+                }
+                else{
+                    System.out.println(autosuggest.getProduct() );
+                    suggestionsListPoduct.add(autosuggest.getProduct());
+                }
+                if(autosuggest.getRemarks()==null){
+                    
+                }
+                else{
+                    System.out.println(autosuggest.getRemarks() );
+                    suggestionsListRemarks.add(autosuggest.getRemarks());  
+                }
+                if(autosuggest.getVehicleNo()==null){
+              
+                }
+                else{
+                    suggestionsListVehicleNo.add(autosuggest.getVehicleNo());
+                }
             }
 
         } catch (IOException e) {
@@ -2385,7 +2403,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 // TXT_VechileNo.setEnabled(false);
             }
 
-
+            VechileTypejComboBox.setEnabled(true);
             System.out.println("Filtered Vehicles:");
             filteredList.forEach(System.out::println);
 
@@ -2552,9 +2570,11 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     TXT_RC_NO.setText(rs.getRcNo());
                 }
                 if (rs.getCompVehTypeCode().equalsIgnoreCase("0")) {
-                    // VechileTypejComboBox.setEnabled(false);
+                     VechileTypejComboBox.setEnabled(true);
 
                 } else {
+                    VechileTypejComboBox.setSelectedIndex(0);
+                    VechileTypejComboBox.setEnabled(false);
                     ComboBoxChargeApplied.setEnabled(false);
                     ComboBoxChargeApplied.setSelectedIndex(1);
                     TXT_Charge.setText("0");

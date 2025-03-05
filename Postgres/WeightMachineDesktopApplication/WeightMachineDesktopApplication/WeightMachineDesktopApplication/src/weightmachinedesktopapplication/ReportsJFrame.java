@@ -44,9 +44,11 @@ import org.apache.poi.ss.usermodel.*;
  */
 public class ReportsJFrame extends javax.swing.JFrame {
 
+String unit_Code=null,machine_code=null,comportNo=null,user_Name=null;
     /** Creates new form ReportsJFrame */
-    public ReportsJFrame() {
+    public ReportsJFrame(String userName,String unitCode,String machinecode,String comport) {
         initComponents();
+        
         // reportsDetails();
         try {
             callApiForReports();
@@ -54,6 +56,10 @@ public class ReportsJFrame extends javax.swing.JFrame {
         } catch (ProtocolException e) {
         } catch (JSONException e) {
         }
+        unit_Code=unitCode;
+        machine_code=machinecode;
+        comportNo=comport;
+        user_Name=userName;
     }
 
     /** This method is called from within the constructor to
@@ -67,6 +73,7 @@ public class ReportsJFrame extends javax.swing.JFrame {
         jPanel3 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         BtnLogOut = new javax.swing.JButton();
+        jBackButton = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -89,13 +96,22 @@ public class ReportsJFrame extends javax.swing.JFrame {
             }
         });
 
+        jBackButton.setLabel("Back");
+        jBackButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBackButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 865, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jBackButton)
+                .addGap(32, 32, 32)
                 .addComponent(BtnLogOut)
                 .addGap(22, 22, 22))
         );
@@ -106,7 +122,9 @@ public class ReportsJFrame extends javax.swing.JFrame {
                 .addContainerGap())
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(BtnLogOut)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jBackButton)
+                    .addComponent(BtnLogOut))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -161,7 +179,7 @@ public class ReportsJFrame extends javax.swing.JFrame {
             .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1103, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addGap(200, 200, 200)
@@ -195,6 +213,15 @@ public class ReportsJFrame extends javax.swing.JFrame {
     private void BtnExportExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnExportExcelActionPerformed
        exportTableToExcel(jTable1);
     }//GEN-LAST:event_BtnExportExcelActionPerformed
+
+    private void jBackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBackButtonActionPerformed
+    WeightMechineJFrame weightFrame = new WeightMechineJFrame(user_Name,unit_Code,machine_code,comportNo);
+    weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    weightFrame.setSize(1200, 730);
+    weightFrame.setVisible(true);
+    // super.setVisible(false);
+    super.dispose();        // TODO add your handling code here:
+    }//GEN-LAST:event_jBackButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -230,7 +257,7 @@ public class ReportsJFrame extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ReportsJFrame().setVisible(true);
+                new ReportsJFrame("","","","").setVisible(true);
             }
         });
     }
@@ -238,6 +265,7 @@ public class ReportsJFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BtnExportExcel;
     private javax.swing.JButton BtnLogOut;
+    private javax.swing.JButton jBackButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel3;

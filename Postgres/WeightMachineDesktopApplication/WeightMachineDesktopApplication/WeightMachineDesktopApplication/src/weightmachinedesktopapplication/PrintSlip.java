@@ -49,14 +49,18 @@ import org.json.JSONObject;
  * @author LENOVO
  */
 public class PrintSlip extends javax.swing.JFrame {
-
-    /** Creates new form PrintSlip */
-    public PrintSlip() {
-        initComponents();
-    }
     String printslipNo = null, tokenNo = null, gateNo = null, grossWeight = null, tareWeight = null, netWeight =
         null, party = null, vechileNo = null, vechileType = null, create = null, finaldate = null, charge =
-        null, product = null, remarks = null;
+        null, product = null, remarks = null,unit_Code=null,machine_code=null,comportNo=null,user_Name=null;
+    /** Creates new form PrintSlip */
+    public PrintSlip(String userName,String unitCode,String machinecode,String comport) {
+        unit_Code=unitCode;
+        machine_code=machinecode;
+        comportNo=comport;
+        user_Name=userName;
+        initComponents();
+    }
+   
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -69,6 +73,7 @@ public class PrintSlip extends javax.swing.JFrame {
         jPanel3 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         BtnLogOut = new javax.swing.JButton();
+        jBtnBack = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
         BtnPrint = new javax.swing.JPanel();
@@ -150,6 +155,13 @@ public class PrintSlip extends javax.swing.JFrame {
             }
         });
 
+        jBtnBack.setLabel("Back");
+        jBtnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnBackActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -157,6 +169,8 @@ public class PrintSlip extends javax.swing.JFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jBtnBack)
+                .addGap(30, 30, 30)
                 .addComponent(BtnLogOut)
                 .addGap(22, 22, 22))
         );
@@ -167,7 +181,9 @@ public class PrintSlip extends javax.swing.JFrame {
                 .addContainerGap())
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(BtnLogOut)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jBtnBack)
+                    .addComponent(BtnLogOut))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -656,6 +672,17 @@ public class PrintSlip extends javax.swing.JFrame {
         printSlipjasper();
     }//GEN-LAST:event_jButtonPrintActionPerformed
 
+    private void jBtnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnBackActionPerformed
+        // TODO add your handling code here:
+        WeightMechineJFrame weightFrame = new WeightMechineJFrame(user_Name,unit_Code,machine_code,comportNo);
+        weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        weightFrame.setSize(1200, 730);
+        weightFrame.setVisible(true);
+        // super.setVisible(false);
+        super.dispose();
+        
+    }//GEN-LAST:event_jBtnBackActionPerformed
+
 
 
 
@@ -870,7 +897,7 @@ public class PrintSlip extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new PrintSlip().setVisible(true);
+                new PrintSlip("","","","").setVisible(true);
             }
         });
     }
@@ -904,6 +931,7 @@ public class PrintSlip extends javax.swing.JFrame {
     private javax.swing.JTextField TXT_TrollyNo;
     private javax.swing.JTextPane TXT_VECHILE_TYPE;
     private javax.swing.JTextField TXT_VechileNo;
+    private javax.swing.JButton jBtnBack;
     private javax.swing.JButton jButtonPrint;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
