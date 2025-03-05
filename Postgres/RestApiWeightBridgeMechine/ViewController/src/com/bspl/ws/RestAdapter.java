@@ -37,9 +37,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class RestAdapter {
-    
-   
-    
+
+
     public String getLoginDetails(String empLoginDetails) throws JSONException, Exception {
         Connection conn = null;
         Statement stmt = null;
@@ -61,8 +60,8 @@ public class RestAdapter {
                     callableStatement.setString(2, mJson.getString("empName").trim());
                     callableStatement.setString(3, mJson.getString("empPass").trim());
                     callableStatement.execute();
-                    
-                    
+
+
                     //System.out.println("callableStatement.getString(1)--->" + callableStatement.getString(1).toString());
                     if (!callableStatement.getString(1).equals(mJson.getString("empPass").trim())) {
                         logindetails.setStatusCode(500);
@@ -72,21 +71,22 @@ public class RestAdapter {
                         stmt = conn.createStatement();
                         stmt1 = conn.createStatement();
                         ResultSet rs =
-                            stmt.executeQuery("SELECT  u.user_id,u.unit_cd, u.user_name, u.user_fname,    u.emp_id,    u.unit_cd,    u.valid_to,    u.validity,    w.machine_code,    w.ip_address,w.mode, w.comport, w.setting FROM \n" + 
-                            "    user_master u JOIN     public.weighing_machine_user_map w ON     u.user_id = w.user_id where u.user_name='" +
+                            stmt.executeQuery("SELECT  u.user_id,u.unit_cd, u.user_name, u.user_fname,    u.emp_id,    u.unit_cd,    u.valid_to,    u.validity,    w.machine_code,    w.ip_address,w.mode, w.comport, w.setting FROM \n" +
+                                              "    user_master u JOIN     public.weighing_machine_user_map w ON     u.user_id = w.user_id where u.user_name='" +
                                               mJson.getString("empName").trim() + "'");
                         if (rs.next()) {
                             logindetails.setStatusCode(200);
                             logindetails.setSuccess(true);
                             user_name = rs.getString("USER_NAME");
                             logindetails.setEmpname(user_name);
-                            if(rs.getString("ip_address")==null||rs.getString("ip_address")=="" || rs.getString("ip_address").isEmpty()){
-                                logindetails.setIpAddress("NA"); 
-                            }else{
+                            if (rs.getString("ip_address") == null || rs.getString("ip_address") == "" ||
+                                rs.getString("ip_address").isEmpty()) {
+                                logindetails.setIpAddress("NA");
+                            } else {
                                 logindetails.setIpAddress(rs.getString("ip_address"));
-                                logindetails.setUnitCd(rs.getString("unit_cd")); 
+                                logindetails.setUnitCd(rs.getString("unit_cd"));
                                 logindetails.setMachine_code(rs.getString("machine_code"));
-                                logindetails.setComport(rs.getString("comport")); 
+                                logindetails.setComport(rs.getString("comport"));
                             }
                             logindetails.setMsg("Login Successfully");
                         } else {
@@ -98,7 +98,6 @@ public class RestAdapter {
                     }
 
 
-               
                     //System.out.println("password---" + password);
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -175,26 +174,51 @@ public class RestAdapter {
                 vehicleTypeDetailsList.add(vehicleTypesDetailsObj);
             }
 
-            ResultSet rs2 = stmt.executeQuery("select distinct PARTY,'PARTY'  AS COLUMN_NAME from WEIGHING_BRIDGE union all select distinct PRODUCT,'PRODUCT'  AS COLUMN_NAME from WEIGHING_BRIDGE union all select distinct REMARKS,'REMARKS'  AS COLUMN_NAME from WEIGHING_BRIDGE union all select distinct vehicle_no,'vehicle_no'  AS COLUMN_NAME from WEIGHING_BRIDGE");
-            while (rs2.next()) {
-
-                autoSuggestDetailsobj = new AutoSuggestDetails();
-                if (rs2.getString("COLUMN_NAME").equalsIgnoreCase("PARTY")) {
-                    autoSuggestDetailsobj.setParty(rs2.getString("PARTY"));
-                }
-                if (rs2.getString("COLUMN_NAME").equalsIgnoreCase("PRODUCT")) {
-                    autoSuggestDetailsobj.setProduct(rs2.getString("PARTY"));
-                }
-                if (rs2.getString("COLUMN_NAME").equalsIgnoreCase("REMARKS")) {
-                    autoSuggestDetailsobj.setRemarks(rs2.getString("PARTY"));
-                }
-                if (rs2.getString("COLUMN_NAME").equalsIgnoreCase("vehicle_no")) {
-                    autoSuggestDetailsobj.setVehicleNo(rs2.getString("PARTY"));
-                }
-                autoSuggestDetailsList.add(autoSuggestDetailsobj);
-
-            }
+                        ResultSet rs2 = stmt.executeQuery("select distinct PARTY,'PARTY'  AS COLUMN_NAME from WEIGHING_BRIDGE union all select distinct PRODUCT,'PRODUCT'  AS COLUMN_NAME from WEIGHING_BRIDGE union all select distinct REMARKS,'REMARKS'  AS COLUMN_NAME from WEIGHING_BRIDGE union all select distinct vehicle_no,'vehicle_no'  AS COLUMN_NAME from WEIGHING_BRIDGE");
+                        while (rs2.next()) {
             
+                            autoSuggestDetailsobj = new AutoSuggestDetails();
+                            System.out.println("rs2.getString(\"COLUMN_NAME\")--->"+rs2.getString("COLUMN_NAME"));
+                            System.out.println("rs2.getString(\"PARTY\")--->"+rs2.getString("PARTY"));
+                            if (rs2.getString("COLUMN_NAME").equalsIgnoreCase("PARTY")) {
+                                autoSuggestDetailsobj.setParty(rs2.getString("PARTY"));
+                            }
+                            if (rs2.getString("COLUMN_NAME").equalsIgnoreCase("PRODUCT")) {
+                                autoSuggestDetailsobj.setProduct(rs2.getString("PARTY"));
+                            }
+                            if (rs2.getString("COLUMN_NAME").equalsIgnoreCase("REMARKS")) {
+                                autoSuggestDetailsobj.setRemarks(rs2.getString("PARTY"));
+                            }
+                            if (rs2.getString("COLUMN_NAME").equalsIgnoreCase("vehicle_no")) {
+                                autoSuggestDetailsobj.setVehicleNo(rs2.getString("PARTY"));
+                            }
+                            autoSuggestDetailsList.add(autoSuggestDetailsobj);
+            
+                        }
+
+//            ResultSet rs2 = stmt.executeQuery("select distinct PARTY,PRODUCT,REMARKS from WEIGHING_BRIDGE");
+//            while (rs2.next()) {
+//
+//                autoSuggestDetailsobj = new AutoSuggestDetails();
+//                if (rs2.getString("PARTY") == null) {
+//                    autoSuggestDetailsobj.setParty("0");
+//                } else {
+//                    autoSuggestDetailsobj.setParty(rs2.getString("PARTY").toString());
+//                }
+//                if (rs2.getString("PRODUCT") == null) {
+//                    autoSuggestDetailsobj.setProduct("0");
+//                } else {
+//                    autoSuggestDetailsobj.setProduct(rs2.getString("PRODUCT").toString());
+//                }
+//                if (rs2.getString("REMARKS") == null) {
+//                    autoSuggestDetailsobj.setRemarks("0");
+//                } else {
+//                    autoSuggestDetailsobj.setRemarks(rs2.getString("REMARKS").toString());
+//                }
+//                autoSuggestDetailsList.add(autoSuggestDetailsobj);
+//
+//            }
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -208,6 +232,9 @@ public class RestAdapter {
         }
         if (count <= 0) {
             //  JOptionPane.showMessageDialog(null, "Please Enter Valid Vehicle no / Slip No", "Message",  JOptionPane.INFORMATION_MESSAGE);
+
+
+
 
 
 
@@ -375,7 +402,7 @@ public class RestAdapter {
                 } else {
                     result.setRc_no("0");
                 }
-                if (rs.getString("COMP_VEH_TYPE_CODE") != null) {
+                if (rs.getString("COMP_VEH_TYPE_CODE") != null || rs.getString("COMP_VEH_TYPE_CODE") != "") {
                     result.setComp_veh_type_code(rs.getString("COMP_VEH_TYPE_CODE"));
                 } else {
                     result.setComp_veh_type_code("0");
@@ -403,6 +430,9 @@ public class RestAdapter {
         }
         if (count <= 0) {
             //  JOptionPane.showMessageDialog(null, "Please Enter Valid Vehicle no / Slip No", "Message",  JOptionPane.INFORMATION_MESSAGE);
+
+
+
 
 
 
@@ -600,7 +630,7 @@ public class RestAdapter {
         if (jsonString == null || jsonString == "") {
             jsonString = "Invalid Json";
         } else {
-            String grossWeight=null;
+            String grossWeight = null;
             ErrorMsg objError = new ErrorMsg();
             JSONObject responseObject = new JSONObject(jsonString);
 
@@ -608,9 +638,9 @@ public class RestAdapter {
             String slipNo = responseObject.getString("slip_no");
             String vehTypeCode = responseObject.getString("veh_type_code");
             String rcNo = responseObject.getString("rc_no");
-            try{
-             grossWeight = responseObject.getString("gross_weight");
-            }catch(Exception ex){
+            try {
+                grossWeight = responseObject.getString("gross_weight");
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
             String tereWeight = responseObject.getString("tere_weight");
@@ -653,7 +683,7 @@ public class RestAdapter {
                 String sqlInsertUpdate =
                     "UPDATE  WEIGHING_BRIDGE set GROSS_WEIGHT=?,TERE_WEIGHT=?,NET_WEIGHT=?,FINAL_ENTERED_BY=?,FINAL_ENTERED_DATE=?,REMARKS=?, LAST_UPDATED_BY=?,LAST_UPDATE_DATE=?,CHARGE_APPLICABLE=?,CHARGE=?,VEH_TYPE_CODE=?,PARTY=?,PRODUCT=?,RC_NO=? where SLIP_NO=? ";
                 preparedStatement = conn.prepareStatement(sqlInsertUpdate);
-                preparedStatement.setInt(1,Integer.parseInt( grossWeight)); // PROCESS_COD
+                preparedStatement.setInt(1, Integer.parseInt(grossWeight)); // PROCESS_COD
                 preparedStatement.setInt(2, Integer.parseInt(tereWeight)); // GROSS_WEIGHT
                 preparedStatement.setInt(3, Integer.parseInt(netWeight)); // TERE_WEIGHT
                 preparedStatement.setString(4, finalEnteredBy);
