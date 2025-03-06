@@ -225,13 +225,14 @@ public class PrintSlip extends javax.swing.JFrame {
 
         TXT_GrossWeight.setEditable(false);
         TXT_GrossWeight.setBackground(new java.awt.Color(248, 245, 245));
-        TXT_GrossWeight.setDisabledTextColor(new java.awt.Color(204, 204, 204));
+        TXT_GrossWeight.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         TXT_GrossWeight.setEnabled(false);
         jScrollPane8.setViewportView(TXT_GrossWeight);
 
         jLabel19.setText("Tare Weight");
 
         TXT_TareWeight.setEditable(false);
+        TXT_TareWeight.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         TXT_TareWeight.setEnabled(false);
         jScrollPane9.setViewportView(TXT_TareWeight);
 
@@ -250,15 +251,19 @@ public class PrintSlip extends javax.swing.JFrame {
         jLabel24.setText("Product");
 
         TXT_VechileNo.setEditable(false);
+        TXT_VechileNo.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         TXT_VechileNo.setEnabled(false);
 
         TXT_TrollyNo.setEditable(false);
+        TXT_TrollyNo.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         TXT_TrollyNo.setEnabled(false);
 
         TXT_Part.setEditable(false);
+        TXT_Part.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         TXT_Part.setEnabled(false);
 
         TXT_Product.setEditable(false);
+        TXT_Product.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         TXT_Product.setEnabled(false);
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
@@ -341,6 +346,7 @@ public class PrintSlip extends javax.swing.JFrame {
 
         TXT_CreateTime.setEditable(false);
         TXT_CreateTime.setBackground(new java.awt.Color(204, 204, 204));
+        TXT_CreateTime.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         TXT_CreateTime.setEnabled(false);
         jScrollPane5.setViewportView(TXT_CreateTime);
 
@@ -354,11 +360,13 @@ public class PrintSlip extends javax.swing.JFrame {
         jLabel5.setText("Token No");
 
         TXT_CreateBy.setEditable(false);
+        TXT_CreateBy.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         TXT_CreateBy.setEnabled(false);
 
         jLabel7.setText("Create By");
 
         TXT_TokenNo.setEditable(false);
+        TXT_TokenNo.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         TXT_TokenNo.setEnabled(false);
         jScrollPane3.setViewportView(TXT_TokenNo);
 
@@ -367,6 +375,7 @@ public class PrintSlip extends javax.swing.JFrame {
         jLabel6.setText("Slip Number");
 
         TXT_SlipNo.setEditable(false);
+        TXT_SlipNo.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         TXT_SlipNo.setEnabled(false);
 
         TXT_RC_NO.setEditable(false);
@@ -376,6 +385,7 @@ public class PrintSlip extends javax.swing.JFrame {
 
         TXT_CHARGEAPPLED.setEditable(false);
         TXT_CHARGEAPPLED.setBackground(new java.awt.Color(204, 204, 204));
+        TXT_CHARGEAPPLED.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         TXT_CHARGEAPPLED.setEnabled(false);
         jScrollPane11.setViewportView(TXT_CHARGEAPPLED);
 
@@ -474,6 +484,7 @@ public class PrintSlip extends javax.swing.JFrame {
         jLabel15.setText("Final Entered By");
 
         TXT_GateEntry.setEditable(false);
+        TXT_GateEntry.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         TXT_GateEntry.setEnabled(false);
         TXT_GateEntry.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -489,10 +500,12 @@ public class PrintSlip extends javax.swing.JFrame {
         jLabel13.setText("Process");
 
         TXT_Machine.setEditable(false);
+        TXT_Machine.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         TXT_Machine.setEnabled(false);
 
         jLabel11.setText("Machine");
 
+        TXT_FinealEnterDate.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         TXT_FinealEnterDate.setEnabled(false);
         jScrollPane6.setViewportView(TXT_FinealEnterDate);
 

@@ -136,7 +136,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         autoSugestParty();
         autoSugestProduct();
         autoSugestRemarks();
-       autoSugestVehicleNo();
+        autoSugestVehicleNo();
 
 
         //
@@ -1245,6 +1245,13 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                                           JOptionPane.INFORMATION_MESSAGE);
             return;
         }
+        if (compVechileType.equalsIgnoreCase("N")) {
+            if (TXT_Charge.getText() == "0") {
+                JOptionPane.showMessageDialog(null, "This vehicle outside charge is applied,please select vehicle type",
+                                              "Message", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+        }
         String selectedItem = (String) VechileTypejComboBox.getSelectedItem();
         System.out.println("Selected Item: " + selectedItem);
         if (selectedItem.equalsIgnoreCase("Please Select")) {
@@ -1459,6 +1466,10 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     private void BtnGrossActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnGrossActionPerformed
         btnEventName = "grossBtncall";
         comPoartMechineConnection("GrossBtn");
+
+        if (TXT_SlipNo.getText() == null || TXT_SlipNo.getText().isEmpty()) {
+            TXT_TareWeight.setText("0");
+        }
         TXT_GrossWeight.setText(TXT_AutoWeight.getText().toString());
         int netWeight = netWeightCalculate();
         TXT_NetWeight.setText(String.valueOf(netWeight)); 
@@ -1573,20 +1584,25 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             TXT_Charge.setText("0");
             ComboBoxChargeApplied.setSelectedIndex(1);
         } else {
-            ComboBoxChargeApplied.setSelectedIndex(0);
-            String firstValue = itemList.stream().filter(item -> item.getKey().equals(selectedItem)) // Filter based on the key
-                .map(Item::getValue) // Map to the values
-                .findFirst() // Get the first matching value
-                .orElse(null); // Return null if no match is found
-            System.out.println("firstValue--+" + firstValue);
+            if (compVechileType.equalsIgnoreCase("N")) {
+                ComboBoxChargeApplied.setSelectedIndex(0);
+                String firstValue = itemList.stream().filter(item -> item.getKey().equals(selectedItem)) // Filter based on the key
+                    .map(Item::getValue) // Map to the values
+                    .findFirst() // Get the first matching value
+                    .orElse(null); // Return null if no match is found
+                System.out.println("firstValue--+" + firstValue);
 
-            if (firstValue == null) {
-                TXT_Charge.setText("0");
-            } else {
-                TXT_Charge.setText(firstValue);
-
+                if (firstValue == null) {
+                    TXT_Charge.setText("0");
+                } else {
+                    if (compVechileType.equalsIgnoreCase("Y")) {
+                        ComboBoxChargeApplied.setSelectedIndex(1);
+                        TXT_Charge.setText("0");
+                    } else {
+                        TXT_Charge.setText(firstValue);
+                    }
+                }
             }
-
             String codeValue = itemCodeList.stream().filter(item -> item.getKey().equals(selectedItem)) // Filter based on the key
                 .map(Item::getValue) // Map to the values
                 .findFirst() // Get the first matching value
@@ -1796,162 +1812,163 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         }
     }
 
-    public void VechileDetails(String vechileNo, String slipNo) {
-        onLoadDate();
-        Connection conn = null;
-        Statement stmt = null;
-        String query = null;
-        WeightBridgeDao obj = new WeightBridgeDao();
-        int count = 0;
-        try {
-            conn = obj.getStartConnection();
-            stmt = conn.createStatement();
-            if (vechileNo != null) {
-
-                query = "SELECT * FROM vw_weighing_bridge_penddoc where VEHICLE_NO='" + vechileNo + "'";
-                System.out.println("query--" + query);
-            }
-            if (slipNo != null) {
-                query = "SELECT * FROM vw_weighing_bridge_penddoc where LOWER(SLIP_NO)=LOWER('" + slipNo + "')";
-                System.out.println("query--" + query);
-            }
-            ResultSet rs = stmt.executeQuery(query);
-            while (rs.next()) {
-                count++;
-                if (vechileNo == null) {
-                    if (rs.getString("VEHICLE_NO") != null) {
-                        TXT_VechileNo.setText(rs.getString("VEHICLE_NO").toUpperCase());
-                    }
-                }
-                if (slipNo == null) {
-                    if (rs.getString("SLIP_NO") != null) {
-                        TXT_SlipNo.setText(rs.getString("SLIP_NO"));
-
-                    }
-                }
-
-                if (rs.getString("TOKEN_NO") != null) {
-                    TXT_TokenNo.setText(rs.getString("TOKEN_NO"));
-                }
-                if (rs.getString("PARTY") != null) {
-                    TXT_Part.setText(rs.getString("PARTY"));
-                }
-                if (rs.getString("PRODUCT") != null) {
-                    TXT_Product.setText(rs.getString("PRODUCT"));
-                }
-                if (rs.getString("GROSS_WEIGHT") != null) {
-                    TXT_GrossWeight.setText(rs.getString("GROSS_WEIGHT"));
-                    Integer grossWeight = Integer.parseInt(rs.getString("GROSS_WEIGHT"));
-                    if (grossWeight > 0) {
-                        BtnGross.setEnabled(false);
-                    }
-
-                }
-                if (rs.getString("TERE_WEIGHT") != null) {
-                    TXT_TareWeight.setText(rs.getString("TERE_WEIGHT"));
-                    Integer tareWeight = Integer.parseInt(rs.getString("TERE_WEIGHT"));
-                    if (tareWeight > 0) {
-                        BtnTare.setEnabled(false);
-                    }
-                }
-                if (rs.getString("NET_WEIGHT") != null) {
-                    TXT_NetWeight.setText(rs.getString("NET_WEIGHT"));
-                    Integer tareWeight = Integer.parseInt(rs.getString("NET_WEIGHT"));
-                    if (tareWeight > 0) {
-                        BtnSubmit.setEnabled(false);
-                        BtnActionClear.setEnabled(false);
-                    }
-                }
-                if (rs.getString("FINAL_ENTERED_BY") != null) {
-                    TXT_FinealEnterBy.setText(rs.getString("FINAL_ENTERED_BY"));
-                }
-                if (rs.getString("TROLLEY_NO") != null) {
-                    TXT_TrollyNo.setText(rs.getString("TROLLEY_NO"));
-                }
-                if (rs.getString("CHARGE") == null) {
-                    TXT_Charge.setText("0");
-                } else {
-
-                    TXT_Charge.setText(rs.getString("CHARGE"));
-                }
-                if (rs.getString("CHARGE_APPLICABLE") != null) {
-                    if (rs.getString("CHARGE_APPLICABLE").equalsIgnoreCase("Y")) {
-                        ComboBoxChargeApplied.setSelectedIndex(0);
-                    } else {
-                        ComboBoxChargeApplied.setSelectedIndex(1);
-                    }
-
-
-                }
-                if (rs.getString("VEH_TYPE_CODE") != null || rs.getString("VEH_TYPE_CODE") != "") {
-
-                    String value = rs.getString("VEH_TYPE_CODE");
-                    String codeNameValue = itemCodeNameList.stream().filter(item -> item.getKey().equals(value)) // Filter based on the key
-                        .map(Item::getValue) // Map to the values
-                        .findFirst() // Get the first matching value
-                        .orElse(null); // Return null if no match is found
-                    System.out.println("codeNameValue--+" + codeNameValue);
-                    if (codeNameValue != null) {
-                        //VechileTypejComboBox.addItem(codeNameValue);
-                        VechileTypejComboBox.setSelectedItem(codeNameValue);
-                    }
-
-                }
-                if (rs.getString("REMARKS") != null) {
-                    TXT_REMARKS.setText(rs.getString("REMARKS"));
-                }
-                if (rs.getString("MACHINE_NO") != null) {
-                    TXT_Machine.setText(rs.getString("MACHINE_NO"));
-                }
-                if (rs.getString("GATE_ENTRY_NUMBER") != null) {
-                    TXT_GateEntry.setText(rs.getString("GATE_ENTRY_NUMBER"));
-                }
-
-                if (rs.getString("CREATED_BY") != null) {
-                    TXT_CreateBy.setText(rs.getString("CREATED_BY"));
-                }
-                if (rs.getString("CREATION_DATE") != null) {
-                    TXT_CreateDate.setText(rs.getString("CREATION_DATE"));
-                }
-                if (rs.getString("CREATION_TIME") != null) {
-                    TXT_CreateTime.setText(rs.getString("CREATION_TIME"));
-                }
-
-                if (rs.getString("PROCESS_CODE") != null) {
-                    TXT_Process.setText(rs.getString("PROCESS_CODE"));
-                }
-                if (rs.getString("RC_NO") != null) {
-                    TXT_RC_NO.setText(rs.getString("RC_NO"));
-                }
-                if (rs.getString("COMP_VEH_TYPE_CODE") != null) {
-                    VechileTypejComboBox.setEnabled(false);
-                    ComboBoxChargeApplied.setEnabled(false);
-                    ComboBoxChargeApplied.setSelectedIndex(1);
-                    TXT_Charge.setText("0");
-                }
-
-
-                //VechileTypejComboBox.addItem(rs.getString("CODE")+"-"+rs.getString("TYPE_DESC"));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                stmt.close();
-                conn.close();
-            } catch (Exception ex) {
-
-            }
-        }
-        if (count <= 0) {
-            JOptionPane.showMessageDialog(null, "Please Enter Valid Vehicle no / Slip No", "Message",
-                                          JOptionPane.INFORMATION_MESSAGE);
-
-            resetValue();
-        } else {
-            forPrint();
-        }
-    }
+    //    public void VechileDetails(String vechileNo, String slipNo) {
+    //        onLoadDate();
+    //        Connection conn = null;
+    //        Statement stmt = null;
+    //        String query = null;
+    //        WeightBridgeDao obj = new WeightBridgeDao();
+    //        int count = 0;
+    //        try {
+    //            conn = obj.getStartConnection();
+    //            stmt = conn.createStatement();
+    //            if (vechileNo != null) {
+    //
+    //                query = "SELECT * FROM vw_weighing_bridge_penddoc where VEHICLE_NO='" + vechileNo + "'";
+    //                System.out.println("query--" + query);
+    //            }
+    //            if (slipNo != null) {
+    //                query = "SELECT * FROM vw_weighing_bridge_penddoc where LOWER(SLIP_NO)=LOWER('" + slipNo + "')";
+    //                System.out.println("query--" + query);
+    //            }
+    //            ResultSet rs = stmt.executeQuery(query);
+    //            while (rs.next()) {
+    //                count++;
+    //                if (vechileNo == null) {
+    //                    if (rs.getString("VEHICLE_NO") != null) {
+    //                        TXT_VechileNo.setText(rs.getString("VEHICLE_NO").toUpperCase());
+    //                    }
+    //                }
+    //                if (slipNo == null) {
+    //                    if (rs.getString("SLIP_NO") != null) {
+    //                        TXT_SlipNo.setText(rs.getString("SLIP_NO"));
+    //
+    //                    }
+    //                }
+    //
+    //                if (rs.getString("TOKEN_NO") != null) {
+    //                    TXT_TokenNo.setText(rs.getString("TOKEN_NO"));
+    //                }
+    //                if (rs.getString("PARTY") != null) {
+    //                    TXT_Part.setText(rs.getString("PARTY"));
+    //                }
+    //                if (rs.getString("PRODUCT") != null) {
+    //                    TXT_Product.setText(rs.getString("PRODUCT"));
+    //                }
+    //                if (rs.getString("GROSS_WEIGHT") != null) {
+    //                    TXT_GrossWeight.setText(rs.getString("GROSS_WEIGHT"));
+    //                    Integer grossWeight = Integer.parseInt(rs.getString("GROSS_WEIGHT"));
+    //                    if (grossWeight > 0) {
+    //                        BtnGross.setEnabled(false);
+    //                    }
+    //
+    //                }
+    //                if (rs.getString("TERE_WEIGHT") != null) {
+    //                    TXT_TareWeight.setText(rs.getString("TERE_WEIGHT"));
+    //                    Integer tareWeight = Integer.parseInt(rs.getString("TERE_WEIGHT"));
+    //                    if (tareWeight > 0) {
+    //                        BtnTare.setEnabled(false);
+    //                    }
+    //                }
+    //                if (rs.getString("NET_WEIGHT") != null) {
+    //                    TXT_NetWeight.setText(rs.getString("NET_WEIGHT"));
+    //                    Integer tareWeight = Integer.parseInt(rs.getString("NET_WEIGHT"));
+    //                    if (tareWeight > 0) {
+    //                        BtnSubmit.setEnabled(false);
+    //                        BtnActionClear.setEnabled(false);
+    //                    }
+    //                }
+    //                if (rs.getString("FINAL_ENTERED_BY") != null) {
+    //                    TXT_FinealEnterBy.setText(rs.getString("FINAL_ENTERED_BY"));
+    //                }
+    //                if (rs.getString("TROLLEY_NO") != null) {
+    //                    TXT_TrollyNo.setText(rs.getString("TROLLEY_NO"));
+    //                }
+    //                if (rs.getString("CHARGE") == null) {
+    //                    TXT_Charge.setText("0");
+    //                } else {
+    //
+    //                    TXT_Charge.setText(rs.getString("CHARGE"));
+    //                }
+    //                if (rs.getString("CHARGE_APPLICABLE") != null) {
+    //                    if (rs.getString("CHARGE_APPLICABLE").equalsIgnoreCase("Y")) {
+    //                        ComboBoxChargeApplied.setSelectedIndex(0);
+    //                    } else {
+    //                        ComboBoxChargeApplied.setSelectedIndex(1);
+    //                    }
+    //
+    //
+    //                }
+    //                if (rs.getString("VEH_TYPE_CODE") != null || rs.getString("VEH_TYPE_CODE") != "") {
+    //
+    //                    String value = rs.getString("VEH_TYPE_CODE");
+    //                    String codeNameValue = itemCodeNameList.stream().filter(item -> item.getKey().equals(value)) // Filter based on the key
+    //                        .map(Item::getValue) // Map to the values
+    //                        .findFirst() // Get the first matching value
+    //                        .orElse(null); // Return null if no match is found
+    //                    System.out.println("codeNameValue--+" + codeNameValue);
+    //                    if (codeNameValue != null) {
+    //                        //VechileTypejComboBox.addItem(codeNameValue);
+    //                        VechileTypejComboBox.setSelectedItem(codeNameValue);
+    //                    }
+    //
+    //                }
+    //                if (rs.getString("REMARKS") != null) {
+    //                    TXT_REMARKS.setText(rs.getString("REMARKS"));
+    //                }
+    //                if (rs.getString("MACHINE_NO") != null) {
+    //                    TXT_Machine.setText(rs.getString("MACHINE_NO"));
+    //                }
+    //                if (rs.getString("GATE_ENTRY_NUMBER") != null) {
+    //                    TXT_GateEntry.setText(rs.getString("GATE_ENTRY_NUMBER"));
+    //                }
+    //
+    //                if (rs.getString("CREATED_BY") != null) {
+    //                    TXT_CreateBy.setText(rs.getString("CREATED_BY"));
+    //                }
+    //                if (rs.getString("CREATION_DATE") != null) {
+    //                    TXT_CreateDate.setText(rs.getString("CREATION_DATE"));
+    //                }
+    //                if (rs.getString("CREATION_TIME") != null) {
+    //                    TXT_CreateTime.setText(rs.getString("CREATION_TIME"));
+    //                }
+    //
+    //                if (rs.getString("PROCESS_CODE") != null) {
+    //                    TXT_Process.setText(rs.getString("PROCESS_CODE"));
+    //                }
+    //                if (rs.getString("RC_NO") != null) {
+    //                    TXT_RC_NO.setText(rs.getString("RC_NO"));
+    //                }
+    //                if (rs.getString("COMP_VEH_TYPE_CODE") != null) {
+    //                   // VechileTypejComboBox.setEnabled(false);
+    //                    compVechileType="Y";
+    //                    ComboBoxChargeApplied.setEnabled(false);
+    //                    ComboBoxChargeApplied.setSelectedIndex(1);
+    //                    TXT_Charge.setText("0");
+    //                }
+    //
+    //
+    //                //VechileTypejComboBox.addItem(rs.getString("CODE")+"-"+rs.getString("TYPE_DESC"));
+    //            }
+    //        } catch (Exception e) {
+    //            e.printStackTrace();
+    //        } finally {
+    //            try {
+    //                stmt.close();
+    //                conn.close();
+    //            } catch (Exception ex) {
+    //
+    //            }
+    //        }
+    //        if (count <= 0) {
+    //            JOptionPane.showMessageDialog(null, "Please Enter Valid Vehicle no / Slip No", "Message",
+    //                                          JOptionPane.INFORMATION_MESSAGE);
+    //
+    //            resetValue();
+    //        } else {
+    //            forPrint();
+    //        }
+    //    }
 
     public Integer netWeightCalculate() {
         Integer netWeight = 0;
@@ -2159,14 +2176,15 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     
    
 
-    public String comPoartMechineConnection(String callBy) {
 
+    public String comPoartMechineConnection(String callBy) {
+        SerialPort port = SerialPort.getCommPort(comport_no);
         try {
             //  yavraj
             // SerialPort port = SerialPort.getCommPort("COM5");
             //Lokande
             System.out.println("comport_no--->" + comport_no);
-            SerialPort port = SerialPort.getCommPort(comport_no);
+
             //kartik
             // SerialPort port = SerialPort.getCommPort("COM9");
             if (port.openPort()) {
@@ -2175,7 +2193,9 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 //                                              JOptionPane.INFORMATION_MESSAGE);
             } else {
                 System.out.println("Failed to open port.");
-              //  return "N";
+                JOptionPane.showMessageDialog(null, "Failed to open port 123", "Message",
+                                              JOptionPane.INFORMATION_MESSAGE);
+                return "N";
             }
             port.setComPortParameters(9600, 8, 1, 0); // Adjust these parameters as necessary
             port.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING, 1000, 0);
@@ -2194,16 +2214,20 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                         // Display the processed single value
                         System.out.println("Single Value: " + firstValue);
                         int value = Integer.parseInt(firstValue);
+                        JOptionPane.showMessageDialog(null, "Weight  match-->" + value, "Message",
+                                                      JOptionPane.INFORMATION_MESSAGE);
                         if (value > 0) {
                             System.out.println("weight---" + value);
                             if (callBy.equalsIgnoreCase("SaveBtn")) {
                                 if (btnEventName.equalsIgnoreCase("grossBtncall")) {
                                     int grossWeightnew = Integer.valueOf(TXT_GrossWeight.getText().toString());
                                     if (grossWeightnew != value) {
-                                        JOptionPane.showMessageDialog(null, "Weight bridge weight not match-->"+grossWeightnew, "Message",
+                                        JOptionPane.showMessageDialog(null,
+                                                                      "Weight bridge weight not match-->" +
+                                                                      grossWeightnew, "Message",
                                                                       JOptionPane.INFORMATION_MESSAGE);
                                         TXT_GrossWeight.setText("0");
-                                      
+
                                         return "N";
                                     }
                                 }
@@ -2230,13 +2254,20 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     break;
                 }
             } else {
+                JOptionPane.showMessageDialog(null, "Failed to open port", "Message", JOptionPane.INFORMATION_MESSAGE);
                 System.out.println("Failed to open port");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to open port" + ex.toString(), "Message",
+                                          JOptionPane.INFORMATION_MESSAGE);
             TXT_AutoWeight.setText("0");
+            port.closePort();
             return "N";
+        } finally {
+            port.closePort();
         }
+
         return "Y";
     }
 
@@ -2310,29 +2341,25 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
             System.out.println("\nAutosuggest List:");
             for (Autosuggest autosuggest : apiResponse.getAutosuggestList()) {
-                if(autosuggest.getParty()==null){
-                }
-                else{
-                    System.out.println(autosuggest.getParty() );
+                if (autosuggest.getParty() == null) {
+                } else {
+                    System.out.println(autosuggest.getParty());
                     suggestionsListParty.add(autosuggest.getParty());
                 }
-                if(autosuggest.getProduct()==null ){
-                }
-                else{
-                    System.out.println(autosuggest.getProduct() );
+                if (autosuggest.getProduct() == null) {
+                } else {
+                    System.out.println(autosuggest.getProduct());
                     suggestionsListPoduct.add(autosuggest.getProduct());
                 }
-                if(autosuggest.getRemarks()==null){
-                    
+                if (autosuggest.getRemarks() == null) {
+
+                } else {
+                    System.out.println(autosuggest.getRemarks());
+                    suggestionsListRemarks.add(autosuggest.getRemarks());
                 }
-                else{
-                    System.out.println(autosuggest.getRemarks() );
-                    suggestionsListRemarks.add(autosuggest.getRemarks());  
-                }
-                if(autosuggest.getVehicleNo()==null){
-              
-                }
-                else{
+                if (autosuggest.getVehicleNo() == null) {
+
+                } else {
                     suggestionsListVehicleNo.add(autosuggest.getVehicleNo());
                 }
             }
@@ -2347,6 +2374,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
     }
 
+    String compVechileType = "N";
 
     public void oncallApiVehicleSlipNo(String vechileNo, String slipNo) {
         // String url = "http://182.16.9.100:7003/RestApiWeightBridge/resources/vehicleDetails";
@@ -2529,6 +2557,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
                 } else {
                     VechileTypejComboBox.setSelectedItem(rs.getVeh_subtype_desc());
+                    // VechileTypejComboBox.setEnabled(false);
                 }
 
                 if (rs.getRemarks().equalsIgnoreCase("0")) {
@@ -2570,14 +2599,18 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     TXT_RC_NO.setText(rs.getRcNo());
                 }
                 if (rs.getCompVehTypeCode().equalsIgnoreCase("0")) {
-                     VechileTypejComboBox.setEnabled(true);
-
+                    VechileTypejComboBox.setEnabled(true);
+                    compVechileType = "N";
+                    ComboBoxChargeApplied.setSelectedIndex(0);
+                   // ComboBoxChargeApplied.setEnabled(false);
+                    TXT_Charge.setText("0");
                 } else {
                     VechileTypejComboBox.setSelectedIndex(0);
-                    VechileTypejComboBox.setEnabled(false);
-                    ComboBoxChargeApplied.setEnabled(false);
+                    // VechileTypejComboBox.setEnabled(false);
+                   // ComboBoxChargeApplied.setEnabled(true);
                     ComboBoxChargeApplied.setSelectedIndex(1);
                     TXT_Charge.setText("0");
+                    compVechileType = "Y";
                 }
 
 
