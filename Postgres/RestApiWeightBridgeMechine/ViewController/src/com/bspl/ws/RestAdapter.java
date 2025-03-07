@@ -860,6 +860,10 @@ public class RestAdapter {
 
             result.setCreationTime(rs.getString("CREATION_TIME").toUpperCase());
           }
+          if (rs.getString("TROLLEY_NO") != null) {
+
+            result.setTrolleyNo(rs.getString("TROLLEY_NO").toUpperCase());
+          }
           //VechileTypejComboBox.addItem(rs.getString("CODE")+"-"+rs.getString("TYPE_DESC"));
           printSlipDetails.add(result);
         }
