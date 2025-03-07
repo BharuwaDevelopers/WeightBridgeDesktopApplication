@@ -9,10 +9,13 @@ import com.google.gson.Gson;
 
 import com.google.gson.JsonObject;
 
+import java.awt.Component;
 import java.awt.Dimension;
 
 import java.awt.event.ActionEvent;
 
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.print.PrinterException;
@@ -203,8 +206,23 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         //        }
         //
         //        //scanner.close();
+        TXT_Product.addFocusListener(new FocusListener() {
+          @Override
+          public void focusGained(FocusEvent e) {
+            // TODO Implement this method
+          }
 
-
+          @Override
+          public void focusLost(FocusEvent e) {
+            // TODO Implement this method
+            // Check if focus is lost to another component (like a button)
+            Component opposite = e.getOppositeComponent();
+            if (!(opposite instanceof JButton)) {
+                // Request focus back to textField
+                SwingUtilities.invokeLater(TXT_Product::requestFocusInWindow);
+            }
+          }
+        });
     }
 
     public void autoSugestParty() {
@@ -314,6 +332,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             System.out.println("input.length()--" + input.length());
             if (input.length() < 4) {
                 System.out.println("input.length()-1-" + input.length());
+              suggestionMenuProduct.setVisible(false);
                 // JOptionPane.showMessageDialog(null, "Please enter at least 4 characters", "Message", JOptionPane.ERROR_MESSAGE);
                 return;
             }
