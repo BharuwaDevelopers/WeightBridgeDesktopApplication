@@ -243,6 +243,8 @@ public class RestAdapter {
 
 
 
+
+
     }
 
 
@@ -404,11 +406,13 @@ public class RestAdapter {
         } else {
           result.setRc_no("0");
         }
-        if (rs.getString("COMP_VEH_TYPE_CODE") != null || rs.getString("COMP_VEH_TYPE_CODE") != "") {
-          result.setComp_veh_type_code(rs.getString("COMP_VEH_TYPE_CODE"));
-        } else {
+
+        if (rs.getString("COMP_VEH_TYPE_CODE") == null) {
           result.setComp_veh_type_code("0");
+        } else {
+          result.setComp_veh_type_code(rs.getString("COMP_VEH_TYPE_CODE"));
         }
+
 
         if (rs.getString("VEH_SUBTYPE_DESC") != null) {
           result.setVeh_subtype_desc(rs.getString("VEH_SUBTYPE_DESC"));
@@ -432,6 +436,8 @@ public class RestAdapter {
     }
     if (count <= 0) {
       //  JOptionPane.showMessageDialog(null, "Please Enter Valid Vehicle no / Slip No", "Message",  JOptionPane.INFORMATION_MESSAGE);
+
+
 
 
 
