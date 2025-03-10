@@ -419,6 +419,11 @@ public class RestAdapter {
         } else {
           result.setVeh_subtype_desc("0");
         }
+        if (rs.getString("trolly_req") != null) {
+          result.setTrolly_req(rs.getString("trolly_req"));
+        } else {
+          result.setTrolly_req("0");
+        }
 
         vehicleDetails.add(result);
       }
