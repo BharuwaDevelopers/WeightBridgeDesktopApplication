@@ -245,6 +245,7 @@ public class RestAdapter {
 
 
 
+
     }
 
 
@@ -419,10 +420,17 @@ public class RestAdapter {
         } else {
           result.setVeh_subtype_desc("0");
         }
+        
         if (rs.getString("trolly_req") != null) {
           result.setTrolly_req(rs.getString("trolly_req"));
         } else {
           result.setTrolly_req("0");
+        }
+
+        if (rs.getString("ft_tere_weight") != null) {
+          result.setFt_tere_weight(rs.getString("ft_tere_weight"));
+        } else {
+          result.setFt_tere_weight("0");
         }
 
         vehicleDetails.add(result);
@@ -441,6 +449,7 @@ public class RestAdapter {
     }
     if (count <= 0) {
       //  JOptionPane.showMessageDialog(null, "Please Enter Valid Vehicle no / Slip No", "Message",  JOptionPane.INFORMATION_MESSAGE);
+
 
 
 
@@ -1012,6 +1021,209 @@ public class RestAdapter {
     // Convert the custom class object to JSON
     Gson gson = new Gson();
     String jsonResponse = gson.toJson(reportsDetailsList);
+    return jsonResponse;
+  }
+
+  String jsonResponse = null;
+
+  public String getTrollyDetails(String trollyDetails) {
+    Connection conn = null;
+    Statement stmt = null;
+    String query = null;
+    RestAdapterDao obj = new RestAdapterDao();
+    int count = 0;
+    VehilcleDetails result = null;
+    String vechileNo = null, trolly = null;
+    if (trollyDetails == null || trollyDetails == "") {
+      trollyDetails = "Invalid Json";
+    } else {
+      try {
+        JSONObject mJson = new JSONObject(trollyDetails);
+        vechileNo = mJson.getString("vechileNo");
+        trolly = mJson.getString("trolly");
+      } catch (JSONException e) {
+      }
+
+    //  ArrayList<VehilcleDetails> vehicleDetails = new ArrayList<VehilcleDetails>();
+      try {
+        conn = obj.getConnection();
+        stmt = conn.createStatement();
+        query =
+          "SELECT * FROM vw_weighing_bridge_penddoc where vehicle_no ='" + vechileNo + "' and trolley_no='" + trolly +
+          "'";
+        System.out.println("query--" + query);
+
+        ResultSet rs = stmt.executeQuery(query);
+        if (rs.next()) {
+          count++;
+          result = new VehilcleDetails();
+          if (rs.getString("VEHICLE_NO") != null) {
+            result.setVehicle_no(rs.getString("VEHICLE_NO"));
+          } else {
+            result.setVehicle_no("0");
+          }
+
+          if (rs.getString("SLIP_NO") != null) {
+            result.setSlip_no(rs.getString("SLIP_NO"));
+          } else {
+            result.setSlip_no("0");
+          }
+          if (rs.getString("TOKEN_NO") != null) {
+            result.setToken_no(rs.getString("TOKEN_NO"));
+          } else {
+            result.setToken_no("0");
+          }
+          if (rs.getString("PARTY") != null) {
+            result.setParty(rs.getString("PARTY"));
+          } else {
+            result.setParty("0");
+          }
+          if (rs.getString("PRODUCT") != null) {
+            result.setProduct(rs.getString("PRODUCT"));
+          } else {
+            result.setProduct("0");
+          }
+          if (rs.getString("GROSS_WEIGHT") != null) {
+            result.setGross_weight(rs.getString("GROSS_WEIGHT"));
+
+          } else {
+            result.setGross_weight("0");
+          }
+          if (rs.getString("TERE_WEIGHT") != null) {
+            result.setTere_weight(rs.getString("TERE_WEIGHT"));
+
+          } else {
+            result.setTere_weight("0");
+          }
+          if (rs.getString("NET_WEIGHT") != null) {
+            result.setNet_weight(rs.getString("NET_WEIGHT"));
+
+          } else {
+            result.setNet_weight("0");
+          }
+          if (rs.getString("FINAL_ENTERED_BY") != null) {
+            result.setFinal_entered_by(rs.getString("FINAL_ENTERED_BY"));
+          } else {
+            result.setFinal_entered_by("0");
+          }
+          if (rs.getString("TROLLEY_NO") != null) {
+            result.setTrolley_no(rs.getString("TROLLEY_NO"));
+          } else {
+            result.setTrolley_no("0");
+          }
+
+          if (rs.getString("CHARGE") == null) {
+            result.setCharge("0");
+          } else {
+
+            result.setCharge(rs.getString("CHARGE"));
+          }
+          if (rs.getString("CHARGE_APPLICABLE") != null) {
+            if (rs.getString("CHARGE_APPLICABLE").equalsIgnoreCase("Y")) {
+              // ComboBoxChargeApplied.setSelectedIndex(0);
+              result.setCharge_applicable(rs.getString("CHARGE_APPLICABLE"));
+            } else {
+              result.setCharge_applicable("N");
+            }
+          } else {
+            result.setCharge_applicable("N");
+          }
+          if (rs.getString("VEH_TYPE_CODE") != null || rs.getString("VEH_TYPE_CODE") != "") {
+
+            String value = rs.getString("VEH_TYPE_CODE");
+            result.setVeh_type_code(value);
+
+          } else {
+            result.setVeh_type_code("0");
+          }
+          if (rs.getString("REMARKS") != null) {
+            result.setRemarks(rs.getString("REMARKS"));
+          } else {
+            result.setRemarks("0");
+          }
+          if (rs.getString("MACHINE_NO") != null) {
+            result.setMachine_no(rs.getString("MACHINE_NO"));
+          } else {
+            result.setMachine_no("0");
+          }
+          if (rs.getString("GATE_ENTRY_NUMBER") != null) {
+            result.setGate_entry_number(rs.getString("GATE_ENTRY_NUMBER"));
+          } else {
+            result.setGate_entry_number("0");
+          }
+
+          if (rs.getString("CREATED_BY") != null) {
+            result.setCreated_by(rs.getString("CREATED_BY"));
+          } else {
+            result.setCreated_by("0");
+          }
+          if (rs.getString("CREATION_DATE") != null) {
+            result.setCreation_date(rs.getString("CREATION_DATE"));
+          } else {
+            result.setCreation_date("0");
+          }
+          if (rs.getString("CREATION_TIME") != null) {
+            result.setCreation_time(rs.getString("CREATION_TIME"));
+          } else {
+            result.setCreation_time("0");
+          }
+
+          if (rs.getString("PROCESS_CODE") != null) {
+            result.setProcess_code(rs.getString("PROCESS_CODE"));
+          } else {
+            result.setProcess_code("0");
+          }
+          if (rs.getString("RC_NO") != null) {
+            result.setRc_no(rs.getString("RC_NO"));
+          } else {
+            result.setRc_no("0");
+          }
+
+          if (rs.getString("COMP_VEH_TYPE_CODE") == null) {
+            result.setComp_veh_type_code("0");
+          } else {
+            result.setComp_veh_type_code(rs.getString("COMP_VEH_TYPE_CODE"));
+          }
+
+
+          if (rs.getString("VEH_SUBTYPE_DESC") != null) {
+            result.setVeh_subtype_desc(rs.getString("VEH_SUBTYPE_DESC"));
+          } else {
+            result.setVeh_subtype_desc("0");
+          }
+          if (rs.getString("trolly_req") != null) {
+            result.setTrolly_req(rs.getString("trolly_req"));
+          } else {
+            result.setTrolly_req("0");
+          }
+
+        //  vehicleDetails.add(result);
+        }
+
+
+      } catch (Exception e) {
+        e.printStackTrace();
+      } finally {
+        try {
+          stmt.close();
+          conn.close();
+        } catch (Exception ex) {
+
+        }
+      }
+      if (count <= 0) {
+        //  JOptionPane.showMessageDialog(null, "Please Enter Valid Vehicle no / Slip No", "Message",  JOptionPane.INFORMATION_MESSAGE);
+
+      }
+
+      // Create the custom class instance
+    //  ResponseDataVehicleDetails responseData = new ResponseDataVehicleDetails(vehicleDetails);
+      // Convert the custom class object to JSON
+      Gson gson = new Gson();
+      jsonResponse = gson.toJson(result);
+    }
+    //        Gson gson = new Gson();
+    //        String jsonResponse = gson.toJson(SocietyMstDetailsList);
     return jsonResponse;
   }
 }

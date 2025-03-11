@@ -1,7 +1,7 @@
 package com.bspl.bean;
 
 public class VehilcleDetails {
-  private String slip_no, machine_no, token_no, unit_cd, process_code, vehicle_no, veh_type_code, rc_no, weighing_type, gross_weight, tere_weight, net_weight, entered_by, entered_date, final_entered_by, final_entered_date, trolley_no, charge, charge_applicable, party, product, gate_entry_number, remarks, created_by, creation_date, creation_time, comp_veh_type_code, veh_subtype_desc, trolly_req;
+  private String slip_no, machine_no, token_no, unit_cd, process_code, vehicle_no, veh_type_code, rc_no, weighing_type, gross_weight, tere_weight, net_weight, entered_by, entered_date, final_entered_by, final_entered_date, trolley_no, charge, charge_applicable, party, product, gate_entry_number, remarks, created_by, creation_date, creation_time, comp_veh_type_code, veh_subtype_desc, trolly_req, ft_tere_weight;
 
   public void setSlip_no(String slip_no) {
     this.slip_no = slip_no;
@@ -9,6 +9,14 @@ public class VehilcleDetails {
 
   public String getSlip_no() {
     return slip_no;
+  }
+
+  public void setFt_tere_weight(String ft_tere_weight) {
+    this.ft_tere_weight = ft_tere_weight;
+  }
+
+  public String getFt_tere_weight() {
+    return ft_tere_weight;
   }
 
   public void setMachine_no(String machine_no) {
