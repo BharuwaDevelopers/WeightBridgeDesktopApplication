@@ -6,7 +6,6 @@ import com.bspl.bean.LoginBean;
 import com.bspl.bean.PrintSlipDetails;
 import com.bspl.bean.ReportDetails;
 import com.bspl.bean.ResponseData;
-import com.bspl.bean.ResponseDataPrintSlipdetails;
 import com.bspl.bean.ResponseDataVehicleDetails;
 import com.bspl.bean.VehicleTypesDetails;
 import com.bspl.bean.VehilcleDetails;
@@ -19,9 +18,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import java.sql.Statement;
-
 import java.sql.Timestamp;
 import java.sql.Types;
 
@@ -30,20 +27,16 @@ import java.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 
-import javax.swing.JOptionPane;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class RestAdapter {
-
+  String jsonResponse = null;
 
   public String getLoginDetails(String empLoginDetails) throws JSONException, Exception {
     Connection conn = null;
     Statement stmt = null;
     Statement stmt1 = null;
-    String json = "";
     String user_name = null;
     LoginBean logindetails = new LoginBean();
     try {
@@ -125,14 +118,12 @@ public class RestAdapter {
     }
     // result.setSucess(true);
     Gson gson = new Gson();
-    json = gson.toJson(logindetails);
-    return json;
+    return gson.toJson(logindetails);
   }
 
 
   public String getVehicleTypeAutoSuggest() {
-
-    Connection conn = null;
+    // Connection conn = null;
     Statement stmt = null;
     String query = null;
     RestAdapterDao obj = new RestAdapterDao();
@@ -141,8 +132,7 @@ public class RestAdapter {
     AutoSuggestDetails autoSuggestDetailsobj = null;
     ArrayList<VehicleTypesDetails> vehicleTypeDetailsList = new ArrayList<VehicleTypesDetails>();
     ArrayList<AutoSuggestDetails> autoSuggestDetailsList = new ArrayList<AutoSuggestDetails>();
-    try {
-      conn = obj.getConnection();
+    try (Connection conn = obj.getConnection()) {
       stmt = conn.createStatement();
       ResultSet rs1 =
         stmt.executeQuery("select V.CODE,V.TYPE_CODE,V.SUBTYPE_DESC,M.WEIGHING_RATE FROM  vehicle_subtype_master  V\n" +
@@ -174,13 +164,17 @@ public class RestAdapter {
         vehicleTypeDetailsList.add(vehicleTypesDetailsObj);
       }
 
-      ResultSet rs2 =
-        stmt.executeQuery("select distinct PARTY,'PARTY'  AS COLUMN_NAME from WEIGHING_BRIDGE union all select distinct PRODUCT,'PRODUCT'  AS COLUMN_NAME from WEIGHING_BRIDGE union all select distinct REMARKS,'REMARKS'  AS COLUMN_NAME from WEIGHING_BRIDGE union all select distinct vehicle_no,'vehicle_no'  AS COLUMN_NAME from WEIGHING_BRIDGE");
+      // ResultSet rs2 = stmt.executeQuery("select distinct PARTY,'PARTY'  AS COLUMN_NAME from WEIGHING_BRIDGE union all select distinct PRODUCT,'PRODUCT'  AS COLUMN_NAME from WEIGHING_BRIDGE union all select distinct REMARKS,'REMARKS'  AS COLUMN_NAME from WEIGHING_BRIDGE union all select distinct vehicle_no,'vehicle_no'  AS COLUMN_NAME from WEIGHING_BRIDGE");
+      ResultSet rs2 = stmt.executeQuery(
+      "SELECT PARTY, 'PARTY' AS COLUMN_NAME FROM WEIGHING_BRIDGE\n" + 
+      "UNION SELECT PRODUCT, 'PRODUCT' FROM WEIGHING_BRIDGE\n" + 
+      "UNION SELECT REMARKS, 'REMARKS' FROM WEIGHING_BRIDGE\n" + 
+      "UNION SELECT VEHICLE_NO, 'VEHICLE_NO' FROM WEIGHING_BRIDGE\n" + 
+      "UNION SELECT TROLLEY_NO, 'TROLLEY_NO' FROM VEHICLE_TROLLEY_MAP\n" + 
+      "ORDER BY COLUMN_NAME, PARTY;");
       while (rs2.next()) {
 
         autoSuggestDetailsobj = new AutoSuggestDetails();
-        System.out.println("rs2.getString(\"COLUMN_NAME\")--->" + rs2.getString("COLUMN_NAME"));
-        System.out.println("rs2.getString(\"PARTY\")--->" + rs2.getString("PARTY"));
         if (rs2.getString("COLUMN_NAME").equalsIgnoreCase("PARTY")) {
           autoSuggestDetailsobj.setParty(rs2.getString("PARTY"));
         }
@@ -190,76 +184,30 @@ public class RestAdapter {
         if (rs2.getString("COLUMN_NAME").equalsIgnoreCase("REMARKS")) {
           autoSuggestDetailsobj.setRemarks(rs2.getString("PARTY"));
         }
-        if (rs2.getString("COLUMN_NAME").equalsIgnoreCase("vehicle_no")) {
+        if (rs2.getString("COLUMN_NAME").equalsIgnoreCase("VEHICLE_NO")) {
           autoSuggestDetailsobj.setVehicleNo(rs2.getString("PARTY"));
+        }
+        if (rs2.getString("COLUMN_NAME").equalsIgnoreCase("TROLLEY_NO")) {
+          autoSuggestDetailsobj.setTrollyNo(rs2.getString("PARTY"));
         }
         autoSuggestDetailsList.add(autoSuggestDetailsobj);
 
       }
-
-      //            ResultSet rs2 = stmt.executeQuery("select distinct PARTY,PRODUCT,REMARKS from WEIGHING_BRIDGE");
-      //            while (rs2.next()) {
-      //
-      //                autoSuggestDetailsobj = new AutoSuggestDetails();
-      //                if (rs2.getString("PARTY") == null) {
-      //                    autoSuggestDetailsobj.setParty("0");
-      //                } else {
-      //                    autoSuggestDetailsobj.setParty(rs2.getString("PARTY").toString());
-      //                }
-      //                if (rs2.getString("PRODUCT") == null) {
-      //                    autoSuggestDetailsobj.setProduct("0");
-      //                } else {
-      //                    autoSuggestDetailsobj.setProduct(rs2.getString("PRODUCT").toString());
-      //                }
-      //                if (rs2.getString("REMARKS") == null) {
-      //                    autoSuggestDetailsobj.setRemarks("0");
-      //                } else {
-      //                    autoSuggestDetailsobj.setRemarks(rs2.getString("REMARKS").toString());
-      //                }
-      //                autoSuggestDetailsList.add(autoSuggestDetailsobj);
-      //
-      //            }
-
-
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
       try {
         stmt.close();
-        conn.close();
       } catch (Exception ex) {
 
       }
     }
     if (count <= 0) {
-      //  JOptionPane.showMessageDialog(null, "Please Enter Valid Vehicle no / Slip No", "Message",  JOptionPane.INFORMATION_MESSAGE);
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 
-
-    // Create the custom class instance
     ResponseData responseData = new ResponseData(vehicleTypeDetailsList, autoSuggestDetailsList);
-
-    // Convert the custom class object to JSON
     Gson gson = new Gson();
-    String jsonResponse = gson.toJson(responseData);
-
-
-    //        Gson gson = new Gson();
-    //        String jsonResponse = gson.toJson(SocietyMstDetailsList);
-    return jsonResponse;
+    return gson.toJson(responseData);
   }
 
 
@@ -1023,8 +971,6 @@ public class RestAdapter {
     String jsonResponse = gson.toJson(reportsDetailsList);
     return jsonResponse;
   }
-
-  String jsonResponse = null;
 
   public String getTrollyDetails(String trollyDetails) {
     Connection conn = null;
