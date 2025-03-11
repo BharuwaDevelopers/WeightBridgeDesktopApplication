@@ -77,10 +77,12 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
   private JPopupMenu suggestionMenuProduct;
   private JPopupMenu suggestionMenuRemarks;
   private JPopupMenu suggestionMenuVehicleNo;
+  private JPopupMenu suggestionMenutrollyNo;
   private List<String> suggestionsListParty;
   private List<String> suggestionsListPoduct;
   private List<String> suggestionsListRemarks;
   private List<String> suggestionsListVehicleNo;
+  private List<String> suggestionsListTrollyNo;
 
   /** Creates new form WeightMechineJFrame */
   public WeightMechineJFrame(String userName, String unitCd, String machine_code, String comPort) {
@@ -108,6 +110,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     autoSugestProduct();
     autoSugestRemarks();
     autoSugestVehicleNo();
+    autoSuggestTrollyNo();
 
 
     //
@@ -491,7 +494,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         updateVehicleNoSuggestions();
       }
     });
-
     TXT_VechileNo.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e) {
@@ -500,7 +502,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         }
       }
     });
-
   }
 
 
@@ -530,43 +531,63 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         suggestionMenuVehicleNo.setVisible(false);
       }
     }
-    //        String input = TXT_VechileNo.getText();
-    //        if (input.isEmpty() || input.equalsIgnoreCase(null) || input.equals("")) {
-    //            // JOptionPane.showMessageDialog(null, "Please enter at least 4 characters", "Message", JOptionPane.ERROR_MESSAGE);
-    //            return;
-    //        } else {
-    //            System.out.println("input.length()--" + input.length());
-    //            if (input.length() < 4) {
-    //                System.out.println("input.length()-1-" + input.length());
-    //                // JOptionPane.showMessageDialog(null, "Please enter at least 4 characters", "Message", JOptionPane.ERROR_MESSAGE);
-    //                return;
-    //            }
-    //        }
-    //        suggestionMenuVehicleNo.removeAll();
-    //
-    //        if (input.isEmpty()) {
-    //            suggestionMenuVehicleNo.setVisible(false);
-    //            return;
-    //        }
-    //
-    //        for (String suggestion : suggestionsListVehicleNo) {
-    //            if (suggestion.toLowerCase().contains(input.toLowerCase())) {
-    //                JMenuItem item = new JMenuItem(suggestion);
-    //                item.addActionListener(e -> {
-    //                        TXT_VechileNo.setText(suggestion);
-    //                        suggestionMenuVehicleNo.setVisible(false);
-    //                    });
-    //                suggestionMenuVehicleNo.add(item);
-    //            }
-    //        }
-    //
-    //        if (suggestionMenuVehicleNo.getComponentCount() > 0) {
-    //            suggestionMenuVehicleNo.show(TXT_VechileNo, 0, TXT_VechileNo.getHeight());
-    //        } else {
-    //            suggestionMenuVehicleNo.setVisible(false);
-    //        }
   }
+  
+  public void autoSuggestTrollyNo() {
+    suggestionMenutrollyNo = new JPopupMenu();
+    TXT_TrollyNo.getDocument().addDocumentListener(new DocumentListener() {
+      @Override
+      public void insertUpdate(DocumentEvent e) {
+        updateTrollyNoSuggestions();
+      }
 
+      @Override
+      public void removeUpdate(DocumentEvent e) {
+        updateTrollyNoSuggestions();
+      }
+
+      @Override
+      public void changedUpdate(DocumentEvent e) {
+        updateTrollyNoSuggestions();
+      }
+    });
+    TXT_TrollyNo.addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+          suggestionMenutrollyNo.setVisible(false);
+        }
+      }
+    });
+  }
+  
+  public void updateTrollyNoSuggestions() {
+    suggestionMenutrollyNo.setVisible(false);
+    suggestionMenutrollyNo.removeAll();
+    String input = TXT_TrollyNo.getText();
+    if (input.length() > 3) {
+      boolean found = false;
+      for (String item : suggestionsListTrollyNo) {
+        if (item.toLowerCase().contains(input.toLowerCase())) {
+          JMenuItem menuItem = new JMenuItem(item);
+          menuItem.addActionListener(e -> {
+              TXT_TrollyNo.setText(item);
+              suggestionMenutrollyNo.setVisible(false);
+              // textField.requestFocusInWindow();
+            });
+          suggestionMenutrollyNo.add(menuItem);
+          found = true;
+        }
+      }
+      if (found) {
+        suggestionMenutrollyNo.setLightWeightPopupEnabled(false);
+        suggestionMenutrollyNo.show(TXT_TrollyNo, 0, TXT_TrollyNo.getHeight());
+        SwingUtilities.invokeLater(TXT_TrollyNo::requestFocusInWindow);
+      } else {
+        suggestionMenutrollyNo.setVisible(false);
+      }
+    }
+  }
 
   //----------------------------------------------------------------------
 
@@ -2428,8 +2449,10 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     suggestionsListPoduct = new ArrayList<>();
     suggestionsListRemarks = new ArrayList<>();
     suggestionsListVehicleNo = new ArrayList<>();
+    suggestionsListTrollyNo = new ArrayList<>();
     // String url = "http://182.16.9.100:7003/RestApiWeightBridge/resources/vehicleType";
     String url = "http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleType";
+    // String url = "http://localhost:7101/RestApiWeightBridge/resources/vehicleType";
     // Try-catch block to handle potential IOExceptions and other exceptions
     try {
       // Create a URL object from the URL string
@@ -2474,37 +2497,27 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
       System.out.println("\nAutosuggest List:");
       for (Autosuggest autosuggest : apiResponse.getAutosuggestList()) {
-        if (autosuggest.getParty() == null) {
-        } else {
-          System.out.println(autosuggest.getParty());
+        if (autosuggest.getParty() != null) {
           suggestionsListParty.add(autosuggest.getParty());
         }
-        if (autosuggest.getProduct() == null) {
-        } else {
-          System.out.println(autosuggest.getProduct());
+        if (autosuggest.getProduct() != null) {
           suggestionsListPoduct.add(autosuggest.getProduct());
         }
-        if (autosuggest.getRemarks() == null) {
-
-        } else {
-          System.out.println(autosuggest.getRemarks());
+        if (autosuggest.getRemarks() != null) {
           suggestionsListRemarks.add(autosuggest.getRemarks());
         }
-        if (autosuggest.getVehicleNo() == null) {
-
-        } else {
+        if (autosuggest.getVehicleNo() != null) {
           suggestionsListVehicleNo.add(autosuggest.getVehicleNo());
+        }
+        if (autosuggest.getTrollyNo() != null) {
+          suggestionsListTrollyNo.add(autosuggest.getTrollyNo());
         }
       }
 
     } catch (IOException e) {
-      // Print the exception message if an error occurs
       System.err.println("Error during API call: " + e.getMessage());
       e.printStackTrace();
     }
-    // Print the response
-    // System.out.println("Response: " + jsonResponse);
-
   }
 
   String compVechileType = "N";
