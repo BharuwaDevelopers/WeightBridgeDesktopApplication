@@ -3,87 +3,54 @@ package weightmachinedesktopapplication;
 
 import com.fazecast.jSerialComm.SerialPort;
 
-//import com.sun.corba.se.spi.extension.ZeroPortPolicy;
-
 import com.google.gson.Gson;
 
 import com.google.gson.JsonObject;
 
-import java.awt.Component;
-import java.awt.Dimension;
-
-import java.awt.event.ActionEvent;
-
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.print.PrinterException;
-import java.awt.print.PrinterJob;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.io.InputStreamReader;
-
 import java.io.OutputStream;
 
-import java.math.BigDecimal;
 
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
-import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 
-import java.sql.Types;
-
 import java.time.LocalDate;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import java.time.format.DateTimeFormatterBuilder;
-
-import java.time.temporal.ChronoField;
-
 import java.util.ArrayList;
-
 import java.util.HashMap;
 import java.util.List;
-
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
 import javax.swing.*;
-
-import java.util.Scanner;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.view.JasperViewer;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -105,7 +72,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
   String wt_type = null;
   String slipNo = null, tokenNo = null, gateNo = null, grossWeight = null, tareWeight = null, netWeight = null, party =
     null, vechileNo = null, vechileType = null, create = null, finaldate = null, charge = null, product =
-    null, remarks = null, comport_no = null, machinecode = null;
+    null, remarks = null, comport_no = null, machinecode = null, ftTereWeight = null;
   private JPopupMenu suggestionMenuPart;
   private JPopupMenu suggestionMenuProduct;
   private JPopupMenu suggestionMenuRemarks;
@@ -1072,41 +1039,46 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
       }
     });
 
+    TXT_TrollyNo.addKeyListener(new java.awt.event.KeyAdapter() {
+      public void keyPressed(java.awt.event.KeyEvent evt) {
+        TXT_TrollyNoKeyPressed(evt);
+      }
+    });
+
     javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
     jPanel4.setLayout(jPanel4Layout);
     jPanel4Layout.setHorizontalGroup(
       jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(jPanel4Layout.createSequentialGroup()
         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(jLabel21)
+          .addComponent(jLabel20)
+          .addComponent(jLabel19)
+          .addComponent(jLabel2)
+          .addComponent(jLabel22))
+        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addGroup(jPanel4Layout.createSequentialGroup()
+            .addGap(30, 30, 30)
+            .addComponent(TXT_TrollyNo))
+          .addGroup(jPanel4Layout.createSequentialGroup()
+            .addGap(32, 32, 32)
             .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addComponent(jLabel21)
-              .addComponent(jLabel20)
-              .addComponent(jLabel19)
-              .addComponent(jLabel2)
-              .addComponent(jLabel22))
-            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addComponent(TXT_VechileNo)
               .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(32, 32, 32)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                   .addComponent(jScrollPane10, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
                   .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
                   .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 88, Short.MAX_VALUE))
-              .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(27, 27, 27)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                  .addComponent(TXT_VechileNo, javax.swing.GroupLayout.Alignment.TRAILING)
-                  .addComponent(TXT_TrollyNo)))))
-          .addGroup(jPanel4Layout.createSequentialGroup()
-            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addComponent(jLabel23)
-              .addComponent(jLabel24))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 63, Short.MAX_VALUE)
-            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-              .addComponent(TXT_Product, javax.swing.GroupLayout.DEFAULT_SIZE, 240, Short.MAX_VALUE)
-              .addComponent(TXT_Part))))
+                .addGap(0, 88, Short.MAX_VALUE)))))
         .addContainerGap())
+      .addGroup(jPanel4Layout.createSequentialGroup()
+        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(jLabel23)
+          .addComponent(jLabel24))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+          .addComponent(TXT_Part, javax.swing.GroupLayout.DEFAULT_SIZE, 240, Short.MAX_VALUE)
+          .addComponent(TXT_Product)))
     );
     jPanel4Layout.setVerticalGroup(
       jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1339,7 +1311,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
   }//GEN-END:initComponents
 
     private void BtnSubmitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnSubmitActionPerformed
-       
+   
+    // return netWeight;
     System.out.println("btnEventName---" + btnEventName);
     if (TXT_GrossWeight.getText().equalsIgnoreCase("0") && TXT_TareWeight.getText().equalsIgnoreCase("0")) {
       JOptionPane.showMessageDialog(null, "Gross Weight/ Tare Weight 0", "Message", JOptionPane.INFORMATION_MESSAGE);
@@ -1361,6 +1334,23 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
       JOptionPane.showMessageDialog(null, "Weight-bridge weight not match", "Message", JOptionPane.INFORMATION_MESSAGE);
       return;
     }
+    
+      int margin = 1000;
+      int tareWeight = Integer.valueOf(TXT_TareWeight.getText().toString()); 
+      // 10000 - 1000 = 9000
+      // 10000 + 1000 = 11000
+      int oldTareWeight = 0;
+      if (ftTereWeight == null)  {
+        oldTareWeight = margin;
+      } else {
+        oldTareWeight = Integer.parseInt(ftTereWeight);
+      }
+      
+      if (tareWeight > oldTareWeight + margin || tareWeight < oldTareWeight - margin) {
+        JOptionPane.showMessageDialog(null, "Tare Weight is not match.", "Message", JOptionPane.INFORMATION_MESSAGE);
+        return;
+      }
+      
     if (compVechileType.equalsIgnoreCase("N")) {
       if (TXT_Charge.getText() == "0" || TXT_Charge.getText().equalsIgnoreCase("0")) {
         JOptionPane.showMessageDialog(null, "This vehicle outside charge is applied,please select vehicle type",
@@ -1836,7 +1826,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     TXT_FinealEnterTime.setText(null);
     TXT_SlipNo.setText(null);
     TXT_VechileNo.setEnabled(true);
-    TXT_VechileNo.setEnabled(true);
+    TXT_SlipNo.setEnabled(true);
     }//GEN-LAST:event_BtnActionClearActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
@@ -1857,6 +1847,21 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     weightFrame.setVisible(true);
     this.dispose();
     }//GEN-LAST:event_jMenuItem3ActionPerformed
+
+  private void TXT_TrollyNoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TXT_TrollyNoKeyPressed
+    if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+      System.out.println("Enter key pressed!");
+      String vechileNo = TXT_VechileNo.getText().toString().toUpperCase();
+      // VechileDetails(vechileNo, null);
+      // oncallApiVehicleSlipNo(vechileNo, null);
+      try {
+        trollyDeatilsApiCall();
+      } catch (IOException e) {
+      } catch (JSONException e) {
+      }
+      onLoadDate();
+    }
+  }//GEN-LAST:event_TXT_TrollyNoKeyPressed
 
    
 
@@ -2503,6 +2508,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
   }
 
   String compVechileType = "N";
+  String trollyReq = "N";
 
   public void oncallApiVehicleSlipNo(String vechileNo, String slipNo) {
     // String url = "http://182.16.9.100:7003/RestApiWeightBridge/resources/vehicleDetails";
@@ -2566,7 +2572,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
       for (VehicleDetails rs : filteredList) {
         System.out.println(rs.getVehicleNo() + " - " + rs.getTokenNo());
         if (rs.getMachineNo().equalsIgnoreCase("0")) {
-
+          //
         } else {
           if (rs.getMachineNo().equalsIgnoreCase(TXT_Machine.getText())) {
             TXT_Machine.setText(rs.getMachineNo().toUpperCase());
@@ -2585,6 +2591,35 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
           }
         }
 
+
+        if (rs.getTrolly_req().equalsIgnoreCase("0")) {
+
+        } else {
+          if (rs.getTrolly_req().equalsIgnoreCase("Y")) {
+            TXT_TrollyNo.setEnabled(true);
+            trollyReq = "Y";
+            VechileTypejComboBox.setSelectedItem("TRACTOR");
+            ComboBoxChargeApplied.setSelectedIndex(1);
+            ComboBoxChargeApplied.setEnabled(false);
+            TXT_Charge.setText("0");
+            System.out.println("Slip Number is: " + TXT_SlipNo.getText());
+            if (TXT_SlipNo.getText().trim() == null || TXT_SlipNo.getText().isEmpty()) {
+              if (TXT_TrollyNo.getText().isEmpty() || TXT_TrollyNo.getText().trim() == null ||
+                  TXT_TrollyNo.getText().trim() == "") {
+                JOptionPane.showMessageDialog(null, "Please Enter Trolly  no", "Message",
+                                              JOptionPane.INFORMATION_MESSAGE);
+              }
+              return;
+            } else {
+
+            }
+
+          }
+          else{
+            TXT_TrollyNo.setEnabled(false);
+          }
+          // TXT_TokenNo.setText(rs.getTokenNo());
+        }
         if (slipNo == null) {
           if (rs.getSlipNo().equalsIgnoreCase("0")) {
           } else {
@@ -2666,20 +2701,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             ComboBoxChargeApplied.setSelectedIndex(1);
           }
         }
-        //                if (rs.getVehicleN("VEH_TYPE_CODE") != null || rs.getString("VEH_TYPE_CODE") != "") {
-        //
-        //                String value = rs.getString("VEH_TYPE_CODE");
-        //                String codeNameValue = itemCodeNameList.stream().filter(item -> item.getKey().equals(value)) // Filter based on the key
-        //                    .map(Item::getValue) // Map to the values
-        //                    .findFirst() // Get the first matching value
-        //                    .orElse(null); // Return null if no match is found
-        //                System.out.println("codeNameValue--+" + codeNameValue);
-        //                if (codeNameValue != null) {
-        //                    //VechileTypejComboBox.addItem(codeNameValue);
-        //                    VechileTypejComboBox.setSelectedItem(codeNameValue);
-        //                }
-        //
-        //                }
+      
 
         if (rs.getVeh_subtype_desc().equalsIgnoreCase("0")) {
           // System.out.println("rs.getVeh_subtype_desc()--->"+rs.getVeh_subtype_desc());
@@ -2740,8 +2762,12 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
           TXT_Charge.setText("0");
           compVechileType = "Y";
         }
-
-
+        
+        if (rs.getFt_tere_weight().equalsIgnoreCase("0")) {
+          //
+        } else {
+          ftTereWeight = rs.getFt_tere_weight();
+        }
       }
 
       //            System.out.println("Vehicle Details List:");
@@ -2775,5 +2801,185 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
       forPrint();
     }
 
+  }
+
+
+  public void trollyDeatilsApiCall() throws JSONException, IOException {
+    // InetAddress inetAddress = null;
+    if (TXT_TrollyNo.getText().isEmpty() || TXT_VechileNo.getText() == null) {
+      JOptionPane.showMessageDialog(null, "Please Enter User Name", "Message", JOptionPane.INFORMATION_MESSAGE);
+      return;
+    }
+    try {
+      URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/trollyDtl");
+      HttpURLConnection con = (HttpURLConnection) url.openConnection();
+      con.setRequestMethod("POST");
+      con.setRequestProperty("Content-Type", "application/json");
+      con.setRequestProperty("Accept", "application/json");
+      con.setDoOutput(true);
+      String jsonInputString =
+        "{\"vechileNo\":\"" + TXT_VechileNo.getText() + "\",\"trolly\":\"" + TXT_TrollyNo.getText() + "\"}";
+      try (OutputStream os = con.getOutputStream()) {
+        byte[] input = jsonInputString.getBytes("utf-8");
+        os.write(input, 0, input.length);
+      }
+      try (BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"))) {
+        StringBuilder response = new StringBuilder();
+        String responseLine = null;
+        while ((responseLine = br.readLine()) != null) {
+          response.append(responseLine.trim());
+        }
+        System.out.println(response.toString());
+        String jsonResponse = response.toString();
+        JSONObject rs = new JSONObject(jsonResponse);
+        System.out.println("rs---" + rs);
+        if (rs == null) {
+          onLoad();
+          onLoadDate();
+          resetValue();
+          TXT_FinealEnterBy.setText(null);
+          TXT_FinealEnterDate.setText(null);
+          TXT_FinealEnterTime.setText(null);
+          TXT_SlipNo.setText(null);
+          TXT_VechileNo.setEnabled(true);
+          TXT_SlipNo.setEnabled(true);
+          return;
+        }
+
+        if (rs.getString("slip_no") != "0") {
+          TXT_SlipNo.setText(rs.getString("slip_no"));
+        }
+
+        if (rs.getString("machine_no") != "0") {
+          TXT_Machine.setText(rs.getString("machine_no"));
+        }
+
+        if (rs.getString("trolly_req") != "0") {
+          if (rs.getString("trolly_req").equalsIgnoreCase("Y")) {
+            trollyReq = "Y";
+          }
+        }
+
+        if (rs.getString("token_no") != "0") {
+          TXT_TokenNo.setText(rs.getString("token_no"));
+        }
+
+        if (rs.getString("party") != "0") {
+          TXT_Part.setText(rs.getString("party").toUpperCase());
+        }
+
+        if (rs.getString("product") != "0") {
+          TXT_Product.setText(rs.getString("product").toUpperCase());
+        }
+
+        if (rs.getString("gross_weight").equalsIgnoreCase("0")) {
+          TXT_GrossWeight.setText(rs.getString("gross_weight"));
+        } else {
+          Integer grossWeight = Integer.parseInt(rs.getString("gross_weight"));
+          if (grossWeight > 0) {
+            BtnGross.setEnabled(false);
+          }
+          TXT_GrossWeight.setText(rs.getString("gross_weight"));
+        }
+
+        if (rs.getString("tere_weight").equalsIgnoreCase("0")) {
+          TXT_TareWeight.setText(rs.getString("tere_weight"));
+        } else {
+          Integer tareWeight = Integer.parseInt(rs.getString("tere_weight"));
+          if (tareWeight > 0) {
+            BtnTare.setEnabled(false);
+          }
+          TXT_TareWeight.setText(rs.getString("tere_weight"));
+        }
+
+        if (rs.getString("net_weight").equalsIgnoreCase("0")) {
+          TXT_NetWeight.setText(rs.getString("net_weight"));
+        } else {
+          Integer tareWeight = Integer.parseInt(rs.getString("net_weight"));
+          if (tareWeight > 0) {
+            BtnSubmit.setEnabled(false);
+            BtnActionClear.setEnabled(false);
+          }
+          TXT_TareWeight.setText(rs.getString("net_weight"));
+        }
+
+        if (rs.getString("final_entered_by") != "0") {
+          TXT_FinealEnterBy.setText(rs.getString("final_entered_by"));
+        }
+
+        if (rs.getString("trolley_no") != "0") {
+          TXT_TrollyNo.setText(rs.getString("trolley_no"));
+        }
+
+        if (rs.getString("charge").equalsIgnoreCase("0") || rs.getString("charge") == "0") {
+          TXT_Charge.setText("0");
+        } else {
+          TXT_Charge.setText(rs.getString("charge"));
+        }
+
+        if (rs.getString("charge_applicable") != "0") {
+          if (rs.getString("charge_applicable").equalsIgnoreCase("Yes")) {
+            ComboBoxChargeApplied.setSelectedIndex(0);
+          } else {
+            ComboBoxChargeApplied.setSelectedIndex(1);
+          }
+        }
+
+        if (rs.getString("veh_subtype_desc").equalsIgnoreCase("0")) {
+          VechileTypejComboBox.setSelectedItem(rs.getString("veh_subtype_desc"));
+        }
+
+        if (rs.getString("remarks") != "0") {
+          TXT_REMARKS.setText(rs.getString("remarks").toUpperCase());
+        }
+
+        if (rs.getString("gate_entry_number") != "0") {
+          TXT_GateEntry.setText(rs.getString("gate_entry_number"));
+        }
+
+        if (!rs.getString("created_by").equalsIgnoreCase("0")) {
+          TXT_CreateBy.setText(rs.getString("created_by"));
+        }
+
+        if (!rs.getString("creation_date").equalsIgnoreCase("0")) {
+          TXT_CreateDate.setText(rs.getString("creation_date"));
+        }
+
+        if (!rs.getString("creation_time").equalsIgnoreCase("0")) {
+          TXT_CreateTime.setText(rs.getString("creation_time"));
+        }
+
+        if (!rs.getString("process_code").equalsIgnoreCase("0")) {
+          TXT_Process.setText(rs.getString("process_code"));
+        }
+
+        if (!rs.getString("rc_no").equalsIgnoreCase("0")) {
+          TXT_RC_NO.setText(rs.getString("rc_no"));
+        }
+        if (rs.getString("comp_veh_type_code").equalsIgnoreCase("0")) {
+          VechileTypejComboBox.setEnabled(true);
+          compVechileType = "N";
+          ComboBoxChargeApplied.setSelectedIndex(0);
+          TXT_Charge.setText("0");
+        } else {
+          VechileTypejComboBox.setEnabled(false);
+          ComboBoxChargeApplied.setEnabled(false);
+          ComboBoxChargeApplied.setSelectedIndex(1);
+          TXT_Charge.setText("0");
+          compVechileType = "Y";
+        }
+
+        if (TXT_SlipNo.getText() == null || TXT_SlipNo.getText().equalsIgnoreCase("0") ||
+            TXT_SlipNo.getText().isEmpty() || TXT_SlipNo.getText() == "" || TXT_SlipNo.getText().equals("")) {
+          System.out.println("hhhhhh---" + TXT_SlipNo.getText());
+          VechileTypejComboBox.setEnabled(true);
+          ComboBoxChargeApplied.setEnabled(true);
+        } else {
+          VechileTypejComboBox.setEnabled(false);
+          ComboBoxChargeApplied.setEnabled(false);
+        }
+      }
+    } catch (MalformedURLException e) {
+    }
   }
 }
