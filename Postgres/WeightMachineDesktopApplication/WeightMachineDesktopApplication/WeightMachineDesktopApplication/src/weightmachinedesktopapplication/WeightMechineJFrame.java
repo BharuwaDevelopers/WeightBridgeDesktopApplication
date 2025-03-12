@@ -4,7 +4,6 @@ package weightmachinedesktopapplication;
 import com.fazecast.jSerialComm.SerialPort;
 
 import com.google.gson.Gson;
-
 import com.google.gson.JsonObject;
 
 import java.awt.event.KeyAdapter;
@@ -1332,57 +1331,54 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
   }//GEN-END:initComponents
 
     private void BtnSubmitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnSubmitActionPerformed
-   
-    // return netWeight;
     System.out.println("btnEventName---" + btnEventName);
     if (TXT_GrossWeight.getText().equalsIgnoreCase("0") && TXT_TareWeight.getText().equalsIgnoreCase("0")) {
-      JOptionPane.showMessageDialog(null, "Gross Weight/ Tare Weight 0", "Message", JOptionPane.INFORMATION_MESSAGE);
+      JOptionPane.showMessageDialog(null, "Gross Weight/Tare Weight 0", "Message", JOptionPane.INFORMATION_MESSAGE);
       return;
     }
 
     if (TXT_TokenNo.getText().isEmpty() || TXT_TokenNo.getText() == null || TXT_TokenNo.getText() == "") {
-      JOptionPane.showMessageDialog(null, "Token number not found", "Message", JOptionPane.INFORMATION_MESSAGE);
+      JOptionPane.showMessageDialog(null, "Token number not found.", "Message", JOptionPane.INFORMATION_MESSAGE);
       return;
     }
-    Integer netWeight = Integer.parseInt(TXT_NetWeight.getText());
-    if (netWeight < 0) {
-      JOptionPane.showMessageDialog(null, "Net Weight must be greater than zero", "Message",
+
+    // Integer netWeight = Integer.parseInt(TXT_NetWeight.getText());
+    if (Integer.parseInt(TXT_NetWeight.getText()) < 0) {
+      String message = "Net Weight must be greater than zero.";
+      JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
+      return;
+    }
+
+    String flage = comPoartMechineConnection("SaveBtn");
+    if (flage.equalsIgnoreCase("N")) {
+      JOptionPane.showMessageDialog(null, "Weight-bridge weight not match.", "Message",
                                     JOptionPane.INFORMATION_MESSAGE);
       return;
     }
-    String flage = comPoartMechineConnection("SaveBtn");
-    if (flage.equalsIgnoreCase("N")) {
-      JOptionPane.showMessageDialog(null, "Weight-bridge weight not match", "Message", JOptionPane.INFORMATION_MESSAGE);
-      return;
-    }
 
-    if (TXT_TareWeight.getText() != "0" && TXT_GrossWeight.getText().equalsIgnoreCase("0")) {
-      int margin = 1000;
-      int tareWeight = Integer.valueOf(TXT_TareWeight.getText().toString());
-      // 10000 - 1000 = 9000
-      // 10000 + 1000 = 11000
-      int oldTareWeight = 0;
-      if (ftTereWeight == null) {
-        oldTareWeight = margin;
-      } else {
-        oldTareWeight = Integer.parseInt(ftTereWeight);
-      }
+    if (ftTereWeight != null) {
+      if (TXT_TareWeight.getText() != "0" && TXT_GrossWeight.getText().equalsIgnoreCase("0")) {
+        int margin = 1000;
+        int tareWeight = Integer.valueOf(TXT_TareWeight.getText());
+        int oldTareWeight = Integer.parseInt(ftTereWeight);
 
-      if (tareWeight > oldTareWeight + margin || tareWeight < oldTareWeight - margin) {
-        JOptionPane.showMessageDialog(null, "Tare Weight is not match.", "Message", JOptionPane.INFORMATION_MESSAGE);
-        return;
+        if (tareWeight > oldTareWeight + margin || tareWeight < oldTareWeight - margin) {
+          String message = "Difference is more than 1000 KGs.";
+          JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
+          return;
+        }
       }
     }
 
     if (compVechileType.equalsIgnoreCase("N")) {
       if (TXT_Charge.getText() == "0" || TXT_Charge.getText().equalsIgnoreCase("0")) {
-        JOptionPane.showMessageDialog(null, "This vehicle outside charge is applied,please select vehicle type",
-                                      "Message", JOptionPane.INFORMATION_MESSAGE);
+        String message = "This vehicle outside charge is applied, please select vehicle type.";
+        JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
         return;
       }
     }
     String selectedItem = (String) VechileTypejComboBox.getSelectedItem();
-    System.out.println("Selected Item: " + selectedItem);
+    // System.out.println("Selected Item: " + selectedItem);
     if (selectedItem.equalsIgnoreCase("Please Select")) {
       JOptionPane.showMessageDialog(null, "please select vehicle type", "Message", JOptionPane.INFORMATION_MESSAGE);
       return;
@@ -1397,19 +1393,18 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
       return;
     }
 
-    System.out.println("TXT_SlipNo.getText()--" + TXT_SlipNo.getText().toString().length());
+    // System.out.println("TXT_SlipNo.getText()--" + TXT_SlipNo.getText().toString().length());
     if (TXT_SlipNo.getText().trim().isEmpty() || TXT_SlipNo.getText().trim() == null ||
         TXT_SlipNo.getText().trim() == "" || TXT_SlipNo.getText().equalsIgnoreCase("0")) {
       insertdateCallApi();
     } else {
-
       if (TXT_REMARKS.getText().trim().isEmpty()) {
         JOptionPane.showMessageDialog(null, "Please Enter Remark", "Message", JOptionPane.INFORMATION_MESSAGE);
         return;
       }
       if (Integer.parseInt(TXT_NetWeight.getText()) <= 0) {
-        JOptionPane.showMessageDialog(null, "Net weight is should be greater than 0", "Message",
-                                      JOptionPane.INFORMATION_MESSAGE);
+        String message = "Net weight is should be greater than 0";
+        JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
         return;
       }
 
@@ -1503,8 +1498,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
   public void updatedateCallApi() {
     try {
-      // URL url = new URL(" http://127.0.0.1:7101/RestApiWeightBridge/resources/update");
-
+      // URL url = new URL("http://127.0.0.1:7101/RestApiWeightBridge/resources/update");
       // URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/update");
       URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/update");
       HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -1529,50 +1523,31 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
       jsonObject.addProperty("remarks", TXT_REMARKS.getText().toUpperCase());
 
       // Convert JsonObject to JSON string
-      String jsonInputString = jsonObject.toString();
+      // String jsonInputString = jsonObject.toString();
       // String jsonInputString = "{\"empCode\":\"" + TXT_USERNAME.getText() + "\",\"pass\":\"" + passwordString + "\"}";
       try (OutputStream os = con.getOutputStream()) {
-        byte[] input = jsonInputString.getBytes("utf-8");
+        byte[] input = jsonObject.toString().getBytes("utf-8");
         os.write(input, 0, input.length);
       }
       try (BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"))) {
-        StringBuilder response = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
         String responseLine = null;
         while ((responseLine = br.readLine()) != null) {
-          response.append(responseLine.trim());
+          stringBuilder.append(responseLine.trim());
         }
-        System.out.println(response.toString());
-        String jsonResponse = response.toString();
-        JSONObject responseObject = new JSONObject(jsonResponse);
+        // System.out.println(response.toString());
+        // String jsonResponse = stringBuilder.toString();
+        JSONObject responseObject = new JSONObject(stringBuilder.toString());
         // Check response status
         int status = responseObject.getInt("statusCode");
         String message = responseObject.getString("message");
-
-        System.out.println("Response Status: " + status);
-        System.out.println("Response Message: " + message);
+        // System.out.println("Response Status: " + status);
+        // System.out.println("Response Message: " + message);
         if (status == 200) {
           String SlipNojson = responseObject.getString("slipNo");
           System.out.println("Response SlipNojson: " + SlipNojson);
           JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
 
-          // LocalDateTime currentDateTime = LocalDateTime.now();
-          // DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("dd-MM-yy h:mm:ss.SSSSSSSSS a");
-          // todayDateTime = currentDateTime.format(formatter1);
-          // System.out.println("Current Date and Time: " + todayDateTime); // Example: 2024-10-16 13:32:43
-          // LocalDate currentDate = LocalDate.now();
-          // System.out.println("Current Date: " + currentDate);
-          // DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-          // DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-          // Parse the input date
-          // LocalDate date = LocalDate.parse(currentDate.toString(), inputFormatter);
-          // Format the date to the desired output format
-          // String outputDate = date.format(outputFormatter);
-          // System.out.println("outputDate--" + outputDate);
-          // Format the date and time
-          // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-          // String timeOnly = now.format(formatter);
-          // Print the current date and time
-          // System.out.println("Current date and time: " + timeOnly);
           TXT_CreateDate.setText(getDate(LocalDate.now()));
           if (Integer.parseInt(TXT_NetWeight.getText()) > 0) {
             TXT_FinealEnterBy.setText(userNamevalue);
@@ -1585,13 +1560,10 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         } else {
           JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
         }
-
-
       }
     } catch (Exception ex) {
       ex.printStackTrace();
       JOptionPane.showMessageDialog(null, ex.toString(), "Message", JOptionPane.INFORMATION_MESSAGE);
-
     }
   }
 
@@ -2982,11 +2954,11 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     } catch (MalformedURLException e) {
     }
   }
-  
+
   public static String getDate(LocalDate localDate) {
     return localDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
   }
-  
+
   public static String getTime(LocalDateTime localDateTime) {
     return localDateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
   }
