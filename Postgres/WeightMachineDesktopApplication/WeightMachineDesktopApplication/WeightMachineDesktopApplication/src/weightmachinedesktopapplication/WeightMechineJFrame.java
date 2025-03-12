@@ -532,7 +532,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
       }
     }
   }
-  
+
   public void autoSuggestTrollyNo() {
     suggestionMenutrollyNo = new JPopupMenu();
     TXT_TrollyNo.getDocument().addDocumentListener(new DocumentListener() {
@@ -560,7 +560,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
       }
     });
   }
-  
+
   public void updateTrollyNoSuggestions() {
     suggestionMenutrollyNo.setVisible(false);
     suggestionMenutrollyNo.removeAll();
@@ -1355,23 +1355,25 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
       JOptionPane.showMessageDialog(null, "Weight-bridge weight not match", "Message", JOptionPane.INFORMATION_MESSAGE);
       return;
     }
-    
+
+    if (TXT_TareWeight.getText() != "0" && TXT_GrossWeight.getText().equalsIgnoreCase("0")) {
       int margin = 1000;
-      int tareWeight = Integer.valueOf(TXT_TareWeight.getText().toString()); 
+      int tareWeight = Integer.valueOf(TXT_TareWeight.getText().toString());
       // 10000 - 1000 = 9000
       // 10000 + 1000 = 11000
       int oldTareWeight = 0;
-      if (ftTereWeight == null)  {
+      if (ftTereWeight == null) {
         oldTareWeight = margin;
       } else {
         oldTareWeight = Integer.parseInt(ftTereWeight);
       }
-      
+
       if (tareWeight > oldTareWeight + margin || tareWeight < oldTareWeight - margin) {
         JOptionPane.showMessageDialog(null, "Tare Weight is not match.", "Message", JOptionPane.INFORMATION_MESSAGE);
         return;
       }
-      
+    }
+
     if (compVechileType.equalsIgnoreCase("N")) {
       if (TXT_Charge.getText() == "0" || TXT_Charge.getText().equalsIgnoreCase("0")) {
         JOptionPane.showMessageDialog(null, "This vehicle outside charge is applied,please select vehicle type",
@@ -1553,29 +1555,30 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
           System.out.println("Response SlipNojson: " + SlipNojson);
           JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
 
-          LocalDateTime currentDateTime = LocalDateTime.now();
-          DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("dd-MM-yy h:mm:ss.SSSSSSSSS a");
-          todayDateTime = currentDateTime.format(formatter1);
-          System.out.println("Current Date and Time: " + todayDateTime); // Example: 2024-10-16 13:32:43
-          LocalDate currentDate = LocalDate.now();
-          System.out.println("Current Date: " + currentDate);
-          DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-          DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+          // LocalDateTime currentDateTime = LocalDateTime.now();
+          // DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("dd-MM-yy h:mm:ss.SSSSSSSSS a");
+          // todayDateTime = currentDateTime.format(formatter1);
+          // System.out.println("Current Date and Time: " + todayDateTime); // Example: 2024-10-16 13:32:43
+          // LocalDate currentDate = LocalDate.now();
+          // System.out.println("Current Date: " + currentDate);
+          // DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+          // DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
           // Parse the input date
-          LocalDate date = LocalDate.parse(currentDate.toString(), inputFormatter);
+          // LocalDate date = LocalDate.parse(currentDate.toString(), inputFormatter);
           // Format the date to the desired output format
-          String outputDate = date.format(outputFormatter);
-          System.out.println("outputDate--" + outputDate);
-          TXT_CreateDate.setText(outputDate);
-          LocalDateTime now = LocalDateTime.now();
+          // String outputDate = date.format(outputFormatter);
+          // System.out.println("outputDate--" + outputDate);
           // Format the date and time
-          DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-          String timeOnly = now.format(formatter);
+          // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+          // String timeOnly = now.format(formatter);
           // Print the current date and time
-          System.out.println("Current date and time: " + timeOnly);
-          TXT_FinealEnterBy.setText(userNamevalue);
-          TXT_FinealEnterDate.setText(outputDate);
-          TXT_FinealEnterTime.setText(timeOnly);
+          // System.out.println("Current date and time: " + timeOnly);
+          TXT_CreateDate.setText(getDate(LocalDate.now()));
+          if (Integer.parseInt(TXT_NetWeight.getText()) > 0) {
+            TXT_FinealEnterBy.setText(userNamevalue);
+            TXT_FinealEnterDate.setText(getDate(LocalDate.now()));
+            TXT_FinealEnterTime.setText(getTime(LocalDateTime.now()));
+          }
           forPrint();
           TXT_SlipNo.setText(TXT_SlipNo.getText());
           disableValueAfterSave();
@@ -1606,8 +1609,12 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     }
     TXT_GrossWeight.setText(TXT_AutoWeight.getText().toString());
     int netWeight = netWeightCalculate();
-    TXT_NetWeight.setText(String.valueOf(netWeight)); 
-        
+    TXT_NetWeight.setText(String.valueOf(netWeight));
+    if (Integer.parseInt(TXT_NetWeight.getText()) > 0) {
+      TXT_FinealEnterBy.setText(userNamevalue);
+      TXT_FinealEnterDate.setText(getDate(LocalDate.now()));
+      TXT_FinealEnterTime.setText(getTime(LocalDateTime.now()));
+    }
     }//GEN-LAST:event_BtnGrossActionPerformed
 
     private void BtnTareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnTareActionPerformed
@@ -1779,34 +1786,15 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
     private void TXT_SlipNoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TXT_SlipNoKeyPressed
     if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-      System.out.println("Enter key pressed!");
-      LocalDateTime currentDateTime = LocalDateTime.now();
-      DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("dd-MM-yy h:mm:ss.SSSSSSSSS a");
-      todayDateTime = currentDateTime.format(formatter1);
-      System.out.println("Current Date and Time: " + todayDateTime); // Example: 2024-10-16 13:32:43
-      LocalDate currentDate = LocalDate.now();
-      System.out.println("Current Date: " + currentDate);
-      DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-      DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-      // Parse the input date
-      LocalDate date = LocalDate.parse(currentDate.toString(), inputFormatter);
-      // Format the date to the desired output format
-      String outputDate = date.format(outputFormatter);
-      System.out.println("outputDate--" + outputDate);
-      TXT_CreateDate.setText(outputDate);
-      LocalDateTime now = LocalDateTime.now();
-      // Format the date and time
-      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-      String timeOnly = now.format(formatter);
-      // Print the current date and time
-      System.out.println("Current date and time: " + timeOnly);
+      String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+      TXT_CreateDate.setText(currentDate);
       TXT_FinealEnterBy.setText(userNamevalue);
-      TXT_FinealEnterDate.setText(outputDate);
+      TXT_FinealEnterDate.setText(currentDate);
+      String timeOnly = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
       TXT_FinealEnterTime.setText(timeOnly);
       String slipNo = TXT_SlipNo.getText().trim().toUpperCase();
-      //VechileDetails(null, slipNo);
+      // VechileDetails(null, slipNo);
       oncallApiVehicleSlipNo(null, slipNo);
-
       onLoadDate();
     }
     }//GEN-LAST:event_TXT_SlipNoKeyPressed
@@ -2627,8 +2615,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
             }
 
-          }
-          else{
+          } else {
             TXT_TrollyNo.setEnabled(false);
           }
           // TXT_TokenNo.setText(rs.getTokenNo());
@@ -2714,7 +2701,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             ComboBoxChargeApplied.setSelectedIndex(1);
           }
         }
-      
+
 
         if (rs.getVeh_subtype_desc().equalsIgnoreCase("0")) {
           // System.out.println("rs.getVeh_subtype_desc()--->"+rs.getVeh_subtype_desc());
@@ -2775,7 +2762,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
           TXT_Charge.setText("0");
           compVechileType = "Y";
         }
-        
+
         if (rs.getFt_tere_weight().equalsIgnoreCase("0")) {
           //
         } else {
@@ -2994,5 +2981,13 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
       }
     } catch (MalformedURLException e) {
     }
+  }
+  
+  public static String getDate(LocalDate localDate) {
+    return localDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+  }
+  
+  public static String getTime(LocalDateTime localDateTime) {
+    return localDateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
   }
 }
