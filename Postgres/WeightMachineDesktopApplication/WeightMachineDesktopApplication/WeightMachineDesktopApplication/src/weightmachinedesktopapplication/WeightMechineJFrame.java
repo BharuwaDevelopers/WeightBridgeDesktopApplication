@@ -2195,7 +2195,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
   public void trollyDeatilsApiCall() throws JSONException, IOException {
     if (TXT_TrollyNo.getText().isEmpty() || TXT_VechileNo.getText() == null) {
-      JOptionPane.showMessageDialog(null, "Please Enter User Name", "Message", JOptionPane.INFORMATION_MESSAGE);
+      JOptionPane.showMessageDialog(null, "Please Trolley Number", "Message", JOptionPane.INFORMATION_MESSAGE);
       return;
     }
     try {
