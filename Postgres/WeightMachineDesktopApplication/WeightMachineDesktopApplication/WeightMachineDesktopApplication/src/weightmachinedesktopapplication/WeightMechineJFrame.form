@@ -229,6 +229,7 @@
       <SubComponents>
         <Component class="javax.swing.JTextField" name="TXT_AutoWeight">
           <Properties>
+            <Property name="editable" type="boolean" value="false"/>
             <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="f5" green="f5" red="f8" type="rgb"/>
             </Property>
@@ -924,6 +925,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Trolly Number"/>
               </Properties>
+              <AccessibilityProperties>
+                <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="Trolley Number"/>
+              </AccessibilityProperties>
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel23">
               <Properties>
