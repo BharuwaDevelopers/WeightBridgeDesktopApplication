@@ -76,7 +76,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
   String slipNo = null, tokenNo = null, gateNo = null, grossWeight = null, tareWeight = null, netWeight = null, party =
     null, vechileNo = null, vechileType = null, create = null, finaldate = null, charge = null, product =
-    null, remarks = null, comport_no = null, machinecode = null, ftTereWeight = null;
+    null, remarks = null, comport_no = null, machinecode = null, ftTereWeight = "0";
   private JPopupMenu suggestionMenuPart;
   private JPopupMenu suggestionMenuProduct;
   private JPopupMenu suggestionMenuRemarks;
@@ -1197,14 +1197,20 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
       JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
       return;
     }
-
+      String value=comPoartMechineConnection("SaveBtn");
+       // JOptionPane.showMessageDialog(null, "valuueueueu----"+value, "Message", JOptionPane.INFORMATION_MESSAGE);
     if (comPoartMechineConnection("SaveBtn").equalsIgnoreCase("N")) {
       String message = "Weight-bridge weight not match.";
       JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
       return;
     }
-
-    if (!ftTereWeight.equalsIgnoreCase("0")) {
+    try{
+    
+        if(ftTereWeight.equalsIgnoreCase("0")){
+            JOptionPane.showMessageDialog(null, "ftTereWeight---"+ftTereWeight, "Message", JOptionPane.INFORMATION_MESSAGE);
+        }
+        else{
+        JOptionPane.showMessageDialog(null, "ftTereWeight--33-"+ftTereWeight, "Message", JOptionPane.INFORMATION_MESSAGE);
       if (TXT_TareWeight.getText() != "0") {
         int margin = 1000;
         int tareWeight = Integer.valueOf(TXT_TareWeight.getText());
@@ -1217,8 +1223,11 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         }
       }
     }
-    
-
+    }catch(Exception ex){
+       // JOptionPane.showMessageDialog(null, "sawan kumar--23234-"+ex.toString(), "Message", JOptionPane.INFORMATION_MESSAGE);
+    }
+//    
+        //JOptionPane.showMessageDialog(null, "valuueueueu----2", "Message", JOptionPane.INFORMATION_MESSAGE);
 
     if (compVechileType.equalsIgnoreCase("N")) {
       if (TXT_Charge.getText() == "0" || TXT_Charge.getText().equalsIgnoreCase("0")) {
@@ -1227,24 +1236,26 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         return;
       }
     }
-    
+       // JOptionPane.showMessageDialog(null, "valuueueueu----3", "Message", JOptionPane.INFORMATION_MESSAGE);
     String selectedItem = (String) VechileTypejComboBox.getSelectedItem();
     if (selectedItem.equalsIgnoreCase("Please Select")) {
       JOptionPane.showMessageDialog(null, "please select vehicle type", "Message", JOptionPane.INFORMATION_MESSAGE);
       return;
     }
+       // JOptionPane.showMessageDialog(null, "valuueueueu----4", "Message", JOptionPane.INFORMATION_MESSAGE);
     if (TXT_Part.getText().trim().isEmpty()) {
       JOptionPane.showMessageDialog(null, "Please Enter Party Details", "Message", JOptionPane.INFORMATION_MESSAGE);
       return;
     }
-
+      //  JOptionPane.showMessageDialog(null, "valuueueueu----5", "Message", JOptionPane.INFORMATION_MESSAGE);
     if (TXT_Product.getText().trim().isEmpty()) {
       JOptionPane.showMessageDialog(null, "Please Enter Product Details", "Message", JOptionPane.INFORMATION_MESSAGE);
       return;
     }
-
+       // JOptionPane.showMessageDialog(null, "valuueueueu----6", "Message", JOptionPane.INFORMATION_MESSAGE);
     if (TXT_SlipNo.getText().trim().isEmpty() || TXT_SlipNo.getText().trim() == null ||
         TXT_SlipNo.getText().trim() == "" || TXT_SlipNo.getText().equalsIgnoreCase("0")) {
+       // JOptionPane.showMessageDialog(null, "valuueueueu----7", "Message", JOptionPane.INFORMATION_MESSAGE);
       insertdateCallApi();
     } else {
       if (TXT_REMARKS.getText().trim().isEmpty()) {
@@ -1286,7 +1297,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
       int netWeight = Integer.parseInt(TXT_NetWeight.getText());
       jsonObject.addProperty("net_weight", netWeight);
       jsonObject.addProperty("entered_by", TXT_CreateBy.getText().toUpperCase());
-      jsonObject.addProperty("final_entered_by", TXT_CreateBy.getText().toUpperCase());
+      jsonObject.addProperty("final_entered_by", TXT_FinealEnterBy.getText().toUpperCase());
       jsonObject.addProperty("trolley_no", TXT_TrollyNo.getText());
       jsonObject.addProperty("charge", TXT_Charge.getText());
       jsonObject.addProperty("charge_applicable", ComboBoxChargeApplied.getSelectedItem().toString());
@@ -1843,7 +1854,75 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     private java.awt.MenuBar menuBar1;
     // End of variables declaration//GEN-END:variables
 
-  public String comPoartMechineConnection(String callBy) {
+//  public String comPoartMechineConnection(String callBy) {
+//    SerialPort port = SerialPort.getCommPort(comport_no);
+//    try {
+//      if (!port.openPort()) {
+//        JOptionPane.showMessageDialog(null, "Failed to open port 123", "Message", JOptionPane.INFORMATION_MESSAGE);
+//        return "N";
+//      }
+//      port.setComPortParameters(9600, 8, 1, 0); // Adjust these parameters as necessary
+//      port.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING, 1000, 0);
+//      if (port.openPort()) {
+//        byte[] buffer = new byte[1024];
+//        while (true) {
+//          int bytesRead = port.readBytes(buffer, buffer.length);
+//          if (bytesRead > 0) {
+//            String receivedData = new String(buffer, 0, bytesRead);
+//            String processedData = receivedData.replace("k", "");
+//            processedData = processedData.trim();
+//            String firstValue = processedData.split("\\s+")[0];
+//            int value = Integer.parseInt(firstValue);
+//          
+//            if (value > 0) {
+//                JOptionPane.showMessageDialog(null, "Weight match: " + value, "Message", JOptionPane.INFORMATION_MESSAGE);
+//              if (callBy.equalsIgnoreCase("SaveBtn")) {
+//                if (btnEventName.equalsIgnoreCase("grossBtnCall")) {
+//                  int grossWeight = Integer.valueOf(TXT_GrossWeight.getText());
+//                    JOptionPane.showMessageDialog(null, "gross Weight  match: "+grossWeight+"-" + value, "Message", JOptionPane.INFORMATION_MESSAGE);
+//                  if (grossWeight != value) {
+//                    TXT_GrossWeight.setText("0");
+//                    String message = "Weight bridge weight not match.";
+//                    JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
+//                    return "N";
+//                  }
+//                }
+//                if (btnEventName.equalsIgnoreCase("tareBtnCall")) {
+//                  int tareWeight = Integer.valueOf(TXT_TareWeight.getText());
+//                    JOptionPane.showMessageDialog(null, "tareWeight Weight  match: "+tareWeight+"-" + value, "Message", JOptionPane.INFORMATION_MESSAGE);
+//                  if (tareWeight != value) {
+//                    TXT_TareWeight.setText("0");
+//                    String message = "Weight bridge weight not match.";
+//                    JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
+//                    return "N";
+//                  }
+//                }
+//              } else {
+//                TXT_AutoWeight.setText(firstValue);
+//              }
+//            } else {
+//              TXT_AutoWeight.setText("0");
+//            }
+//          }
+//          break;
+//        }
+//      } else {
+//        JOptionPane.showMessageDialog(null, "Failed to open port: ", "Message", JOptionPane.INFORMATION_MESSAGE);
+//      }
+//    } catch (Exception ex) {
+//      ex.printStackTrace();
+//      String message = "Failed to open port: " + ex.toString();
+//      JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
+//      TXT_AutoWeight.setText("0");
+//      port.closePort();
+//      return "N";
+//    } finally {
+//      port.closePort();
+//    }
+//    return "Y";
+//  }
+    
+      public String comPoartMechineConnection(String callBy) {
     SerialPort port = SerialPort.getCommPort(comport_no);
     try {
       if (!port.openPort()) {
@@ -1864,11 +1943,11 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             int value = Integer.parseInt(firstValue);
           
             if (value > 0) {
-                JOptionPane.showMessageDialog(null, "Weight match: " + value, "Message", JOptionPane.INFORMATION_MESSAGE);
+                //JOptionPane.showMessageDialog(null, "Weight match: " + value, "Message", JOptionPane.INFORMATION_MESSAGE);
               if (callBy.equalsIgnoreCase("SaveBtn")) {
                 if (btnEventName.equalsIgnoreCase("grossBtnCall")) {
                   int grossWeight = Integer.valueOf(TXT_GrossWeight.getText());
-                    JOptionPane.showMessageDialog(null, "gross Weight  match: "+grossWeight+"-" + value, "Message", JOptionPane.INFORMATION_MESSAGE);
+                  //  JOptionPane.showMessageDialog(null, "gross Weight  match: "+grossWeight+"-" + value, "Message", JOptionPane.INFORMATION_MESSAGE);
                   if (grossWeight != value) {
                     TXT_GrossWeight.setText("0");
                     String message = "Weight bridge weight not match.";
@@ -1891,12 +1970,14 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
               }
             } else {
               TXT_AutoWeight.setText("0");
+                return "N";
             }
           }
           break;
         }
       } else {
         JOptionPane.showMessageDialog(null, "Failed to open port: ", "Message", JOptionPane.INFORMATION_MESSAGE);
+          return "N";
       }
     } catch (Exception ex) {
       ex.printStackTrace();
