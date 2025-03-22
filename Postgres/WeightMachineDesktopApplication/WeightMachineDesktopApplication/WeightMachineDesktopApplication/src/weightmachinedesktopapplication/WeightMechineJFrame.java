@@ -1205,13 +1205,16 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
       return;
     }
     try{
-    
+        if( TXT_GrossWeight.getText()!="0"){
+            
+        }else{
         if(ftTereWeight.equalsIgnoreCase("0")){
-            JOptionPane.showMessageDialog(null, "ftTereWeight---"+ftTereWeight, "Message", JOptionPane.INFORMATION_MESSAGE);
+         //   JOptionPane.showMessageDialog(null, "ftTereWeight---"+ftTereWeight, "Message", JOptionPane.INFORMATION_MESSAGE);
         }
         else{
-        JOptionPane.showMessageDialog(null, "ftTereWeight--33-"+ftTereWeight, "Message", JOptionPane.INFORMATION_MESSAGE);
-      if (TXT_TareWeight.getText() != "0") {
+      //  JOptionPane.showMessageDialog(null, "ftTereWeight--33-"+ftTereWeight, "Message", JOptionPane.INFORMATION_MESSAGE);
+           
+      if (TXT_TareWeight.getText() != "0" ) {
         int margin = 1000;
         int tareWeight = Integer.valueOf(TXT_TareWeight.getText());
         int oldTareWeight = Integer.parseInt(ftTereWeight);
@@ -1223,9 +1226,11 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         }
       }
     }
+        }
     }catch(Exception ex){
        // JOptionPane.showMessageDialog(null, "sawan kumar--23234-"+ex.toString(), "Message", JOptionPane.INFORMATION_MESSAGE);
     }
+    
 //    
         //JOptionPane.showMessageDialog(null, "valuueueueu----2", "Message", JOptionPane.INFORMATION_MESSAGE);
 
@@ -1248,24 +1253,30 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
       return;
     }
       //  JOptionPane.showMessageDialog(null, "valuueueueu----5", "Message", JOptionPane.INFORMATION_MESSAGE);
-    if (TXT_Product.getText().trim().isEmpty()) {
-      JOptionPane.showMessageDialog(null, "Please Enter Product Details", "Message", JOptionPane.INFORMATION_MESSAGE);
-      return;
-    }
+//    if (TXT_Product.getText().trim().isEmpty()) {
+//      JOptionPane.showMessageDialog(null, "Please Enter Product Details", "Message", JOptionPane.INFORMATION_MESSAGE);
+//      return;
+//    }
        // JOptionPane.showMessageDialog(null, "valuueueueu----6", "Message", JOptionPane.INFORMATION_MESSAGE);
     if (TXT_SlipNo.getText().trim().isEmpty() || TXT_SlipNo.getText().trim() == null ||
         TXT_SlipNo.getText().trim() == "" || TXT_SlipNo.getText().equalsIgnoreCase("0")) {
        // JOptionPane.showMessageDialog(null, "valuueueueu----7", "Message", JOptionPane.INFORMATION_MESSAGE);
       insertdateCallApi();
     } else {
-      if (TXT_REMARKS.getText().trim().isEmpty()) {
-        JOptionPane.showMessageDialog(null, "Please Enter Remark", "Message", JOptionPane.INFORMATION_MESSAGE);
-        return;
-      }
+//      if (TXT_REMARKS.getText().trim().isEmpty()) {
+//        JOptionPane.showMessageDialog(null, "Please Enter Remark", "Message", JOptionPane.INFORMATION_MESSAGE);
+//        return;
+//      }
       if (Integer.parseInt(TXT_NetWeight.getText()) <= 0) {
         String message = "Net weight is should be greater than 0";
         JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
         return;
+      }
+      else{
+          if (TXT_Product.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Please Enter Product Details", "Message", JOptionPane.INFORMATION_MESSAGE);
+                return;
+              }
       }
       updatedateCallApi();
     }
@@ -1957,7 +1968,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 }
                 if (btnEventName.equalsIgnoreCase("tareBtnCall")) {
                   int tareWeight = Integer.valueOf(TXT_TareWeight.getText());
-                    JOptionPane.showMessageDialog(null, "tareWeight Weight  match: "+tareWeight+"-" + value, "Message", JOptionPane.INFORMATION_MESSAGE);
+                 //   JOptionPane.showMessageDialog(null, "tareWeight Weight  match: "+tareWeight+"-" + value, "Message", JOptionPane.INFORMATION_MESSAGE);
                   if (tareWeight != value) {
                     TXT_TareWeight.setText("0");
                     String message = "Weight bridge weight not match.";
