@@ -5,14 +5,16 @@ import javax.ws.rs.Path;
 
 import javax.ws.rs.Produces;
 
+import javax.ws.rs.QueryParam;
+
 import org.json.JSONException;
 
 @Path("vehicleType")
 public class WS_VehicleTypeAutoSuggest {
   @GET
   @Produces("application/json")
-  public String getgetVehicleTypeAutoSuggest() throws JSONException, Exception{
+  public String getVehicleTypeAutoSuggest(@QueryParam("machineCode") String machineCode) throws JSONException, Exception{
          RestAdapter restadapter=new RestAdapter();
-         return restadapter.getVehicleTypeAutoSuggest();
+         return restadapter.getVehicleTypeAutoSuggest(machineCode);
     }
 }

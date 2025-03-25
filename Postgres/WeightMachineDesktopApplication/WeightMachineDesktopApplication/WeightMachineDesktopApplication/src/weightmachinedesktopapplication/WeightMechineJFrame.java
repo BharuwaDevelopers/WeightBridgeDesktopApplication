@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 
 import javax.swing.JFrame;
 import javax.swing.*;
-
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -78,20 +77,33 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
   String slipNo = null, tokenNo = null, gateNo = null, grossWeight = null, tareWeight = null, netWeight = null, party =
     null, vechileNo = null, vechileType = null, create = null, finaldate = null, charge = null, product =
     null, remarks = null, comport_no = null, machinecode = null, ftTereWeight = "0";
-  private JPopupMenu suggestionMenuPart;
+
+  private JPopupMenu suggestionMenuParty;
   private JPopupMenu suggestionMenuProduct;
   private JPopupMenu suggestionMenuRemarks;
   private JPopupMenu suggestionMenuVehicleNo;
-  private JPopupMenu suggestionMenutrollyNo;
+  private JPopupMenu suggestionMenuTrollyNo;
+
   private List<String> suggestionsListParty;
-  private List<String> suggestionsListPoduct;
+  private List<String> suggestionsListProduct;
   private List<String> suggestionsListRemarks;
   private List<String> suggestionsListVehicleNo;
   private List<String> suggestionsListTrollyNo;
 
+  List<JMenuItem> partyMenuItems = new ArrayList<>();
+  List<JMenuItem> productMenuItems = new ArrayList<>();
+  List<JMenuItem> remarksMenuItems = new ArrayList<>();
+  List<JMenuItem> vehicleNoMenuItems = new ArrayList<>();
+  List<JMenuItem> trollyNoMenuItems = new ArrayList<>();
+
+  int[] partySelectedIndex = { -1 };
+  int[] productSelectedIndex = { -1 };
+  int[] remarksSelectedIndex = { -1 };
+  int[] vehicleNoSelectedIndex = { -1 };
+  int[] trollyNoSelectedIndex = { -1 };
+
   /** Creates new form WeightMechineJFrame */
   public WeightMechineJFrame(String userName, String unitCd, String machine_code, String comPort) {
-    System.out.println("userName----" + userName);
     if (userName == null || userName.isEmpty() || userName == "") {
       userName = "E-001";
     }
@@ -100,346 +112,552 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     comport_no = comPort;
     machinecode = machine_code;
     initComponents();
-
     onLoad();
     onLoadApiVehicleTypeAutoSugest();
-
     onLoadDate();
     TXT_Machine.setText(machine_code);
-
-    autoSugestParty();
-    autoSugestProduct();
-    autoSugestRemarks();
-    autoSugestVehicleNo();
+    autoSuggestParty();
+    autoSuggestProduct();
+    autoSuggestRemarks();
+    autoSuggestVehicleNo();
     autoSuggestTrollyNo();
   }
 
-  public void autoSugestParty() {
-    suggestionMenuPart = new JPopupMenu();
+  public void autoSuggestParty() {
+    suggestionMenuParty = new JPopupMenu();
     TXT_Part.getDocument().addDocumentListener(new DocumentListener() {
       @Override
       public void insertUpdate(DocumentEvent e) {
-        updatePartySuggestions();
+        updatePartySuggestions(TXT_Part.getText().trim());
       }
 
       @Override
       public void removeUpdate(DocumentEvent e) {
-        updatePartySuggestions();
+        updatePartySuggestions(TXT_Part.getText().trim());
       }
 
       @Override
       public void changedUpdate(DocumentEvent e) {
-        updatePartySuggestions();
+        updatePartySuggestions(TXT_Part.getText().trim());
+      }
+
+      private void updatePartySuggestions(String input) {
+        suggestionMenuParty.setVisible(false);
+        suggestionMenuParty.removeAll();
+        partyMenuItems.clear();
+        partySelectedIndex[0] = -1;
+
+        if (input.length() >= 1) {
+          boolean found = false;
+          for (String item : suggestionsListParty) {
+            if (item.toLowerCase().startsWith(input.toLowerCase())) {
+              JMenuItem menuItem = new JMenuItem(item);
+              menuItem.addActionListener(e -> {
+                  TXT_Part.setText(item);
+                  suggestionMenuParty.setVisible(false);
+                });
+              suggestionMenuParty.add(menuItem);
+              partyMenuItems.add(menuItem);
+              found = true;
+            }
+          }
+          if (found) {
+            suggestionMenuParty.setLightWeightPopupEnabled(false);
+            suggestionMenuParty.show(TXT_Part, 0, TXT_Part.getHeight());
+            SwingUtilities.invokeLater(TXT_Part::requestFocusInWindow);
+          } else {
+            suggestionMenuParty.setVisible(false);
+          }
+        }
       }
     });
 
     TXT_Part.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-          suggestionMenuPart.setVisible(false);
+        if (suggestionMenuParty == null || partyMenuItems == null || partyMenuItems.isEmpty()) {
+          return;
+        }
+
+        if (suggestionMenuParty.isVisible()) {
+          int keyCode = e.getKeyCode();
+          int lastIndex = partyMenuItems.size() - 1;
+
+          switch (keyCode) {
+          case KeyEvent.VK_DOWN:
+            if (partySelectedIndex[0] < lastIndex) {
+              partySelectedIndex[0]++;
+            } else {
+              partySelectedIndex[0] = 0;
+            }
+            updateSelection();
+            break;
+
+          case KeyEvent.VK_UP:
+            if (partySelectedIndex[0] > 0) {
+              partySelectedIndex[0]--;
+            } else {
+              partySelectedIndex[0] = lastIndex;
+            }
+            updateSelection();
+            break;
+
+          case KeyEvent.VK_RIGHT:
+            if (partySelectedIndex[0] >= 0 && partySelectedIndex[0] <= lastIndex) {
+              partyMenuItems.get(partySelectedIndex[0]).doClick();
+            }
+            break;
+
+          case KeyEvent.VK_ESCAPE:
+            suggestionMenuParty.setVisible(false);
+            break;
+
+          default:
+            break;
+          }
+        }
+      }
+
+      private void updateSelection() {
+        for (JMenuItem item : partyMenuItems) {
+          item.setArmed(false);
+        }
+
+        if (partySelectedIndex[0] >= 0 && partySelectedIndex[0] < partyMenuItems.size()) {
+          partyMenuItems.get(partySelectedIndex[0]).setArmed(true);
         }
       }
     });
-
   }
 
-  private void updatePartySuggestions() {
-    suggestionMenuPart.setVisible(false);
-    suggestionMenuPart.removeAll();
-    String input = TXT_Part.getText();
-    if (input.length() > 3) {
-      boolean found = false;
-      for (String item : suggestionsListParty) {
-        if (item.toLowerCase().contains(input.toLowerCase())) {
-          JMenuItem menuItem = new JMenuItem(item);
-          menuItem.addActionListener(e -> {
-              TXT_Part.setText(item);
-              suggestionMenuPart.setVisible(false);
-              // textField.requestFocusInWindow();
-            });
-          suggestionMenuPart.add(menuItem);
-          found = true;
-        }
-      }
-      if (found) {
-        suggestionMenuPart.setLightWeightPopupEnabled(false);
-        suggestionMenuPart.show(TXT_Part, 0, TXT_Part.getHeight());
-        SwingUtilities.invokeLater(TXT_Part::requestFocusInWindow);
-      } else {
-        suggestionMenuPart.setVisible(false);
-      }
-    }
-  }
-
-  public void autoSugestProduct() {
+  public void autoSuggestProduct() {
     suggestionMenuProduct = new JPopupMenu();
     TXT_Product.getDocument().addDocumentListener(new DocumentListener() {
       @Override
       public void insertUpdate(DocumentEvent e) {
-        updateProductSuggestions();
+        updateProductSuggestions(TXT_Product.getText().trim());
       }
 
       @Override
       public void removeUpdate(DocumentEvent e) {
-        updateProductSuggestions();
+        updateProductSuggestions(TXT_Product.getText().trim());
       }
 
       @Override
       public void changedUpdate(DocumentEvent e) {
-        updateProductSuggestions();
+        updateProductSuggestions(TXT_Product.getText().trim());
+      }
+
+      private void updateProductSuggestions(String input) {
+        suggestionMenuProduct.setVisible(false);
+        suggestionMenuProduct.removeAll();
+        productMenuItems.clear();
+        productSelectedIndex[0] = -1;
+        if (input.length() > 3) {
+          boolean found = false;
+          for (String item : suggestionsListProduct) {
+            if (item.toLowerCase().contains(input.toLowerCase())) {
+              JMenuItem menuItem = new JMenuItem(item);
+              menuItem.addActionListener(e -> {
+                  TXT_Product.setText(item);
+                  suggestionMenuProduct.setVisible(false);
+                });
+              suggestionMenuProduct.add(menuItem);
+              productMenuItems.add(menuItem);
+              found = true;
+            }
+          }
+          if (found) {
+            suggestionMenuProduct.setLightWeightPopupEnabled(false);
+            suggestionMenuProduct.show(TXT_Product, 0, TXT_Product.getHeight());
+            SwingUtilities.invokeLater(TXT_Product::requestFocusInWindow);
+          } else {
+            suggestionMenuProduct.setVisible(false);
+          }
+        }
       }
     });
 
     TXT_Product.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-          suggestionMenuProduct.setVisible(false);
+        if (suggestionMenuProduct == null || productMenuItems == null || productMenuItems.isEmpty()) {
+          return;
+        }
+
+        if (suggestionMenuProduct.isVisible()) {
+          int keyCode = e.getKeyCode();
+          int lastIndex = productMenuItems.size() - 1;
+
+          switch (keyCode) {
+          case KeyEvent.VK_DOWN:
+            if (productSelectedIndex[0] < lastIndex) {
+              productSelectedIndex[0]++;
+            } else {
+              productSelectedIndex[0] = 0;
+            }
+            updateSelection();
+            break;
+
+          case KeyEvent.VK_UP:
+            if (productSelectedIndex[0] > 0) {
+              productSelectedIndex[0]--;
+            } else {
+              productSelectedIndex[0] = lastIndex;
+            }
+            updateSelection();
+            break;
+
+          case KeyEvent.VK_RIGHT:
+            if (productSelectedIndex[0] >= 0 && productSelectedIndex[0] <= lastIndex) {
+              productMenuItems.get(productSelectedIndex[0]).doClick();
+            }
+            break;
+
+          case KeyEvent.VK_ESCAPE:
+            suggestionMenuProduct.setVisible(false);
+            break;
+
+          default:
+            break;
+          }
+        }
+      }
+
+      private void updateSelection() {
+        for (JMenuItem item : productMenuItems) {
+          item.setArmed(false);
+        }
+
+        if (productSelectedIndex[0] >= 0 && productSelectedIndex[0] < productMenuItems.size()) {
+          productMenuItems.get(productSelectedIndex[0]).setArmed(true);
         }
       }
     });
 
   }
 
-  private void updateProductSuggestions() {
-    suggestionMenuProduct.setVisible(false);
-    suggestionMenuProduct.removeAll();
-    String input = TXT_Product.getText();
-    if (input.length() > 3) {
-      boolean found = false;
-      for (String item : suggestionsListPoduct) {
-        if (item.toLowerCase().contains(input.toLowerCase())) {
-          JMenuItem menuItem = new JMenuItem(item);
-          menuItem.addActionListener(e -> {
-              TXT_Product.setText(item);
-              suggestionMenuProduct.setVisible(false);
-              // textField.requestFocusInWindow();
-            });
-          suggestionMenuProduct.add(menuItem);
-          found = true;
-        }
-      }
-      if (found) {
-        suggestionMenuProduct.setLightWeightPopupEnabled(false);
-        suggestionMenuProduct.show(TXT_Product, 0, TXT_Product.getHeight());
-        SwingUtilities.invokeLater(TXT_Product::requestFocusInWindow);
-      } else {
-        suggestionMenuProduct.setVisible(false);
-      }
-    }
-  }
-
-
-  public void autoSugestRemarks() {
+  public void autoSuggestRemarks() {
     suggestionMenuRemarks = new JPopupMenu();
     TXT_REMARKS.getDocument().addDocumentListener(new DocumentListener() {
       @Override
       public void insertUpdate(DocumentEvent e) {
-        updateRemarksSuggestions();
+        updateRemarksSuggestions(TXT_REMARKS.getText().trim());
       }
 
       @Override
       public void removeUpdate(DocumentEvent e) {
-        updateRemarksSuggestions();
+        updateRemarksSuggestions(TXT_REMARKS.getText().trim());
       }
 
       @Override
       public void changedUpdate(DocumentEvent e) {
-        updateRemarksSuggestions();
+        updateRemarksSuggestions(TXT_REMARKS.getText().trim());
+      }
+
+      private void updateRemarksSuggestions(String input) {
+        suggestionMenuRemarks.setVisible(false);
+        suggestionMenuRemarks.removeAll();
+        remarksMenuItems.clear();
+        remarksSelectedIndex[0] = -1;
+
+        if (input.length() > 3) {
+          boolean found = false;
+          for (String item : suggestionsListRemarks) {
+            if (item.toLowerCase().contains(input.toLowerCase())) {
+              JMenuItem menuItem = new JMenuItem(item);
+              menuItem.addActionListener(e -> {
+                  TXT_REMARKS.setText(item);
+                  suggestionMenuRemarks.setVisible(false);
+                });
+              suggestionMenuRemarks.add(menuItem);
+              remarksMenuItems.add(menuItem);
+              found = true;
+            }
+          }
+          if (found) {
+            suggestionMenuRemarks.setLightWeightPopupEnabled(false);
+            suggestionMenuRemarks.show(TXT_REMARKS, 0, TXT_REMARKS.getHeight());
+            SwingUtilities.invokeLater(TXT_REMARKS::requestFocusInWindow);
+          } else {
+            suggestionMenuRemarks.setVisible(false);
+          }
+        }
       }
     });
 
     TXT_REMARKS.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-          suggestionMenuRemarks.setVisible(false);
+        if (suggestionMenuRemarks == null || remarksMenuItems == null || remarksMenuItems.isEmpty()) {
+          return;
+        }
+
+        if (suggestionMenuRemarks.isVisible()) {
+          int keyCode = e.getKeyCode();
+          int lastIndex = remarksMenuItems.size() - 1;
+
+          switch (keyCode) {
+          case KeyEvent.VK_DOWN:
+            if (remarksSelectedIndex[0] < lastIndex) {
+              remarksSelectedIndex[0]++;
+            } else {
+              remarksSelectedIndex[0] = 0;
+            }
+            updateSelection();
+            break;
+
+          case KeyEvent.VK_UP:
+            if (remarksSelectedIndex[0] > 0) {
+              remarksSelectedIndex[0]--;
+            } else {
+              remarksSelectedIndex[0] = lastIndex;
+            }
+            updateSelection();
+            break;
+
+          case KeyEvent.VK_RIGHT:
+            if (remarksSelectedIndex[0] >= 0 && remarksSelectedIndex[0] <= lastIndex) {
+              remarksMenuItems.get(remarksSelectedIndex[0]).doClick();
+            }
+            break;
+
+          case KeyEvent.VK_ESCAPE:
+            suggestionMenuRemarks.setVisible(false);
+            break;
+
+          default:
+            break;
+          }
+        }
+      }
+
+      private void updateSelection() {
+        for (JMenuItem item : remarksMenuItems) {
+          item.setArmed(false);
+        }
+
+        if (remarksSelectedIndex[0] >= 0 && remarksSelectedIndex[0] < remarksMenuItems.size()) {
+          remarksMenuItems.get(remarksSelectedIndex[0]).setArmed(true);
         }
       }
     });
-
   }
 
-
-  private void updateRemarksSuggestions() {
-    suggestionMenuRemarks.setVisible(false);
-    suggestionMenuRemarks.removeAll();
-    String input = TXT_REMARKS.getText();
-    if (input.length() > 3) {
-      boolean found = false;
-      for (String item : suggestionsListRemarks) {
-        if (item.toLowerCase().contains(input.toLowerCase())) {
-          JMenuItem menuItem = new JMenuItem(item);
-          menuItem.addActionListener(e -> {
-              TXT_REMARKS.setText(item);
-              suggestionMenuRemarks.setVisible(false);
-              // textField.requestFocusInWindow();
-            });
-          suggestionMenuRemarks.add(menuItem);
-          found = true;
-        }
-      }
-      if (found) {
-        suggestionMenuRemarks.setLightWeightPopupEnabled(false);
-        suggestionMenuRemarks.show(TXT_REMARKS, 0, TXT_REMARKS.getHeight());
-        SwingUtilities.invokeLater(TXT_REMARKS::requestFocusInWindow);
-      } else {
-        suggestionMenuRemarks.setVisible(false);
-      }
-    }
-    //        String input = TXT_REMARKS.getText();
-    //        if (input.isEmpty() || input.equalsIgnoreCase(null) || input.equals("")) {
-    //            // JOptionPane.showMessageDialog(null, "Please enter at least 4 characters", "Message", JOptionPane.ERROR_MESSAGE);
-    //            return;
-    //        } else {
-    //            System.out.println("input.length()--" + input.length());
-    //            if (input.length() < 4) {
-    //                System.out.println("input.length()-1-" + input.length());
-    //                // JOptionPane.showMessageDialog(null, "Please enter at least 4 characters", "Message", JOptionPane.ERROR_MESSAGE);
-    //                return;
-    //            }
-    //        }
-    //        suggestionMenuRemarks.removeAll();
-    //
-    //        if (input.isEmpty()) {
-    //            suggestionMenuRemarks.setVisible(false);
-    //            return;
-    //        }
-    //
-    //        for (String suggestion : suggestionsListRemarks) {
-    //            if (suggestion.toLowerCase().contains(input.toLowerCase())) {
-    //                JMenuItem item = new JMenuItem(suggestion);
-    //                item.addActionListener(e -> {
-    //                        TXT_REMARKS.setText(suggestion);
-    //                        suggestionMenuRemarks.setVisible(false);
-    //                    });
-    //                suggestionMenuRemarks.add(item);
-    //            }
-    //        }
-    //
-    //        if (suggestionMenuRemarks.getComponentCount() > 0) {
-    //            suggestionMenuRemarks.show(TXT_REMARKS, 0, TXT_REMARKS.getHeight());
-    //        } else {
-    //            suggestionMenuRemarks.setVisible(false);
-    //        }
-  }
-  //----------------------------------------------------------------------
-
-  public void autoSugestVehicleNo() {
+  public void autoSuggestVehicleNo() {
     suggestionMenuVehicleNo = new JPopupMenu();
     TXT_VechileNo.getDocument().addDocumentListener(new DocumentListener() {
       @Override
       public void insertUpdate(DocumentEvent e) {
-        updateVehicleNoSuggestions();
+        updateVehicleNoSuggestions(TXT_VechileNo.getText().trim());
       }
 
       @Override
       public void removeUpdate(DocumentEvent e) {
-        updateVehicleNoSuggestions();
+        updateVehicleNoSuggestions(TXT_VechileNo.getText().trim());
       }
 
       @Override
       public void changedUpdate(DocumentEvent e) {
-        updateVehicleNoSuggestions();
+        updateVehicleNoSuggestions(TXT_VechileNo.getText().trim());
+      }
+
+      private void updateVehicleNoSuggestions(String input) {
+        suggestionMenuVehicleNo.setVisible(false);
+        suggestionMenuVehicleNo.removeAll();
+        vehicleNoMenuItems.clear();
+        vehicleNoSelectedIndex[0] = -1;
+
+        if (input.length() > 3) {
+          boolean found = false;
+          for (String item : suggestionsListVehicleNo) {
+            if (item.toLowerCase().contains(input.toLowerCase())) {
+              JMenuItem menuItem = new JMenuItem(item);
+              menuItem.addActionListener(e -> {
+                  TXT_VechileNo.setText(item);
+                  suggestionMenuVehicleNo.setVisible(false);
+                  // textField.requestFocusInWindow();
+                });
+              suggestionMenuVehicleNo.add(menuItem);
+              vehicleNoMenuItems.add(menuItem);
+              found = true;
+            }
+          }
+          if (found) {
+            suggestionMenuVehicleNo.setLightWeightPopupEnabled(false);
+            suggestionMenuVehicleNo.show(TXT_VechileNo, 0, TXT_VechileNo.getHeight());
+            SwingUtilities.invokeLater(TXT_VechileNo::requestFocusInWindow);
+          } else {
+            suggestionMenuVehicleNo.setVisible(false);
+          }
+        }
       }
     });
+
     TXT_VechileNo.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-          suggestionMenuVehicleNo.setVisible(false);
+        if (suggestionMenuVehicleNo == null || vehicleNoMenuItems == null || vehicleNoMenuItems.isEmpty()) {
+          return;
+        }
+
+        if (suggestionMenuVehicleNo.isVisible()) {
+          int keyCode = e.getKeyCode();
+          int lastIndex = vehicleNoMenuItems.size() - 1;
+
+          switch (keyCode) {
+          case KeyEvent.VK_DOWN:
+            if (vehicleNoSelectedIndex[0] < lastIndex) {
+              vehicleNoSelectedIndex[0]++;
+            } else {
+              vehicleNoSelectedIndex[0] = 0;
+            }
+            updateSelection();
+            break;
+
+          case KeyEvent.VK_UP:
+            if (vehicleNoSelectedIndex[0] > 0) {
+              vehicleNoSelectedIndex[0]--;
+            } else {
+              vehicleNoSelectedIndex[0] = lastIndex;
+            }
+            updateSelection();
+            break;
+
+          case KeyEvent.VK_RIGHT:
+            if (vehicleNoSelectedIndex[0] >= 0 && vehicleNoSelectedIndex[0] <= lastIndex) {
+              vehicleNoMenuItems.get(vehicleNoSelectedIndex[0]).doClick();
+            }
+            break;
+
+          case KeyEvent.VK_ESCAPE:
+            suggestionMenuVehicleNo.setVisible(false);
+            break;
+
+          default:
+            break;
+          }
+        }
+      }
+
+      private void updateSelection() {
+        for (JMenuItem item : vehicleNoMenuItems) {
+          item.setArmed(false);
+        }
+
+        if (vehicleNoSelectedIndex[0] >= 0 && vehicleNoSelectedIndex[0] < vehicleNoMenuItems.size()) {
+          vehicleNoMenuItems.get(vehicleNoSelectedIndex[0]).setArmed(true);
         }
       }
     });
   }
 
-
-  private void updateVehicleNoSuggestions() {
-    suggestionMenuVehicleNo.setVisible(false);
-    suggestionMenuVehicleNo.removeAll();
-    String input = TXT_VechileNo.getText();
-    if (input.length() > 3) {
-      boolean found = false;
-      for (String item : suggestionsListVehicleNo) {
-        if (item.toLowerCase().contains(input.toLowerCase())) {
-          JMenuItem menuItem = new JMenuItem(item);
-          menuItem.addActionListener(e -> {
-              TXT_VechileNo.setText(item);
-              suggestionMenuVehicleNo.setVisible(false);
-              // textField.requestFocusInWindow();
-            });
-          suggestionMenuVehicleNo.add(menuItem);
-          found = true;
-        }
-      }
-      if (found) {
-        suggestionMenuVehicleNo.setLightWeightPopupEnabled(false);
-        suggestionMenuVehicleNo.show(TXT_VechileNo, 0, TXT_VechileNo.getHeight());
-        SwingUtilities.invokeLater(TXT_VechileNo::requestFocusInWindow);
-      } else {
-        suggestionMenuVehicleNo.setVisible(false);
-      }
-    }
-  }
-
   public void autoSuggestTrollyNo() {
-    suggestionMenutrollyNo = new JPopupMenu();
+    suggestionMenuTrollyNo = new JPopupMenu();
     TXT_TrollyNo.getDocument().addDocumentListener(new DocumentListener() {
       @Override
       public void insertUpdate(DocumentEvent e) {
-        updateTrollyNoSuggestions();
+        updateTrollyNoSuggestions(TXT_TrollyNo.getText().trim());
       }
 
       @Override
       public void removeUpdate(DocumentEvent e) {
-        updateTrollyNoSuggestions();
+        updateTrollyNoSuggestions(TXT_TrollyNo.getText().trim());
       }
 
       @Override
       public void changedUpdate(DocumentEvent e) {
-        updateTrollyNoSuggestions();
+        updateTrollyNoSuggestions(TXT_TrollyNo.getText().trim());
+      }
+
+      public void updateTrollyNoSuggestions(String input) {
+        suggestionMenuTrollyNo.setVisible(false);
+        suggestionMenuTrollyNo.removeAll();
+        trollyNoMenuItems.clear();
+        trollyNoSelectedIndex[0] = -1;
+        if (input.length() > 3) {
+          boolean found = false;
+          for (String item : suggestionsListTrollyNo) {
+            if (item.toLowerCase().contains(input.toLowerCase())) {
+              JMenuItem menuItem = new JMenuItem(item);
+              menuItem.addActionListener(e -> {
+                  TXT_TrollyNo.setText(item);
+                  suggestionMenuTrollyNo.setVisible(false);
+                  // textField.requestFocusInWindow();
+                });
+              suggestionMenuTrollyNo.add(menuItem);
+              trollyNoMenuItems.add(menuItem);
+              found = true;
+            }
+          }
+          if (found) {
+            suggestionMenuTrollyNo.setLightWeightPopupEnabled(false);
+            suggestionMenuTrollyNo.show(TXT_TrollyNo, 0, TXT_TrollyNo.getHeight());
+            SwingUtilities.invokeLater(TXT_TrollyNo::requestFocusInWindow);
+          } else {
+            suggestionMenuTrollyNo.setVisible(false);
+          }
+        }
       }
     });
+
     TXT_TrollyNo.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-          suggestionMenutrollyNo.setVisible(false);
+        if (suggestionMenuTrollyNo == null || trollyNoMenuItems == null || trollyNoMenuItems.isEmpty()) {
+          return;
+        }
+
+        if (suggestionMenuTrollyNo.isVisible()) {
+          int keyCode = e.getKeyCode();
+          int lastIndex = trollyNoMenuItems.size() - 1;
+
+          switch (keyCode) {
+          case KeyEvent.VK_DOWN:
+            if (trollyNoSelectedIndex[0] < lastIndex) {
+              trollyNoSelectedIndex[0]++;
+            } else {
+              trollyNoSelectedIndex[0] = 0;
+            }
+            updateSelection();
+            break;
+
+          case KeyEvent.VK_UP:
+            if (trollyNoSelectedIndex[0] > 0) {
+              trollyNoSelectedIndex[0]--;
+            } else {
+              trollyNoSelectedIndex[0] = lastIndex;
+            }
+            updateSelection();
+            break;
+
+          case KeyEvent.VK_RIGHT:
+            if (trollyNoSelectedIndex[0] >= 0 && trollyNoSelectedIndex[0] <= lastIndex) {
+              trollyNoMenuItems.get(trollyNoSelectedIndex[0]).doClick();
+            }
+            break;
+
+          case KeyEvent.VK_ESCAPE:
+            suggestionMenuTrollyNo.setVisible(false);
+            break;
+
+          default:
+            break;
+          }
+        }
+      }
+
+      private void updateSelection() {
+        for (JMenuItem item : trollyNoMenuItems) {
+          item.setArmed(false);
+        }
+
+        if (trollyNoSelectedIndex[0] >= 0 && trollyNoSelectedIndex[0] < trollyNoMenuItems.size()) {
+          trollyNoMenuItems.get(trollyNoSelectedIndex[0]).setArmed(true);
         }
       }
     });
   }
-
-  public void updateTrollyNoSuggestions() {
-    suggestionMenutrollyNo.setVisible(false);
-    suggestionMenutrollyNo.removeAll();
-    String input = TXT_TrollyNo.getText();
-    if (input.length() > 3) {
-      boolean found = false;
-      for (String item : suggestionsListTrollyNo) {
-        if (item.toLowerCase().contains(input.toLowerCase())) {
-          JMenuItem menuItem = new JMenuItem(item);
-          menuItem.addActionListener(e -> {
-              TXT_TrollyNo.setText(item);
-              suggestionMenutrollyNo.setVisible(false);
-              // textField.requestFocusInWindow();
-            });
-          suggestionMenutrollyNo.add(menuItem);
-          found = true;
-        }
-      }
-      if (found) {
-        suggestionMenutrollyNo.setLightWeightPopupEnabled(false);
-        suggestionMenutrollyNo.show(TXT_TrollyNo, 0, TXT_TrollyNo.getHeight());
-        SwingUtilities.invokeLater(TXT_TrollyNo::requestFocusInWindow);
-      } else {
-        suggestionMenutrollyNo.setVisible(false);
-      }
-    }
-  }
-
-  //----------------------------------------------------------------------
 
   public void onLoad() {
     TXT_AutoWeight.setText("0");
@@ -454,733 +672,709 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
   }
 
   public void onLoadDate() {
-    LocalDateTime currentDateTime = LocalDateTime.now();
-    //DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("dd-MM-yy HH:mm:ss");
-    DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("dd-MM-yy h:mm:ss.SSSSSSSSS a");
-    todayDateTime = currentDateTime.format(formatter1);
-    System.out.println("Current Date and Time: " + todayDateTime); // Example: 2024-10-16 13:32:43
-    LocalDate currentDate = LocalDate.now();
-    System.out.println("Current Date: " + currentDate);
-    DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    // Parse the input date
-    LocalDate date = LocalDate.parse(currentDate.toString(), inputFormatter);
-    // Format the date to the desired output format
-    String outputDate = date.format(outputFormatter);
-    System.out.println("outputDate--" + outputDate);
-    TXT_CreateDate.setText(outputDate);
-    LocalDateTime now = LocalDateTime.now();
-    // Format the date and time
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-    String timeOnly = now.format(formatter);
-    // Print the current date and time
-    System.out.println("Current date and time: " + timeOnly);
-    TXT_CreateTime.setText(timeOnly);
+    todayDateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yy h:mm:ss.SSSSSSSSS a"));
+    TXT_CreateDate.setText(getCurrentDate());
+    TXT_CreateTime.setText(getCurrentTime());
   }
 
-  /** This method is called from within the constructor to
-   * initialize the form.
-   * WARNING: Do NOT modify this code. The content of this method is
-   * always regenerated by the Form Editor.
-   */
   @SuppressWarnings("unchecked")
-    private void initComponents() {//GEN-BEGIN:initComponents
+  private void initComponents() {//GEN-BEGIN:initComponents
 
-        jMenuItem1 = new javax.swing.JMenuItem();
-        buttonGroup1 = new javax.swing.ButtonGroup();
-        buttonGroup2 = new javax.swing.ButtonGroup();
-        buttonGroup3 = new javax.swing.ButtonGroup();
-        buttonGroup4 = new javax.swing.ButtonGroup();
-        buttonGroup5 = new javax.swing.ButtonGroup();
-        buttonGroup6 = new javax.swing.ButtonGroup();
-        menuBar1 = new java.awt.MenuBar();
-        menu1 = new java.awt.Menu();
-        menu2 = new java.awt.Menu();
-        WeightBridgeJpanel = new javax.swing.JPanel();
-        TXT_AutoWeight = new javax.swing.JTextField();
-        BtnTare = new javax.swing.JButton();
-        BtnGross = new javax.swing.JButton();
-        BtnPrint = new javax.swing.JButton();
-        BtnSubmit = new javax.swing.JButton();
-        jPanel1 = new javax.swing.JPanel();
-        jLabel17 = new javax.swing.JLabel();
-        jScrollPane7 = new javax.swing.JScrollPane();
-        TXT_FinealEnterTime = new javax.swing.JTextPane();
-        TXT_FinealEnterBy = new javax.swing.JTextField();
-        jLabel16 = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
-        TXT_GateEntry = new javax.swing.JTextField();
-        LBL_GateEntry = new javax.swing.JLabel();
-        TXT_Process = new javax.swing.JTextField();
-        jLabel13 = new javax.swing.JLabel();
-        TXT_Machine = new javax.swing.JTextField();
-        jLabel6 = new javax.swing.JLabel();
-        jScrollPane6 = new javax.swing.JScrollPane();
-        TXT_FinealEnterDate = new javax.swing.JTextPane();
-        TXT_Charge = new javax.swing.JTextField();
-        jLabel11 = new javax.swing.JLabel();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel10 = new javax.swing.JLabel();
-        LBL_CreateTime = new javax.swing.JLabel();
-        jScrollPane5 = new javax.swing.JScrollPane();
-        TXT_CreateTime = new javax.swing.JTextPane();
-        jLabel8 = new javax.swing.JLabel();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        TXT_CreateDate = new javax.swing.JTextPane();
-        jLabel5 = new javax.swing.JLabel();
-        TXT_CreateBy = new javax.swing.JTextField();
-        jLabel7 = new javax.swing.JLabel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        TXT_TokenNo = new javax.swing.JTextPane();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        VechileTypejComboBox = new javax.swing.JComboBox();
-        TXT_SlipNo = new javax.swing.JTextField();
-        TXT_RC_NO = new javax.swing.JTextField();
-        jLabel12 = new javax.swing.JLabel();
-        ComboBoxChargeApplied = new javax.swing.JComboBox();
-        jPanel4 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        jScrollPane8 = new javax.swing.JScrollPane();
-        TXT_GrossWeight = new javax.swing.JTextPane();
-        jLabel19 = new javax.swing.JLabel();
-        jScrollPane9 = new javax.swing.JScrollPane();
-        TXT_TareWeight = new javax.swing.JTextPane();
-        jLabel20 = new javax.swing.JLabel();
-        jScrollPane10 = new javax.swing.JScrollPane();
-        TXT_NetWeight = new javax.swing.JTextPane();
-        jLabel21 = new javax.swing.JLabel();
-        jLabel22 = new javax.swing.JLabel();
-        jLabel23 = new javax.swing.JLabel();
-        jLabel24 = new javax.swing.JLabel();
-        TXT_VechileNo = new javax.swing.JTextField();
-        TXT_TrollyNo = new javax.swing.JTextField();
-        TXT_Part = new javax.swing.JTextField();
-        TXT_Product = new javax.swing.JTextField();
-        jLabel14 = new javax.swing.JLabel();
-        TXT_REMARKS = new javax.swing.JTextField();
-        BtnActionClear = new javax.swing.JButton();
-        jPanel3 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        BtnLogOut = new javax.swing.JButton();
-        jPanel5 = new javax.swing.JPanel();
-        jLabel9 = new javax.swing.JLabel();
-        jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
-        jMenu2 = new javax.swing.JMenu();
-        jMenu3 = new javax.swing.JMenu();
-        jMenuItem2 = new javax.swing.JMenuItem();
-        jMenu4 = new javax.swing.JMenu();
-        jMenuItem3 = new javax.swing.JMenuItem();
+    jMenuItem1 = new javax.swing.JMenuItem();
+    buttonGroup1 = new javax.swing.ButtonGroup();
+    buttonGroup2 = new javax.swing.ButtonGroup();
+    buttonGroup3 = new javax.swing.ButtonGroup();
+    buttonGroup4 = new javax.swing.ButtonGroup();
+    buttonGroup5 = new javax.swing.ButtonGroup();
+    buttonGroup6 = new javax.swing.ButtonGroup();
+    menuBar1 = new java.awt.MenuBar();
+    menu1 = new java.awt.Menu();
+    menu2 = new java.awt.Menu();
+    WeightBridgeJpanel = new javax.swing.JPanel();
+    TXT_AutoWeight = new javax.swing.JTextField();
+    BtnTare = new javax.swing.JButton();
+    BtnGross = new javax.swing.JButton();
+    BtnPrint = new javax.swing.JButton();
+    BtnSubmit = new javax.swing.JButton();
+    jPanel1 = new javax.swing.JPanel();
+    jLabel17 = new javax.swing.JLabel();
+    jScrollPane7 = new javax.swing.JScrollPane();
+    TXT_FinealEnterTime = new javax.swing.JTextPane();
+    TXT_FinealEnterBy = new javax.swing.JTextField();
+    jLabel16 = new javax.swing.JLabel();
+    jLabel15 = new javax.swing.JLabel();
+    TXT_GateEntry = new javax.swing.JTextField();
+    LBL_GateEntry = new javax.swing.JLabel();
+    TXT_Process = new javax.swing.JTextField();
+    jLabel13 = new javax.swing.JLabel();
+    TXT_Machine = new javax.swing.JTextField();
+    jLabel6 = new javax.swing.JLabel();
+    jScrollPane6 = new javax.swing.JScrollPane();
+    TXT_FinealEnterDate = new javax.swing.JTextPane();
+    TXT_Charge = new javax.swing.JTextField();
+    jLabel11 = new javax.swing.JLabel();
+    jPanel2 = new javax.swing.JPanel();
+    jLabel10 = new javax.swing.JLabel();
+    LBL_CreateTime = new javax.swing.JLabel();
+    jScrollPane5 = new javax.swing.JScrollPane();
+    TXT_CreateTime = new javax.swing.JTextPane();
+    jLabel8 = new javax.swing.JLabel();
+    jScrollPane4 = new javax.swing.JScrollPane();
+    TXT_CreateDate = new javax.swing.JTextPane();
+    jLabel5 = new javax.swing.JLabel();
+    TXT_CreateBy = new javax.swing.JTextField();
+    jLabel7 = new javax.swing.JLabel();
+    jScrollPane3 = new javax.swing.JScrollPane();
+    TXT_TokenNo = new javax.swing.JTextPane();
+    jLabel4 = new javax.swing.JLabel();
+    jLabel3 = new javax.swing.JLabel();
+    VechileTypejComboBox = new javax.swing.JComboBox();
+    TXT_SlipNo = new javax.swing.JTextField();
+    TXT_RC_NO = new javax.swing.JTextField();
+    jLabel12 = new javax.swing.JLabel();
+    ComboBoxChargeApplied = new javax.swing.JComboBox();
+    jPanel4 = new javax.swing.JPanel();
+    jLabel2 = new javax.swing.JLabel();
+    jScrollPane8 = new javax.swing.JScrollPane();
+    TXT_GrossWeight = new javax.swing.JTextPane();
+    jLabel19 = new javax.swing.JLabel();
+    jScrollPane9 = new javax.swing.JScrollPane();
+    TXT_TareWeight = new javax.swing.JTextPane();
+    jLabel20 = new javax.swing.JLabel();
+    jScrollPane10 = new javax.swing.JScrollPane();
+    TXT_NetWeight = new javax.swing.JTextPane();
+    jLabel21 = new javax.swing.JLabel();
+    jLabel22 = new javax.swing.JLabel();
+    jLabel23 = new javax.swing.JLabel();
+    jLabel24 = new javax.swing.JLabel();
+    TXT_VechileNo = new javax.swing.JTextField();
+    TXT_TrollyNo = new javax.swing.JTextField();
+    TXT_Part = new javax.swing.JTextField();
+    TXT_Product = new javax.swing.JTextField();
+    jLabel14 = new javax.swing.JLabel();
+    TXT_REMARKS = new javax.swing.JTextField();
+    BtnActionClear = new javax.swing.JButton();
+    jPanel3 = new javax.swing.JPanel();
+    jLabel1 = new javax.swing.JLabel();
+    BtnLogOut = new javax.swing.JButton();
+    jPanel5 = new javax.swing.JPanel();
+    jLabel9 = new javax.swing.JLabel();
+    jMenuBar1 = new javax.swing.JMenuBar();
+    jMenu1 = new javax.swing.JMenu();
+    jMenu2 = new javax.swing.JMenu();
+    jMenu3 = new javax.swing.JMenu();
+    jMenuItem2 = new javax.swing.JMenuItem();
+    jMenu4 = new javax.swing.JMenu();
+    jMenuItem3 = new javax.swing.JMenuItem();
 
-        jMenuItem1.setText("jMenuItem1");
+    jMenuItem1.setText("jMenuItem1");
 
-        menu1.setLabel("File");
-        menuBar1.add(menu1);
+    menu1.setLabel("File");
+    menuBar1.add(menu1);
 
-        menu2.setLabel("Edit");
-        menuBar1.add(menu2);
+    menu2.setLabel("Edit");
+    menuBar1.add(menu2);
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Weight Bridge");
-        setBackground(new java.awt.Color(255, 255, 255));
-        setResizable(false);
-        setSize(new java.awt.Dimension(900, 400));
+    setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+    setTitle("Weight Bridge");
+    setBackground(new java.awt.Color(255, 255, 255));
+    setResizable(false);
+    setSize(new java.awt.Dimension(900, 400));
 
-        WeightBridgeJpanel.setBackground(new java.awt.Color(255, 255, 255));
+    WeightBridgeJpanel.setBackground(new java.awt.Color(255, 255, 255));
 
-        TXT_AutoWeight.setEditable(false);
-        TXT_AutoWeight.setBackground(new java.awt.Color(248, 245, 245));
+    TXT_AutoWeight.setEditable(false);
+    TXT_AutoWeight.setBackground(new java.awt.Color(248, 245, 245));
 
-        BtnTare.setBackground(new java.awt.Color(102, 204, 255));
-        BtnTare.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        BtnTare.setForeground(new java.awt.Color(255, 255, 255));
-        BtnTare.setLabel("Tare");
-        BtnTare.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BtnTareActionPerformed(evt);
-            }
-        });
+    BtnTare.setBackground(new java.awt.Color(102, 204, 255));
+    BtnTare.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+    BtnTare.setForeground(new java.awt.Color(255, 255, 255));
+    BtnTare.setLabel("Tare");
+    BtnTare.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        BtnTareActionPerformed(evt);
+      }
+    });
 
-        BtnGross.setBackground(new java.awt.Color(102, 204, 255));
-        BtnGross.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        BtnGross.setForeground(new java.awt.Color(255, 255, 255));
-        BtnGross.setLabel("Gross");
-        BtnGross.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BtnGrossActionPerformed(evt);
-            }
-        });
+    BtnGross.setBackground(new java.awt.Color(102, 204, 255));
+    BtnGross.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+    BtnGross.setForeground(new java.awt.Color(255, 255, 255));
+    BtnGross.setLabel("Gross");
+    BtnGross.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        BtnGrossActionPerformed(evt);
+      }
+    });
 
-        BtnPrint.setBackground(new java.awt.Color(102, 204, 255));
-        BtnPrint.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        BtnPrint.setForeground(new java.awt.Color(255, 255, 255));
-        BtnPrint.setText("Print");
-        BtnPrint.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BtnPrintActionPerformed(evt);
-            }
-        });
+    BtnPrint.setBackground(new java.awt.Color(102, 204, 255));
+    BtnPrint.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+    BtnPrint.setForeground(new java.awt.Color(255, 255, 255));
+    BtnPrint.setText("Print");
+    BtnPrint.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        BtnPrintActionPerformed(evt);
+      }
+    });
 
-        BtnSubmit.setBackground(new java.awt.Color(102, 204, 255));
-        BtnSubmit.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        BtnSubmit.setForeground(new java.awt.Color(255, 255, 255));
-        BtnSubmit.setText("Submit");
-        BtnSubmit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BtnSubmitActionPerformed(evt);
-            }
-        });
+    BtnSubmit.setBackground(new java.awt.Color(102, 204, 255));
+    BtnSubmit.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+    BtnSubmit.setForeground(new java.awt.Color(255, 255, 255));
+    BtnSubmit.setText("Submit");
+    BtnSubmit.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        BtnSubmitActionPerformed(evt);
+      }
+    });
 
-        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+    jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel17.setText("Final Entered Time");
+    jLabel17.setText("Final Entered Time");
 
-        TXT_FinealEnterTime.setDisabledTextColor(new java.awt.Color(51, 51, 51));
-        TXT_FinealEnterTime.setEnabled(false);
-        jScrollPane7.setViewportView(TXT_FinealEnterTime);
+    TXT_FinealEnterTime.setDisabledTextColor(new java.awt.Color(51, 51, 51));
+    TXT_FinealEnterTime.setEnabled(false);
+    jScrollPane7.setViewportView(TXT_FinealEnterTime);
 
-        TXT_FinealEnterBy.setDisabledTextColor(new java.awt.Color(51, 51, 51));
-        TXT_FinealEnterBy.setEnabled(false);
+    TXT_FinealEnterBy.setDisabledTextColor(new java.awt.Color(51, 51, 51));
+    TXT_FinealEnterBy.setEnabled(false);
 
-        jLabel16.setText("Final Entered Date");
+    jLabel16.setText("Final Entered Date");
 
-        jLabel15.setText("Final Entered By");
+    jLabel15.setText("Final Entered By");
 
-        TXT_GateEntry.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                TXT_GateEntryActionPerformed(evt);
-            }
-        });
+    TXT_GateEntry.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        TXT_GateEntryActionPerformed(evt);
+      }
+    });
 
-        LBL_GateEntry.setText("Gate Entry");
+    LBL_GateEntry.setText("Gate Entry");
 
-        jLabel13.setText("Process");
+    jLabel13.setText("Process");
 
-        TXT_Machine.setDisabledTextColor(new java.awt.Color(51, 51, 51));
-        TXT_Machine.setEnabled(false);
+    TXT_Machine.setDisabledTextColor(new java.awt.Color(51, 51, 51));
+    TXT_Machine.setEnabled(false);
 
-        jLabel6.setText("Machine");
+    jLabel6.setText("Machine");
 
-        TXT_FinealEnterDate.setEnabled(false);
-        jScrollPane6.setViewportView(TXT_FinealEnterDate);
+    TXT_FinealEnterDate.setEnabled(false);
+    jScrollPane6.setViewportView(TXT_FinealEnterDate);
 
-        TXT_Charge.setEditable(false);
-        TXT_Charge.setDisabledTextColor(new java.awt.Color(51, 51, 51));
-        TXT_Charge.setEnabled(false);
+    TXT_Charge.setEditable(false);
+    TXT_Charge.setDisabledTextColor(new java.awt.Color(51, 51, 51));
+    TXT_Charge.setEnabled(false);
 
-        jLabel11.setText("Charge");
+    jLabel11.setText("Charge");
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
+    javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+    jPanel1.setLayout(jPanel1Layout);
+    jPanel1Layout.setHorizontalGroup(
+      jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(jPanel1Layout.createSequentialGroup()
+        .addContainerGap()
+        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addComponent(jLabel6)
+              .addComponent(jLabel13))
+            .addGap(62, 62, 62)
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addComponent(TXT_Process)
+              .addComponent(TXT_Machine)))
+          .addGroup(jPanel1Layout.createSequentialGroup()
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addComponent(jLabel15)
+              .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addComponent(jLabel16)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel6)
-                            .addComponent(jLabel13))
-                        .addGap(62, 62, 62)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(TXT_Process)
-                            .addComponent(TXT_Machine)))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel15)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(jLabel16)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel11)
-                                    .addComponent(jLabel17)))
-                            .addComponent(LBL_GateEntry))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(TXT_GateEntry)
-                            .addComponent(TXT_FinealEnterBy, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(TXT_Charge, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
-                            .addComponent(jScrollPane7))))
-                .addContainerGap())
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(30, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(TXT_Machine, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(TXT_Process, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel13))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(TXT_GateEntry, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(LBL_GateEntry))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel15)
-                    .addComponent(TXT_FinealEnterBy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(17, 17, 17)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel16)
-                    .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel17, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(TXT_Charge, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel11))
-                .addGap(38, 38, 38))
-        );
+                  .addComponent(jLabel11)
+                  .addComponent(jLabel17)))
+              .addComponent(LBL_GateEntry))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addComponent(TXT_GateEntry)
+              .addComponent(TXT_FinealEnterBy, javax.swing.GroupLayout.Alignment.TRAILING)
+              .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.TRAILING)
+              .addComponent(TXT_Charge, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
+              .addComponent(jScrollPane7))))
+        .addContainerGap())
+    );
+    jPanel1Layout.setVerticalGroup(
+      jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(jPanel1Layout.createSequentialGroup()
+        .addContainerGap(30, Short.MAX_VALUE)
+        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(TXT_Machine, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(jLabel6))
+        .addGap(18, 18, 18)
+        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(TXT_Process, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(jLabel13))
+        .addGap(18, 18, 18)
+        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(TXT_GateEntry, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(LBL_GateEntry))
+        .addGap(18, 18, 18)
+        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(jLabel15)
+          .addComponent(TXT_FinealEnterBy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addGap(17, 17, 17)
+        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+          .addComponent(jLabel16)
+          .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(jLabel17, javax.swing.GroupLayout.Alignment.TRAILING)
+          .addComponent(jScrollPane7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addGap(18, 18, 18)
+        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+          .addComponent(TXT_Charge, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(jLabel11))
+        .addGap(38, 38, 38))
+    );
 
-        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+    jPanel2.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel10.setText("Vechile Type");
+    jLabel10.setText("Vechile Type");
 
-        LBL_CreateTime.setText("Create Time");
+    LBL_CreateTime.setText("Create Time");
 
-        TXT_CreateTime.setEditable(false);
-        TXT_CreateTime.setBackground(new java.awt.Color(204, 204, 204));
-        TXT_CreateTime.setDisabledTextColor(new java.awt.Color(51, 51, 51));
-        TXT_CreateTime.setEnabled(false);
-        jScrollPane5.setViewportView(TXT_CreateTime);
+    TXT_CreateTime.setEditable(false);
+    TXT_CreateTime.setBackground(new java.awt.Color(204, 204, 204));
+    TXT_CreateTime.setDisabledTextColor(new java.awt.Color(51, 51, 51));
+    TXT_CreateTime.setEnabled(false);
+    jScrollPane5.setViewportView(TXT_CreateTime);
 
-        jLabel8.setText("Create Date");
+    jLabel8.setText("Create Date");
 
-        TXT_CreateDate.setEditable(false);
-        TXT_CreateDate.setBackground(new java.awt.Color(204, 204, 204));
-        TXT_CreateDate.setDisabledTextColor(new java.awt.Color(51, 51, 51));
-        TXT_CreateDate.setEnabled(false);
-        jScrollPane4.setViewportView(TXT_CreateDate);
+    TXT_CreateDate.setEditable(false);
+    TXT_CreateDate.setBackground(new java.awt.Color(204, 204, 204));
+    TXT_CreateDate.setDisabledTextColor(new java.awt.Color(51, 51, 51));
+    TXT_CreateDate.setEnabled(false);
+    jScrollPane4.setViewportView(TXT_CreateDate);
 
-        jLabel5.setText("Token No");
+    jLabel5.setText("Token No");
 
-        TXT_CreateBy.setEditable(false);
-        TXT_CreateBy.setDisabledTextColor(new java.awt.Color(51, 51, 51));
-        TXT_CreateBy.setEnabled(false);
+    TXT_CreateBy.setEditable(false);
+    TXT_CreateBy.setDisabledTextColor(new java.awt.Color(51, 51, 51));
+    TXT_CreateBy.setEnabled(false);
 
-        jLabel7.setText("Create By");
+    jLabel7.setText("Create By");
 
-        TXT_TokenNo.setEditable(false);
-        TXT_TokenNo.setBackground(new java.awt.Color(248, 245, 245));
-        TXT_TokenNo.setDisabledTextColor(new java.awt.Color(51, 51, 51));
-        TXT_TokenNo.setEnabled(false);
-        jScrollPane3.setViewportView(TXT_TokenNo);
+    TXT_TokenNo.setEditable(false);
+    TXT_TokenNo.setBackground(new java.awt.Color(248, 245, 245));
+    TXT_TokenNo.setDisabledTextColor(new java.awt.Color(51, 51, 51));
+    TXT_TokenNo.setEnabled(false);
+    jScrollPane3.setViewportView(TXT_TokenNo);
 
-        jLabel4.setText("RC Number");
+    jLabel4.setText("RC Number");
 
-        jLabel3.setText("Slip Number");
+    jLabel3.setText("Slip Number");
 
-        VechileTypejComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Please Select" }));
-        VechileTypejComboBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                VechileTypejComboBoxActionPerformed(evt);
-            }
-        });
+    VechileTypejComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Please Select" }));
+    VechileTypejComboBox.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        VechileTypejComboBoxActionPerformed(evt);
+      }
+    });
 
-        TXT_SlipNo.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                TXT_SlipNoKeyPressed(evt);
-            }
-        });
+    TXT_SlipNo.addKeyListener(new java.awt.event.KeyAdapter() {
+      public void keyPressed(java.awt.event.KeyEvent evt) {
+        TXT_SlipNoKeyPressed(evt);
+      }
+    });
 
-        jLabel12.setText("Charge Applied Or Not");
+    jLabel12.setText("Charge Applied Or Not");
 
-        ComboBoxChargeApplied.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Yes", "No" }));
-        ComboBoxChargeApplied.setSelectedIndex(1);
-        ComboBoxChargeApplied.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ComboBoxChargeAppliedActionPerformed(evt);
-            }
-        });
+    ComboBoxChargeApplied.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Yes", "No" }));
+    ComboBoxChargeApplied.setSelectedIndex(1);
+    ComboBoxChargeApplied.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        ComboBoxChargeAppliedActionPerformed(evt);
+      }
+    });
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(23, 23, 23)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(jLabel10)
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel7)
-                                    .addComponent(jLabel8)
-                                    .addComponent(jLabel5)
-                                    .addComponent(jLabel4)
-                                    .addComponent(LBL_CreateTime)))
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGap(3, 3, 3)
-                                .addComponent(jLabel3)))
-                        .addGap(61, 61, 61)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
-                            .addComponent(TXT_CreateBy, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
-                            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
-                            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
-                            .addComponent(VechileTypejComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(TXT_SlipNo)
-                            .addComponent(TXT_RC_NO)))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel12)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(ComboBoxChargeApplied, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap(32, Short.MAX_VALUE))
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap(62, Short.MAX_VALUE)
+    javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+    jPanel2.setLayout(jPanel2Layout);
+    jPanel2Layout.setHorizontalGroup(
+      jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(jPanel2Layout.createSequentialGroup()
+        .addGap(23, 23, 23)
+        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+          .addGroup(jPanel2Layout.createSequentialGroup()
+            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addComponent(jLabel10)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(TXT_SlipNo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(24, 24, 24)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(TXT_RC_NO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(TXT_CreateBy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel7))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel8))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(LBL_CreateTime))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel10)
-                    .addComponent(VechileTypejComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(24, 24, 24)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel12)
-                    .addComponent(ComboBoxChargeApplied, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(16, 16, 16))
-        );
+                  .addComponent(jLabel7)
+                  .addComponent(jLabel8)
+                  .addComponent(jLabel5)
+                  .addComponent(jLabel4)
+                  .addComponent(LBL_CreateTime)))
+              .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(3, 3, 3)
+                .addComponent(jLabel3)))
+            .addGap(61, 61, 61)
+            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+              .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
+              .addComponent(TXT_CreateBy, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
+              .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
+              .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
+              .addComponent(VechileTypejComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+              .addComponent(TXT_SlipNo)
+              .addComponent(TXT_RC_NO)))
+          .addGroup(jPanel2Layout.createSequentialGroup()
+            .addComponent(jLabel12)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+            .addComponent(ComboBoxChargeApplied, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+        .addContainerGap(32, Short.MAX_VALUE))
+    );
+    jPanel2Layout.setVerticalGroup(
+      jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(jPanel2Layout.createSequentialGroup()
+        .addContainerGap(62, Short.MAX_VALUE)
+        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING)
+          .addComponent(TXT_SlipNo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addGap(24, 24, 24)
+        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(jLabel4)
+          .addComponent(TXT_RC_NO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addGap(18, 18, 18)
+        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+          .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(jLabel5))
+        .addGap(18, 18, 18)
+        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(TXT_CreateBy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(jLabel7))
+        .addGap(18, 18, 18)
+        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(jLabel8))
+        .addGap(18, 18, 18)
+        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(LBL_CreateTime))
+        .addGap(18, 18, 18)
+        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(jLabel10)
+          .addComponent(VechileTypejComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addGap(24, 24, 24)
+        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(jLabel12)
+          .addComponent(ComboBoxChargeApplied, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addGap(16, 16, 16))
+    );
 
-        jPanel4.setBackground(new java.awt.Color(255, 255, 255));
+    jPanel4.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel2.setText("Gross Weight");
+    jLabel2.setText("Gross Weight");
 
-        TXT_GrossWeight.setEditable(false);
-        TXT_GrossWeight.setBackground(new java.awt.Color(248, 245, 245));
-        TXT_GrossWeight.setDisabledTextColor(new java.awt.Color(51, 51, 51));
-        TXT_GrossWeight.setEnabled(false);
-        jScrollPane8.setViewportView(TXT_GrossWeight);
+    TXT_GrossWeight.setEditable(false);
+    TXT_GrossWeight.setBackground(new java.awt.Color(248, 245, 245));
+    TXT_GrossWeight.setDisabledTextColor(new java.awt.Color(51, 51, 51));
+    TXT_GrossWeight.setEnabled(false);
+    jScrollPane8.setViewportView(TXT_GrossWeight);
 
-        jLabel19.setText("Tare Weight");
+    jLabel19.setText("Tare Weight");
 
-        TXT_TareWeight.setEditable(false);
-        TXT_TareWeight.setDisabledTextColor(new java.awt.Color(51, 51, 51));
-        TXT_TareWeight.setEnabled(false);
-        jScrollPane9.setViewportView(TXT_TareWeight);
+    TXT_TareWeight.setEditable(false);
+    TXT_TareWeight.setDisabledTextColor(new java.awt.Color(51, 51, 51));
+    TXT_TareWeight.setEnabled(false);
+    jScrollPane9.setViewportView(TXT_TareWeight);
 
-        jLabel20.setText("Net Weight");
+    jLabel20.setText("Net Weight");
 
-        TXT_NetWeight.setEditable(false);
-        TXT_NetWeight.setDisabledTextColor(new java.awt.Color(51, 51, 51));
-        TXT_NetWeight.setEnabled(false);
-        jScrollPane10.setViewportView(TXT_NetWeight);
+    TXT_NetWeight.setEditable(false);
+    TXT_NetWeight.setDisabledTextColor(new java.awt.Color(51, 51, 51));
+    TXT_NetWeight.setEnabled(false);
+    jScrollPane10.setViewportView(TXT_NetWeight);
 
-        jLabel21.setText("Vehicle Number");
+    jLabel21.setText("Vehicle Number");
 
-        jLabel22.setText("Trolly Number");
+    jLabel22.setText("Trolley Number");
 
-        jLabel23.setText("Party");
+    jLabel23.setText("Party");
 
-        jLabel24.setText("Product");
+    jLabel24.setText("Product");
 
-        TXT_VechileNo.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                TXT_VechileNoKeyPressed(evt);
-            }
-        });
+    TXT_VechileNo.addKeyListener(new java.awt.event.KeyAdapter() {
+      public void keyPressed(java.awt.event.KeyEvent evt) {
+        TXT_VechileNoKeyPressed(evt);
+      }
+    });
 
-        TXT_TrollyNo.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                TXT_TrollyNoKeyPressed(evt);
-            }
-        });
+    TXT_TrollyNo.addKeyListener(new java.awt.event.KeyAdapter() {
+      public void keyPressed(java.awt.event.KeyEvent evt) {
+        TXT_TrollyNoKeyPressed(evt);
+      }
+    });
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
+    javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+    jPanel4.setLayout(jPanel4Layout);
+    jPanel4Layout.setHorizontalGroup(
+      jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(jPanel4Layout.createSequentialGroup()
+        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(jLabel21)
+          .addComponent(jLabel20)
+          .addComponent(jLabel19)
+          .addComponent(jLabel2)
+          .addComponent(jLabel22))
+        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addGroup(jPanel4Layout.createSequentialGroup()
+            .addGap(30, 30, 30)
+            .addComponent(TXT_TrollyNo))
+          .addGroup(jPanel4Layout.createSequentialGroup()
+            .addGap(32, 32, 32)
+            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addComponent(TXT_VechileNo)
+              .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel21)
-                    .addComponent(jLabel20)
-                    .addComponent(jLabel19)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel22))
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGap(30, 30, 30)
-                        .addComponent(TXT_TrollyNo))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGap(32, 32, 32)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(TXT_VechileNo)
-                            .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jScrollPane10, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(0, 88, Short.MAX_VALUE)))))
-                .addContainerGap())
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel23)
-                    .addComponent(jLabel24))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(TXT_Part, javax.swing.GroupLayout.DEFAULT_SIZE, 240, Short.MAX_VALUE)
-                    .addComponent(TXT_Product)))
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel19)
-                    .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel20)
-                    .addComponent(jScrollPane10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel21)
-                    .addComponent(TXT_VechileNo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(21, 21, 21)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel22)
-                    .addComponent(TXT_TrollyNo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(21, 21, 21)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel23)
-                    .addComponent(TXT_Part, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(21, 21, 21)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel24)
-                    .addComponent(TXT_Product, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(21, Short.MAX_VALUE))
-        );
+                  .addComponent(jScrollPane10, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                  .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                  .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 88, Short.MAX_VALUE)))))
+        .addContainerGap())
+      .addGroup(jPanel4Layout.createSequentialGroup()
+        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(jLabel23)
+          .addComponent(jLabel24))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+          .addComponent(TXT_Part, javax.swing.GroupLayout.DEFAULT_SIZE, 240, Short.MAX_VALUE)
+          .addComponent(TXT_Product)))
+    );
+    jPanel4Layout.setVerticalGroup(
+      jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(jPanel4Layout.createSequentialGroup()
+        .addContainerGap()
+        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addGap(18, 18, 18)
+        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(jLabel19)
+          .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addGap(18, 18, 18)
+        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(jLabel20)
+          .addComponent(jScrollPane10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addGap(18, 18, 18)
+        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(jLabel21)
+          .addComponent(TXT_VechileNo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addGap(21, 21, 21)
+        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(jLabel22)
+          .addComponent(TXT_TrollyNo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addGap(21, 21, 21)
+        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(jLabel23)
+          .addComponent(TXT_Part, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addGap(21, 21, 21)
+        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(jLabel24)
+          .addComponent(TXT_Product, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addContainerGap(21, Short.MAX_VALUE))
+    );
 
-        jLabel2.getAccessibleContext().setAccessibleName("");
-        jLabel22.getAccessibleContext().setAccessibleName("Trolley Number");
+    jLabel2.getAccessibleContext().setAccessibleName("");
+    jLabel22.getAccessibleContext().setAccessibleName("Trolley Number");
 
-        jLabel14.setText("Remark");
+    jLabel14.setText("Remark");
 
-        BtnActionClear.setBackground(new java.awt.Color(102, 204, 255));
-        BtnActionClear.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        BtnActionClear.setForeground(new java.awt.Color(255, 255, 255));
-        BtnActionClear.setText("Reset");
-        BtnActionClear.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BtnActionClearActionPerformed(evt);
-            }
-        });
+    BtnActionClear.setBackground(new java.awt.Color(102, 204, 255));
+    BtnActionClear.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+    BtnActionClear.setForeground(new java.awt.Color(255, 255, 255));
+    BtnActionClear.setText("Reset");
+    BtnActionClear.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        BtnActionClearActionPerformed(evt);
+      }
+    });
 
-        javax.swing.GroupLayout WeightBridgeJpanelLayout = new javax.swing.GroupLayout(WeightBridgeJpanel);
-        WeightBridgeJpanel.setLayout(WeightBridgeJpanelLayout);
-        WeightBridgeJpanelLayout.setHorizontalGroup(
-            WeightBridgeJpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(WeightBridgeJpanelLayout.createSequentialGroup()
-                .addContainerGap(37, Short.MAX_VALUE)
-                .addGroup(WeightBridgeJpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(WeightBridgeJpanelLayout.createSequentialGroup()
-                        .addComponent(jLabel14)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(TXT_REMARKS, javax.swing.GroupLayout.PREFERRED_SIZE, 989, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(WeightBridgeJpanelLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addGroup(WeightBridgeJpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(TXT_AutoWeight, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, WeightBridgeJpanelLayout.createSequentialGroup()
-                                .addGap(12, 12, 12)
-                                .addComponent(BtnTare, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(31, 31, 31)
-                                .addComponent(BtnGross, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(124, 124, 124)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(43, 43, 43))
-                    .addGroup(WeightBridgeJpanelLayout.createSequentialGroup()
-                        .addGroup(WeightBridgeJpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(WeightBridgeJpanelLayout.createSequentialGroup()
-                                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, WeightBridgeJpanelLayout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(BtnSubmit, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(85, 85, 85)
-                                .addComponent(BtnActionClear, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(92, 92, 92)))
-                        .addComponent(BtnPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-        );
-        WeightBridgeJpanelLayout.setVerticalGroup(
-            WeightBridgeJpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(WeightBridgeJpanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(WeightBridgeJpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(WeightBridgeJpanelLayout.createSequentialGroup()
-                        .addComponent(TXT_AutoWeight, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(WeightBridgeJpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(WeightBridgeJpanelLayout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(WeightBridgeJpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(BtnGross)
-                                    .addComponent(BtnTare))
-                                .addGap(18, 18, 18)
-                                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(WeightBridgeJpanelLayout.createSequentialGroup()
-                                .addGap(2, 2, 2)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(2, 2, 2))
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(WeightBridgeJpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel14)
-                    .addComponent(TXT_REMARKS, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+    javax.swing.GroupLayout WeightBridgeJpanelLayout = new javax.swing.GroupLayout(WeightBridgeJpanel);
+    WeightBridgeJpanel.setLayout(WeightBridgeJpanelLayout);
+    WeightBridgeJpanelLayout.setHorizontalGroup(
+      WeightBridgeJpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(WeightBridgeJpanelLayout.createSequentialGroup()
+        .addContainerGap(37, Short.MAX_VALUE)
+        .addGroup(WeightBridgeJpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addGroup(WeightBridgeJpanelLayout.createSequentialGroup()
+            .addComponent(jLabel14)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(TXT_REMARKS, javax.swing.GroupLayout.PREFERRED_SIZE, 989, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGap(0, 0, Short.MAX_VALUE))
+          .addGroup(WeightBridgeJpanelLayout.createSequentialGroup()
+            .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(WeightBridgeJpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+              .addComponent(TXT_AutoWeight, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE)
+              .addGroup(javax.swing.GroupLayout.Alignment.LEADING, WeightBridgeJpanelLayout.createSequentialGroup()
+                .addGap(12, 12, 12)
+                .addComponent(BtnTare, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(31, 31, 31)
+                .addComponent(BtnGross, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)))
+            .addGap(124, 124, 124)
+            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGap(43, 43, 43))
+          .addGroup(WeightBridgeJpanelLayout.createSequentialGroup()
+            .addGroup(WeightBridgeJpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addGroup(WeightBridgeJpanelLayout.createSequentialGroup()
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+              .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, WeightBridgeJpanelLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(BtnSubmit, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(85, 85, 85)
+                .addComponent(BtnActionClear, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(92, 92, 92)))
+            .addComponent(BtnPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+    );
+    WeightBridgeJpanelLayout.setVerticalGroup(
+      WeightBridgeJpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(WeightBridgeJpanelLayout.createSequentialGroup()
+        .addContainerGap()
+        .addGroup(WeightBridgeJpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+          .addGroup(WeightBridgeJpanelLayout.createSequentialGroup()
+            .addComponent(TXT_AutoWeight, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(WeightBridgeJpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addGroup(WeightBridgeJpanelLayout.createSequentialGroup()
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(WeightBridgeJpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(BtnPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(BtnSubmit, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(BtnActionClear, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(25, Short.MAX_VALUE))
-        );
+                  .addComponent(BtnGross)
+                  .addComponent(BtnTare))
+                .addGap(18, 18, 18)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+              .addGroup(WeightBridgeJpanelLayout.createSequentialGroup()
+                .addGap(2, 2, 2)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+            .addGap(2, 2, 2))
+          .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addGroup(WeightBridgeJpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+          .addComponent(jLabel14)
+          .addComponent(TXT_REMARKS, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addGroup(WeightBridgeJpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(BtnPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(BtnSubmit, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+          .addComponent(BtnActionClear, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addContainerGap(25, Short.MAX_VALUE))
+    );
 
-        jPanel3.setBackground(new java.awt.Color(13, 113, 188));
+    jPanel3.setBackground(new java.awt.Color(13, 113, 188));
 
-        jLabel1.setFont(new java.awt.Font("DejaVu Serif Condensed", 1, 24)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Weight Bridge");
+    jLabel1.setFont(new java.awt.Font("DejaVu Serif Condensed", 1, 24)); // NOI18N
+    jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+    jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+    jLabel1.setText("Weight Bridge");
 
-        BtnLogOut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/weightmachinedesktopapplication/shutdown (1).png"))); // NOI18N
-        BtnLogOut.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BtnLogOutActionPerformed(evt);
-            }
-        });
+    BtnLogOut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/weightmachinedesktopapplication/shutdown (1).png"))); // NOI18N
+    BtnLogOut.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        BtnLogOutActionPerformed(evt);
+      }
+    });
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(BtnLogOut)
-                .addGap(22, 22, 22))
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(BtnLogOut)
-                .addContainerGap(22, Short.MAX_VALUE))
-        );
+    javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+    jPanel3.setLayout(jPanel3Layout);
+    jPanel3Layout.setHorizontalGroup(
+      jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(jPanel3Layout.createSequentialGroup()
+        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        .addComponent(BtnLogOut)
+        .addGap(22, 22, 22))
+    );
+    jPanel3Layout.setVerticalGroup(
+      jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(jPanel3Layout.createSequentialGroup()
+        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        .addContainerGap())
+      .addGroup(jPanel3Layout.createSequentialGroup()
+        .addContainerGap()
+        .addComponent(BtnLogOut)
+        .addContainerGap(22, Short.MAX_VALUE))
+    );
 
-        jPanel5.setBackground(new java.awt.Color(13, 113, 188));
+    jPanel5.setBackground(new java.awt.Color(13, 113, 188));
 
-        jLabel9.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel9.setText("Bharuwa solutions Pvt Ltd.");
+    jLabel9.setForeground(new java.awt.Color(255, 255, 255));
+    jLabel9.setText("Bharuwa solutions Pvt Ltd.");
 
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel9)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(20, 20, 20)
-                .addComponent(jLabel9)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+    javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+    jPanel5.setLayout(jPanel5Layout);
+    jPanel5Layout.setHorizontalGroup(
+      jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(jPanel5Layout.createSequentialGroup()
+        .addContainerGap()
+        .addComponent(jLabel9)
+        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+    );
+    jPanel5Layout.setVerticalGroup(
+      jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(jPanel5Layout.createSequentialGroup()
+        .addGap(20, 20, 20)
+        .addComponent(jLabel9)
+        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+    );
 
-        jMenu1.setText("File");
-        jMenuBar1.add(jMenu1);
+    jMenu1.setText("File");
+    jMenuBar1.add(jMenu1);
 
-        jMenu2.setText("Edit");
-        jMenuBar1.add(jMenu2);
+    jMenu2.setText("Edit");
+    jMenuBar1.add(jMenu2);
 
-        jMenu3.setText("Print");
+    jMenu3.setText("Print");
 
-        jMenuItem2.setText("Duplicate print");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
-            }
-        });
-        jMenu3.add(jMenuItem2);
+    jMenuItem2.setText("Duplicate print");
+    jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jMenuItem2ActionPerformed(evt);
+      }
+    });
+    jMenu3.add(jMenuItem2);
 
-        jMenuBar1.add(jMenu3);
+    jMenuBar1.add(jMenu3);
 
-        jMenu4.setText("Report");
+    jMenu4.setText("Report");
 
-        jMenuItem3.setText("Report1");
-        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem3ActionPerformed(evt);
-            }
-        });
-        jMenu4.add(jMenuItem3);
+    jMenuItem3.setText("Report1");
+    jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jMenuItem3ActionPerformed(evt);
+      }
+    });
+    jMenu4.add(jMenuItem3);
 
-        jMenuBar1.add(jMenu4);
+    jMenuBar1.add(jMenu4);
 
-        setJMenuBar(jMenuBar1);
+    setJMenuBar(jMenuBar1);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(WeightBridgeJpanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(WeightBridgeJpanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
+    javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+    getContentPane().setLayout(layout);
+    layout.setHorizontalGroup(
+      layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addComponent(WeightBridgeJpanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+      .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+      .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+    );
+    layout.setVerticalGroup(
+      layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        .addComponent(WeightBridgeJpanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+    );
 
-        pack();
-    }//GEN-END:initComponents
+    pack();
+  }//GEN-END:initComponents
 
     private void BtnSubmitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnSubmitActionPerformed
     if (TXT_GrossWeight.getText().equalsIgnoreCase("0") && TXT_TareWeight.getText().equalsIgnoreCase("0")) {
@@ -1198,43 +1392,32 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
       JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
       return;
     }
-      String value=comPoartMechineConnection("SaveBtn");
-       // JOptionPane.showMessageDialog(null, "valuueueueu----"+value, "Message", JOptionPane.INFORMATION_MESSAGE);
+
+    String value = comPoartMechineConnection("SaveBtn");
     if (comPoartMechineConnection("SaveBtn").equalsIgnoreCase("N")) {
       String message = "Weight-bridge weight not match.";
       JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
       return;
     }
-    try{
-        if( TXT_GrossWeight.getText()!="0"){
-            
-        }else{
-        if(ftTereWeight.equalsIgnoreCase("0")){
-         //   JOptionPane.showMessageDialog(null, "ftTereWeight---"+ftTereWeight, "Message", JOptionPane.INFORMATION_MESSAGE);
-        }
-        else{
-      //  JOptionPane.showMessageDialog(null, "ftTereWeight--33-"+ftTereWeight, "Message", JOptionPane.INFORMATION_MESSAGE);
-           
-      if (TXT_TareWeight.getText() != "0" ) {
-        int margin = 1000;
-        int tareWeight = Integer.valueOf(TXT_TareWeight.getText());
-        int oldTareWeight = Integer.parseInt(ftTereWeight);
+    try {
+      if (TXT_GrossWeight.getText() == "0") {
+        if (!ftTereWeight.equalsIgnoreCase("0")) {
+          if (TXT_TareWeight.getText() != "0") {
+            int margin = 1000;
+            int tareWeight = Integer.valueOf(TXT_TareWeight.getText());
+            int oldTareWeight = Integer.parseInt(ftTereWeight);
 
-        if (tareWeight > oldTareWeight + margin || tareWeight < oldTareWeight - margin) {
-          String message = "Difference is more than 1000 KGs.";
-          JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
-          return;
+            if (tareWeight > oldTareWeight + margin || tareWeight < oldTareWeight - margin) {
+              String message = "Difference is more than 1000 KGs.";
+              JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
+              return;
+            }
+          }
         }
       }
+    } catch (Exception ex) {
+      ex.printStackTrace();
     }
-        }
-    }catch(Exception ex){
-       // JOptionPane.showMessageDialog(null, "sawan kumar--23234-"+ex.toString(), "Message", JOptionPane.INFORMATION_MESSAGE);
-    }
-    
-//    
-        //JOptionPane.showMessageDialog(null, "valuueueueu----2", "Message", JOptionPane.INFORMATION_MESSAGE);
-
     if (compVechileType.equalsIgnoreCase("N")) {
       if (TXT_Charge.getText() == "0" || TXT_Charge.getText().equalsIgnoreCase("0")) {
         String message = "This vehicle outside charge is applied, please select vehicle type.";
@@ -1242,42 +1425,41 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         return;
       }
     }
-       // JOptionPane.showMessageDialog(null, "valuueueueu----3", "Message", JOptionPane.INFORMATION_MESSAGE);
+    // JOptionPane.showMessageDialog(null, "valuueueueu----3", "Message", JOptionPane.INFORMATION_MESSAGE);
     String selectedItem = (String) VechileTypejComboBox.getSelectedItem();
     if (selectedItem.equalsIgnoreCase("Please Select")) {
       JOptionPane.showMessageDialog(null, "please select vehicle type", "Message", JOptionPane.INFORMATION_MESSAGE);
       return;
     }
-       // JOptionPane.showMessageDialog(null, "valuueueueu----4", "Message", JOptionPane.INFORMATION_MESSAGE);
+    // JOptionPane.showMessageDialog(null, "valuueueueu----4", "Message", JOptionPane.INFORMATION_MESSAGE);
     if (TXT_Part.getText().trim().isEmpty()) {
       JOptionPane.showMessageDialog(null, "Please Enter Party Details", "Message", JOptionPane.INFORMATION_MESSAGE);
       return;
     }
-      //  JOptionPane.showMessageDialog(null, "valuueueueu----5", "Message", JOptionPane.INFORMATION_MESSAGE);
-//    if (TXT_Product.getText().trim().isEmpty()) {
-//      JOptionPane.showMessageDialog(null, "Please Enter Product Details", "Message", JOptionPane.INFORMATION_MESSAGE);
-//      return;
-//    }
-       // JOptionPane.showMessageDialog(null, "valuueueueu----6", "Message", JOptionPane.INFORMATION_MESSAGE);
+    //  JOptionPane.showMessageDialog(null, "valuueueueu----5", "Message", JOptionPane.INFORMATION_MESSAGE);
+    //    if (TXT_Product.getText().trim().isEmpty()) {
+    //      JOptionPane.showMessageDialog(null, "Please Enter Product Details", "Message", JOptionPane.INFORMATION_MESSAGE);
+    //      return;
+    //    }
+    // JOptionPane.showMessageDialog(null, "valuueueueu----6", "Message", JOptionPane.INFORMATION_MESSAGE);
     if (TXT_SlipNo.getText().trim().isEmpty() || TXT_SlipNo.getText().trim() == null ||
         TXT_SlipNo.getText().trim() == "" || TXT_SlipNo.getText().equalsIgnoreCase("0")) {
-       // JOptionPane.showMessageDialog(null, "valuueueueu----7", "Message", JOptionPane.INFORMATION_MESSAGE);
       insertdateCallApi();
     } else {
-//      if (TXT_REMARKS.getText().trim().isEmpty()) {
-//        JOptionPane.showMessageDialog(null, "Please Enter Remark", "Message", JOptionPane.INFORMATION_MESSAGE);
-//        return;
-//      }
+      //      if (TXT_REMARKS.getText().trim().isEmpty()) {
+      //        JOptionPane.showMessageDialog(null, "Please Enter Remark", "Message", JOptionPane.INFORMATION_MESSAGE);
+      //        return;
+      //      }
       if (Integer.parseInt(TXT_NetWeight.getText()) <= 0) {
         String message = "Net weight is should be greater than 0";
         JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
         return;
-      }
-      else{
-          if (TXT_Product.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Please Enter Product Details", "Message", JOptionPane.INFORMATION_MESSAGE);
-                return;
-              }
+      } else {
+        if (TXT_Product.getText().trim().isEmpty()) {
+          JOptionPane.showMessageDialog(null, "Please Enter Product Details", "Message",
+                                        JOptionPane.INFORMATION_MESSAGE);
+          return;
+        }
       }
       updatedateCallApi();
     }
@@ -1386,17 +1568,16 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         while ((responseLine = bufferedReader.readLine()) != null) {
           stringBuilder.append(responseLine.trim());
         }
-
         JSONObject responseObject = new JSONObject(stringBuilder.toString());
         int status = responseObject.getInt("statusCode");
         String message = responseObject.getString("message");
         if (status == 200) {
           JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
-          TXT_CreateDate.setText(getDate(LocalDate.now()));
+          TXT_CreateDate.setText(getCurrentDate());
           if (Integer.parseInt(TXT_NetWeight.getText()) > 0) {
             TXT_FinealEnterBy.setText(userNamevalue);
-            TXT_FinealEnterDate.setText(getDate(LocalDate.now()));
-            TXT_FinealEnterTime.setText(getTime(LocalDateTime.now()));
+            TXT_FinealEnterDate.setText(getCurrentDate());
+            TXT_FinealEnterTime.setText(getCurrentTime());
           }
           forPrint();
           TXT_SlipNo.setText(TXT_SlipNo.getText());
@@ -1428,8 +1609,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     TXT_NetWeight.setText(String.valueOf(netWeight));
     if (Integer.parseInt(TXT_NetWeight.getText()) > 0) {
       TXT_FinealEnterBy.setText(userNamevalue);
-      TXT_FinealEnterDate.setText(getDate(LocalDate.now()));
-      TXT_FinealEnterTime.setText(getTime(LocalDateTime.now()));
+      TXT_FinealEnterDate.setText(getCurrentDate());
+      TXT_FinealEnterTime.setText(getCurrentTime());
     }
     }//GEN-LAST:event_BtnGrossActionPerformed
 
@@ -1450,10 +1631,11 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
       JOptionPane.showMessageDialog(null, "Please Enter Slip No", "Message", JOptionPane.ERROR_MESSAGE);
       return;
     }
-        try {
-            oncallApiVehicleSlipNo(TXT_SlipNo.getText().trim());
-        } catch (JSONException e) {
-        }
+    try {
+      oncallApiVehicleSlipNo(TXT_SlipNo.getText().trim());
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
     }//GEN-LAST:event_BtnPrintActionPerformed
 
     private void TXT_GateEntryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TXT_GateEntryActionPerformed
@@ -1485,9 +1667,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         }
       }
       String codeValue = itemCodeList.stream().filter(item -> item.getKey().equals(selectedItem)) // Filter based on the key
-        .map(Item::getValue)
-        .findFirst()
-        .orElse(null);
+        .map(Item::getValue).findFirst().orElse(null);
       if (codeValue != null) {
         vechileCode = codeValue;
       }
@@ -1513,12 +1693,12 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
     private void TXT_SlipNoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TXT_SlipNoKeyPressed
     if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-      String date = getDate(LocalDate.now());
+      String date = getCurrentDate();
       TXT_CreateDate.setText(date);
-      if(netWeightCalculate()>0){
-      TXT_FinealEnterBy.setText(userNamevalue);
-      TXT_FinealEnterDate.setText(date);
-      TXT_FinealEnterTime.setText(getTime(LocalDateTime.now()));
+      if (netWeightCalculate() > 0) {
+        TXT_FinealEnterBy.setText(userNamevalue);
+        TXT_FinealEnterDate.setText(date);
+        TXT_FinealEnterTime.setText(getCurrentTime());
       }
       oncallApiVehicleSlipNo(null, TXT_SlipNo.getText().trim().toUpperCase());
       onLoadDate();
@@ -1537,9 +1717,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     } else {
       String selectedType = (String) VechileTypejComboBox.getSelectedItem();
       String firstValue = itemList.stream().filter(item -> item.getKey().equals(selectedType)) // Filter based on the key
-        .map(Item::getValue)
-        .findFirst()
-        .orElse(null);
+        .map(Item::getValue).findFirst().orElse(null);
       TXT_Charge.setText(firstValue == null ? "0" : firstValue);
     }
     onLoadDate();
@@ -1617,14 +1795,15 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
   public void vehicleDetailsWithAutoSugest() {
     WeightBridgeDao obj = new WeightBridgeDao();
     suggestionsListParty = new ArrayList<>();
-    suggestionsListPoduct = new ArrayList<>();
+    suggestionsListProduct = new ArrayList<>();
     suggestionsListRemarks = new ArrayList<>();
     try (Connection connection = obj.getStartConnection();
-         Statement statement = connection.createStatement();) {
-      String query = "SELECT V.CODE, V.TYPE_CODE, V.SUBTYPE_DESC, M.WEIGHING_RATE\n" + 
-      "FROM VEHICLE_SUBTYPE_MASTER V\n" + 
-      "INNER JOIN WEIGHING_RATE_MASTER M ON V.CODE=M.VEHICLE_SUB_TYPE_CODE\n" + 
-      "WHERE V.STATUS='Y' AND M.STATUS='Y';";
+         Statement statement = connection.createStatement()) {
+      String query =
+        "SELECT V.CODE, V.TYPE_CODE, V.SUBTYPE_DESC, M.WEIGHING_RATE\n" + "FROM VEHICLE_SUBTYPE_MASTER V\n" +
+        "FROM VEHICLE_SUBTYPE_MASTER V\n" + "FROM VEHICLE_SUBTYPE_MASTER V\n" + "FROM VEHICLE_SUBTYPE_MASTER V\n" +
+        "FROM VEHICLE_SUBTYPE_MASTER V\n" + "INNER JOIN WEIGHING_RATE_MASTER M ON V.CODE=M.VEHICLE_SUB_TYPE_CODE\n" +
+        "WHERE V.STATUS='Y' AND M.STATUS='Y';";
       try (ResultSet resultSet = statement.executeQuery(query)) {
         while (resultSet.next()) {
           VechileTypejComboBox.addItem(resultSet.getString("SUBTYPE_DESC"));
@@ -1638,11 +1817,15 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
       try (ResultSet resultSet = statement.executeQuery(query)) {
         while (resultSet.next()) {
           suggestionsListParty.add(resultSet.getString("PARTY"));
-          suggestionsListPoduct.add(resultSet.getString("PRODUCT"));
+          suggestionsListProduct.add(resultSet.getString("PRODUCT"));
           suggestionsListRemarks.add(resultSet.getString("REMARKS"));
         }
       }
     } catch (Exception ex) {
+      JOptionPane.showMessageDialog(null, ex.toString(), "Message", JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(null, ex.toString(), "Message", JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(null, ex.toString(), "Message", JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(null, ex.toString(), "Message", JOptionPane.ERROR_MESSAGE);
       JOptionPane.showMessageDialog(null, ex.toString(), "Message", JOptionPane.ERROR_MESSAGE);
     }
   }
@@ -1752,164 +1935,164 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     BtnGross.setEnabled(false);
   }
   
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton BtnActionClear;
-    private javax.swing.JButton BtnGross;
-    private javax.swing.JButton BtnLogOut;
-    private javax.swing.JButton BtnPrint;
-    private javax.swing.JButton BtnSubmit;
-    private javax.swing.JButton BtnTare;
-    private javax.swing.JComboBox ComboBoxChargeApplied;
-    private javax.swing.JLabel LBL_CreateTime;
-    private javax.swing.JLabel LBL_GateEntry;
-    private javax.swing.JTextField TXT_AutoWeight;
-    private javax.swing.JTextField TXT_Charge;
-    private javax.swing.JTextField TXT_CreateBy;
-    private javax.swing.JTextPane TXT_CreateDate;
-    private javax.swing.JTextPane TXT_CreateTime;
-    private javax.swing.JTextField TXT_FinealEnterBy;
-    private javax.swing.JTextPane TXT_FinealEnterDate;
-    private javax.swing.JTextPane TXT_FinealEnterTime;
-    private javax.swing.JTextField TXT_GateEntry;
-    private javax.swing.JTextPane TXT_GrossWeight;
-    private javax.swing.JTextField TXT_Machine;
-    private javax.swing.JTextPane TXT_NetWeight;
-    private javax.swing.JTextField TXT_Part;
-    private javax.swing.JTextField TXT_Process;
-    private javax.swing.JTextField TXT_Product;
-    private javax.swing.JTextField TXT_RC_NO;
-    private javax.swing.JTextField TXT_REMARKS;
-    private javax.swing.JTextField TXT_SlipNo;
-    private javax.swing.JTextPane TXT_TareWeight;
-    private javax.swing.JTextPane TXT_TokenNo;
-    private javax.swing.JTextField TXT_TrollyNo;
-    private javax.swing.JTextField TXT_VechileNo;
-    private javax.swing.JComboBox VechileTypejComboBox;
-    private javax.swing.JPanel WeightBridgeJpanel;
-    private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.ButtonGroup buttonGroup2;
-    private javax.swing.ButtonGroup buttonGroup3;
-    private javax.swing.ButtonGroup buttonGroup4;
-    private javax.swing.ButtonGroup buttonGroup5;
-    private javax.swing.ButtonGroup buttonGroup6;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel16;
-    private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel19;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel20;
-    private javax.swing.JLabel jLabel21;
-    private javax.swing.JLabel jLabel22;
-    private javax.swing.JLabel jLabel23;
-    private javax.swing.JLabel jLabel24;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenu jMenu3;
-    private javax.swing.JMenu jMenu4;
-    private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem3;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JScrollPane jScrollPane10;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JScrollPane jScrollPane4;
-    private javax.swing.JScrollPane jScrollPane5;
-    private javax.swing.JScrollPane jScrollPane6;
-    private javax.swing.JScrollPane jScrollPane7;
-    private javax.swing.JScrollPane jScrollPane8;
-    private javax.swing.JScrollPane jScrollPane9;
-    private java.awt.Menu menu1;
-    private java.awt.Menu menu2;
-    private java.awt.MenuBar menuBar1;
-    // End of variables declaration//GEN-END:variables
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JButton BtnActionClear;
+  private javax.swing.JButton BtnGross;
+  private javax.swing.JButton BtnLogOut;
+  private javax.swing.JButton BtnPrint;
+  private javax.swing.JButton BtnSubmit;
+  private javax.swing.JButton BtnTare;
+  private javax.swing.JComboBox ComboBoxChargeApplied;
+  private javax.swing.JLabel LBL_CreateTime;
+  private javax.swing.JLabel LBL_GateEntry;
+  private javax.swing.JTextField TXT_AutoWeight;
+  private javax.swing.JTextField TXT_Charge;
+  private javax.swing.JTextField TXT_CreateBy;
+  private javax.swing.JTextPane TXT_CreateDate;
+  private javax.swing.JTextPane TXT_CreateTime;
+  private javax.swing.JTextField TXT_FinealEnterBy;
+  private javax.swing.JTextPane TXT_FinealEnterDate;
+  private javax.swing.JTextPane TXT_FinealEnterTime;
+  private javax.swing.JTextField TXT_GateEntry;
+  private javax.swing.JTextPane TXT_GrossWeight;
+  private javax.swing.JTextField TXT_Machine;
+  private javax.swing.JTextPane TXT_NetWeight;
+  private javax.swing.JTextField TXT_Part;
+  private javax.swing.JTextField TXT_Process;
+  private javax.swing.JTextField TXT_Product;
+  private javax.swing.JTextField TXT_RC_NO;
+  private javax.swing.JTextField TXT_REMARKS;
+  private javax.swing.JTextField TXT_SlipNo;
+  private javax.swing.JTextPane TXT_TareWeight;
+  private javax.swing.JTextPane TXT_TokenNo;
+  private javax.swing.JTextField TXT_TrollyNo;
+  private javax.swing.JTextField TXT_VechileNo;
+  private javax.swing.JComboBox VechileTypejComboBox;
+  private javax.swing.JPanel WeightBridgeJpanel;
+  private javax.swing.ButtonGroup buttonGroup1;
+  private javax.swing.ButtonGroup buttonGroup2;
+  private javax.swing.ButtonGroup buttonGroup3;
+  private javax.swing.ButtonGroup buttonGroup4;
+  private javax.swing.ButtonGroup buttonGroup5;
+  private javax.swing.ButtonGroup buttonGroup6;
+  private javax.swing.JLabel jLabel1;
+  private javax.swing.JLabel jLabel10;
+  private javax.swing.JLabel jLabel11;
+  private javax.swing.JLabel jLabel12;
+  private javax.swing.JLabel jLabel13;
+  private javax.swing.JLabel jLabel14;
+  private javax.swing.JLabel jLabel15;
+  private javax.swing.JLabel jLabel16;
+  private javax.swing.JLabel jLabel17;
+  private javax.swing.JLabel jLabel19;
+  private javax.swing.JLabel jLabel2;
+  private javax.swing.JLabel jLabel20;
+  private javax.swing.JLabel jLabel21;
+  private javax.swing.JLabel jLabel22;
+  private javax.swing.JLabel jLabel23;
+  private javax.swing.JLabel jLabel24;
+  private javax.swing.JLabel jLabel3;
+  private javax.swing.JLabel jLabel4;
+  private javax.swing.JLabel jLabel5;
+  private javax.swing.JLabel jLabel6;
+  private javax.swing.JLabel jLabel7;
+  private javax.swing.JLabel jLabel8;
+  private javax.swing.JLabel jLabel9;
+  private javax.swing.JMenu jMenu1;
+  private javax.swing.JMenu jMenu2;
+  private javax.swing.JMenu jMenu3;
+  private javax.swing.JMenu jMenu4;
+  private javax.swing.JMenuBar jMenuBar1;
+  private javax.swing.JMenuItem jMenuItem1;
+  private javax.swing.JMenuItem jMenuItem2;
+  private javax.swing.JMenuItem jMenuItem3;
+  private javax.swing.JPanel jPanel1;
+  private javax.swing.JPanel jPanel2;
+  private javax.swing.JPanel jPanel3;
+  private javax.swing.JPanel jPanel4;
+  private javax.swing.JPanel jPanel5;
+  private javax.swing.JScrollPane jScrollPane10;
+  private javax.swing.JScrollPane jScrollPane3;
+  private javax.swing.JScrollPane jScrollPane4;
+  private javax.swing.JScrollPane jScrollPane5;
+  private javax.swing.JScrollPane jScrollPane6;
+  private javax.swing.JScrollPane jScrollPane7;
+  private javax.swing.JScrollPane jScrollPane8;
+  private javax.swing.JScrollPane jScrollPane9;
+  private java.awt.Menu menu1;
+  private java.awt.Menu menu2;
+  private java.awt.MenuBar menuBar1;
+  // End of variables declaration//GEN-END:variables
 
-//  public String comPoartMechineConnection(String callBy) {
-//    SerialPort port = SerialPort.getCommPort(comport_no);
-//    try {
-//      if (!port.openPort()) {
-//        JOptionPane.showMessageDialog(null, "Failed to open port 123", "Message", JOptionPane.INFORMATION_MESSAGE);
-//        return "N";
-//      }
-//      port.setComPortParameters(9600, 8, 1, 0); // Adjust these parameters as necessary
-//      port.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING, 1000, 0);
-//      if (port.openPort()) {
-//        byte[] buffer = new byte[1024];
-//        while (true) {
-//          int bytesRead = port.readBytes(buffer, buffer.length);
-//          if (bytesRead > 0) {
-//            String receivedData = new String(buffer, 0, bytesRead);
-//            String processedData = receivedData.replace("k", "");
-//            processedData = processedData.trim();
-//            String firstValue = processedData.split("\\s+")[0];
-//            int value = Integer.parseInt(firstValue);
-//          
-//            if (value > 0) {
-//                JOptionPane.showMessageDialog(null, "Weight match: " + value, "Message", JOptionPane.INFORMATION_MESSAGE);
-//              if (callBy.equalsIgnoreCase("SaveBtn")) {
-//                if (btnEventName.equalsIgnoreCase("grossBtnCall")) {
-//                  int grossWeight = Integer.valueOf(TXT_GrossWeight.getText());
-//                    JOptionPane.showMessageDialog(null, "gross Weight  match: "+grossWeight+"-" + value, "Message", JOptionPane.INFORMATION_MESSAGE);
-//                  if (grossWeight != value) {
-//                    TXT_GrossWeight.setText("0");
-//                    String message = "Weight bridge weight not match.";
-//                    JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
-//                    return "N";
-//                  }
-//                }
-//                if (btnEventName.equalsIgnoreCase("tareBtnCall")) {
-//                  int tareWeight = Integer.valueOf(TXT_TareWeight.getText());
-//                    JOptionPane.showMessageDialog(null, "tareWeight Weight  match: "+tareWeight+"-" + value, "Message", JOptionPane.INFORMATION_MESSAGE);
-//                  if (tareWeight != value) {
-//                    TXT_TareWeight.setText("0");
-//                    String message = "Weight bridge weight not match.";
-//                    JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
-//                    return "N";
-//                  }
-//                }
-//              } else {
-//                TXT_AutoWeight.setText(firstValue);
-//              }
-//            } else {
-//              TXT_AutoWeight.setText("0");
-//            }
-//          }
-//          break;
-//        }
-//      } else {
-//        JOptionPane.showMessageDialog(null, "Failed to open port: ", "Message", JOptionPane.INFORMATION_MESSAGE);
-//      }
-//    } catch (Exception ex) {
-//      ex.printStackTrace();
-//      String message = "Failed to open port: " + ex.toString();
-//      JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
-//      TXT_AutoWeight.setText("0");
-//      port.closePort();
-//      return "N";
-//    } finally {
-//      port.closePort();
-//    }
-//    return "Y";
-//  }
-    
-      public String comPoartMechineConnection(String callBy) {
+  //  public String comPoartMechineConnection(String callBy) {
+  //    SerialPort port = SerialPort.getCommPort(comport_no);
+  //    try {
+  //      if (!port.openPort()) {
+  //        JOptionPane.showMessageDialog(null, "Failed to open port 123", "Message", JOptionPane.INFORMATION_MESSAGE);
+  //        return "N";
+  //      }
+  //      port.setComPortParameters(9600, 8, 1, 0); // Adjust these parameters as necessary
+  //      port.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING, 1000, 0);
+  //      if (port.openPort()) {
+  //        byte[] buffer = new byte[1024];
+  //        while (true) {
+  //          int bytesRead = port.readBytes(buffer, buffer.length);
+  //          if (bytesRead > 0) {
+  //            String receivedData = new String(buffer, 0, bytesRead);
+  //            String processedData = receivedData.replace("k", "");
+  //            processedData = processedData.trim();
+  //            String firstValue = processedData.split("\\s+")[0];
+  //            int value = Integer.parseInt(firstValue);
+  //
+  //            if (value > 0) {
+  //                JOptionPane.showMessageDialog(null, "Weight match: " + value, "Message", JOptionPane.INFORMATION_MESSAGE);
+  //              if (callBy.equalsIgnoreCase("SaveBtn")) {
+  //                if (btnEventName.equalsIgnoreCase("grossBtnCall")) {
+  //                  int grossWeight = Integer.valueOf(TXT_GrossWeight.getText());
+  //                    JOptionPane.showMessageDialog(null, "gross Weight  match: "+grossWeight+"-" + value, "Message", JOptionPane.INFORMATION_MESSAGE);
+  //                  if (grossWeight != value) {
+  //                    TXT_GrossWeight.setText("0");
+  //                    String message = "Weight bridge weight not match.";
+  //                    JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
+  //                    return "N";
+  //                  }
+  //                }
+  //                if (btnEventName.equalsIgnoreCase("tareBtnCall")) {
+  //                  int tareWeight = Integer.valueOf(TXT_TareWeight.getText());
+  //                    JOptionPane.showMessageDialog(null, "tareWeight Weight  match: "+tareWeight+"-" + value, "Message", JOptionPane.INFORMATION_MESSAGE);
+  //                  if (tareWeight != value) {
+  //                    TXT_TareWeight.setText("0");
+  //                    String message = "Weight bridge weight not match.";
+  //                    JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
+  //                    return "N";
+  //                  }
+  //                }
+  //              } else {
+  //                TXT_AutoWeight.setText(firstValue);
+  //              }
+  //            } else {
+  //              TXT_AutoWeight.setText("0");
+  //            }
+  //          }
+  //          break;
+  //        }
+  //      } else {
+  //        JOptionPane.showMessageDialog(null, "Failed to open port: ", "Message", JOptionPane.INFORMATION_MESSAGE);
+  //      }
+  //    } catch (Exception ex) {
+  //      ex.printStackTrace();
+  //      String message = "Failed to open port: " + ex.toString();
+  //      JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
+  //      TXT_AutoWeight.setText("0");
+  //      port.closePort();
+  //      return "N";
+  //    } finally {
+  //      port.closePort();
+  //    }
+  //    return "Y";
+  //  }
+
+  public String comPoartMechineConnection(String callBy) {
     SerialPort port = SerialPort.getCommPort(comport_no);
     try {
       if (!port.openPort()) {
@@ -1928,9 +2111,9 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             processedData = processedData.trim();
             String firstValue = processedData.split("\\s+")[0];
             int value = Integer.parseInt(firstValue);
-          
+
             if (value > 0) {
-                //JOptionPane.showMessageDialog(null, "Weight match: " + value, "Message", JOptionPane.INFORMATION_MESSAGE);
+              //JOptionPane.showMessageDialog(null, "Weight match: " + value, "Message", JOptionPane.INFORMATION_MESSAGE);
               if (callBy.equalsIgnoreCase("SaveBtn")) {
                 if (btnEventName.equalsIgnoreCase("grossBtnCall")) {
                   int grossWeight = Integer.valueOf(TXT_GrossWeight.getText());
@@ -1944,7 +2127,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 }
                 if (btnEventName.equalsIgnoreCase("tareBtnCall")) {
                   int tareWeight = Integer.valueOf(TXT_TareWeight.getText());
-                 //   JOptionPane.showMessageDialog(null, "tareWeight Weight  match: "+tareWeight+"-" + value, "Message", JOptionPane.INFORMATION_MESSAGE);
+                  //   JOptionPane.showMessageDialog(null, "tareWeight Weight  match: "+tareWeight+"-" + value, "Message", JOptionPane.INFORMATION_MESSAGE);
                   if (tareWeight != value) {
                     TXT_TareWeight.setText("0");
                     String message = "Weight bridge weight not match.";
@@ -1957,14 +2140,14 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
               }
             } else {
               TXT_AutoWeight.setText("0");
-                return "N";
+              return "N";
             }
           }
           break;
         }
       } else {
         JOptionPane.showMessageDialog(null, "Failed to open port: ", "Message", JOptionPane.INFORMATION_MESSAGE);
-          return "N";
+        return "N";
       }
     } catch (Exception ex) {
       ex.printStackTrace();
@@ -1998,7 +2181,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
   public void onLoadApiVehicleTypeAutoSugest() {
     suggestionsListParty = new ArrayList<>();
-    suggestionsListPoduct = new ArrayList<>();
+    suggestionsListProduct = new ArrayList<>();
     suggestionsListRemarks = new ArrayList<>();
     suggestionsListVehicleNo = new ArrayList<>();
     suggestionsListTrollyNo = new ArrayList<>();
@@ -2029,7 +2212,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
           suggestionsListParty.add(autosuggest.getParty());
         }
         if (autosuggest.getProduct() != null) {
-          suggestionsListPoduct.add(autosuggest.getProduct());
+          suggestionsListProduct.add(autosuggest.getProduct());
         }
         if (autosuggest.getRemarks() != null) {
           suggestionsListRemarks.add(autosuggest.getRemarks());
@@ -2055,55 +2238,51 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
       connection.setRequestProperty("User-Agent", "Mozilla/5.0");
       BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
       String inputLine;
-      StringBuilder stringBuilder = new StringBuilder(); // Use StringBuilder for efficient string concatenation
+      StringBuilder stringBuilder = new StringBuilder();
       while ((inputLine = bufferedReader.readLine()) != null) {
         stringBuilder.append(inputLine);
       }
       bufferedReader.close();
-      String jsonResponse = stringBuilder.toString();
       Gson gson = new Gson();
-      ApiResponse apiResponse = gson.fromJson(jsonResponse, ApiResponse.class);
+      ApiResponse apiResponse = gson.fromJson(stringBuilder.toString(), ApiResponse.class);
       List<VehicleDetails> vehicleDetailsList = apiResponse.getVehicleDetailsList();
       int size = vehicleDetailsList.size();
       if (vechileNo != null) {
         for (int i = 0; i < size; i++) {
-          filteredList = vehicleDetailsList.stream()
-            .filter(vehicle -> vehicle.getVehicleNo().equals(vechileNo))
-            .collect(Collectors.toList());
+          filteredList =
+            vehicleDetailsList.stream().filter(vehicle -> vehicle.getVehicleNo().equals(vechileNo)).collect(Collectors.toList());
         }
       }
-
       if (slipNo != null) {
         for (int i = 0; i < size; i++) {
-          filteredList = vehicleDetailsList.stream()
-            .filter(vehicle -> vehicle.getSlipNo().equals(slipNo))
-            .collect(Collectors.toList());
+          filteredList =
+            vehicleDetailsList.stream().filter(vehicle -> vehicle.getMachineNo().equalsIgnoreCase(machinecode)).filter(vehicle -> vehicle.getSlipNo().equals(slipNo)).collect(Collectors.toList());
         }
       }
 
       VechileTypejComboBox.setEnabled(true);
       filteredList.forEach(System.out::println);
-      for (VehicleDetails rs : filteredList) {
-        System.out.println(rs.getVehicleNo() + " - " + rs.getTokenNo());
-        if (!rs.getMachineNo().equalsIgnoreCase("0")) {
-          if (rs.getMachineNo().equalsIgnoreCase(TXT_Machine.getText())) {
-            TXT_Machine.setText(rs.getMachineNo().toUpperCase());
+      for (VehicleDetails vehicle : filteredList) {
+        System.out.println(vehicle.getVehicleNo() + " - " + vehicle.getTokenNo());
+        if (!vehicle.getMachineNo().equalsIgnoreCase("0")) {
+          if (vehicle.getMachineNo().equalsIgnoreCase(TXT_Machine.getText())) {
+            TXT_Machine.setText(vehicle.getMachineNo().toUpperCase());
           } else {
             String message = "Please Enter Valid Vehicle no/Slip No";
             JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
             return;
           }
         }
-        if (rs.getVehicleNo() != null) {
-          TXT_VechileNo.setText(rs.getVehicleNo().toUpperCase());
+        if (vehicle.getVehicleNo() != null) {
+          TXT_VechileNo.setText(vehicle.getVehicleNo().toUpperCase());
           if (vechileNo != null) {
             TXT_SlipNo.setEnabled(false);
           }
         }
-        if (!rs.getTokenNo().equalsIgnoreCase("0")) {
-          TXT_TokenNo.setText(rs.getTokenNo());
+        if (!vehicle.getTokenNo().equalsIgnoreCase("0")) {
+          TXT_TokenNo.setText(vehicle.getTokenNo());
         }
-        if (rs.getTrolly_req().equalsIgnoreCase("Y")) {
+        if (vehicle.getTrolly_req().equalsIgnoreCase("Y")) {
           TXT_TrollyNo.setEnabled(true);
           trollyReq = "Y";
           VechileTypejComboBox.setSelectedItem("TRACTOR");
@@ -2112,10 +2291,9 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
           TXT_Charge.setText("0");
           System.out.println("Slip Number is: " + TXT_SlipNo.getText());
           if (TXT_SlipNo.getText().trim() == null || TXT_SlipNo.getText().isEmpty()) {
-            if (TXT_TrollyNo.getText().isEmpty() || 
-                TXT_TrollyNo.getText().trim() == null ||
+            if (TXT_TrollyNo.getText().isEmpty() || TXT_TrollyNo.getText().trim() == null ||
                 TXT_TrollyNo.getText().trim() == "") {
-              String message = "Please enter trolly no.";
+              String message = "Please enter trolley no.";
               JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
             }
             return;
@@ -2124,109 +2302,109 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
           TXT_TrollyNo.setEnabled(false);
         }
         if (slipNo == null) {
-          if (!rs.getSlipNo().equalsIgnoreCase("0")) {
-            TXT_SlipNo.setText(rs.getSlipNo());
+          if (!vehicle.getSlipNo().equalsIgnoreCase("0")) {
+            TXT_SlipNo.setText(vehicle.getSlipNo());
             TXT_VechileNo.setEnabled(false);
           }
-        }        
-        if (!rs.getParty().equalsIgnoreCase("0")) {
-          TXT_Part.setText(rs.getParty().toUpperCase());
         }
-        
-        if (!rs.getProduct().equalsIgnoreCase("0")) {
-          TXT_Product.setText(rs.getProduct().toUpperCase());
+        if (!vehicle.getParty().equalsIgnoreCase("0")) {
+          TXT_Part.setText(vehicle.getParty().toUpperCase());
         }
-        
-        if (rs.getGrossWeight().equalsIgnoreCase("0")) {
-          TXT_GrossWeight.setText(rs.getGrossWeight());
+
+        if (!vehicle.getProduct().equalsIgnoreCase("0")) {
+          TXT_Product.setText(vehicle.getProduct().toUpperCase());
+        }
+
+        if (vehicle.getGrossWeight().equalsIgnoreCase("0")) {
+          TXT_GrossWeight.setText(vehicle.getGrossWeight());
         } else {
-          Integer grossWeight = Integer.parseInt(rs.getGrossWeight());
+          Integer grossWeight = Integer.parseInt(vehicle.getGrossWeight());
           if (grossWeight > 0) {
             BtnGross.setEnabled(false);
           }
-          TXT_GrossWeight.setText(rs.getGrossWeight());
+          TXT_GrossWeight.setText(vehicle.getGrossWeight());
         }
-        
-        if (rs.getTereWeight().equalsIgnoreCase("0")) {
-          TXT_TareWeight.setText(rs.getTereWeight());
+
+        if (vehicle.getTereWeight().equalsIgnoreCase("0")) {
+          TXT_TareWeight.setText(vehicle.getTereWeight());
         } else {
-          Integer tareWeight = Integer.parseInt(rs.getTereWeight());
+          Integer tareWeight = Integer.parseInt(vehicle.getTereWeight());
           if (tareWeight > 0) {
             BtnTare.setEnabled(false);
           }
-          TXT_TareWeight.setText(rs.getTereWeight());
+          TXT_TareWeight.setText(vehicle.getTereWeight());
         }
-        
-        if (rs.getNetWeight().equalsIgnoreCase("0")) {
-          TXT_NetWeight.setText(rs.getNetWeight());
+
+        if (vehicle.getNetWeight().equalsIgnoreCase("0")) {
+          TXT_NetWeight.setText(vehicle.getNetWeight());
         } else {
-          Integer tareWeight = Integer.parseInt(rs.getNetWeight());
+          Integer tareWeight = Integer.parseInt(vehicle.getNetWeight());
           if (tareWeight > 0) {
             BtnSubmit.setEnabled(false);
             BtnActionClear.setEnabled(false);
           }
-          TXT_TareWeight.setText(rs.getNetWeight());
+          TXT_TareWeight.setText(vehicle.getNetWeight());
         }
-        
-        if (!rs.getFinalEnteredBy().equalsIgnoreCase("0")) {
-          TXT_FinealEnterBy.setText(rs.getFinalEnteredBy());
+
+        if (!vehicle.getFinalEnteredBy().equalsIgnoreCase("0")) {
+          TXT_FinealEnterBy.setText(vehicle.getFinalEnteredBy());
         }
-        
-        if (!rs.getTrolleyNo().equalsIgnoreCase("0")) {
-          TXT_TrollyNo.setText(rs.getTrolleyNo());
+
+        if (!vehicle.getTrolleyNo().equalsIgnoreCase("0")) {
+          TXT_TrollyNo.setText(vehicle.getTrolleyNo());
         }
-        
-        if (rs.getCharge().equalsIgnoreCase("0") || rs.getCharge() == "0") {
+
+        if (vehicle.getCharge().equalsIgnoreCase("0") || vehicle.getCharge() == "0") {
           TXT_Charge.setText("0");
         } else {
-          TXT_Charge.setText(rs.getCharge());
+          TXT_Charge.setText(vehicle.getCharge());
         }
-        
-        if (!rs.getCharge_applicable().equalsIgnoreCase("0")) {
-          if (rs.getCharge_applicable().equalsIgnoreCase("Yes")) {
+
+        if (!vehicle.getCharge_applicable().equalsIgnoreCase("0")) {
+          if (vehicle.getCharge_applicable().equalsIgnoreCase("Yes")) {
             ComboBoxChargeApplied.setSelectedIndex(0);
           } else {
             ComboBoxChargeApplied.setSelectedIndex(1);
           }
         }
 
-        if (!rs.getVeh_subtype_desc().equalsIgnoreCase("0")) {
-          VechileTypejComboBox.setSelectedItem(rs.getVeh_subtype_desc());
+        if (!vehicle.getVeh_subtype_desc().equalsIgnoreCase("0")) {
+          VechileTypejComboBox.setSelectedItem(vehicle.getVeh_subtype_desc());
         }
 
-        if (!rs.getRemarks().equalsIgnoreCase("0")) {
-          TXT_REMARKS.setText(rs.getRemarks().toUpperCase());
+        if (!vehicle.getRemarks().equalsIgnoreCase("0")) {
+          TXT_REMARKS.setText(vehicle.getRemarks().toUpperCase());
         }
 
-        if (!rs.getGateEntryNumber().equalsIgnoreCase("0")) {
-          TXT_GateEntry.setText(rs.getGateEntryNumber());
+        if (!vehicle.getGateEntryNumber().equalsIgnoreCase("0")) {
+          TXT_GateEntry.setText(vehicle.getGateEntryNumber());
         }
 
-        if (!rs.getCreatedBy().equalsIgnoreCase("0")) {
-          TXT_CreateBy.setText(rs.getCreatedBy());
-        }
-        
-        if (!rs.getCreationDate().equalsIgnoreCase("0")) {
-          TXT_CreateDate.setText(rs.getCreationDate());
-        }
-        
-        if (!rs.getCreationTime().equalsIgnoreCase("0")) {
-          TXT_CreateTime.setText(rs.getCreationTime());
+        if (!vehicle.getCreatedBy().equalsIgnoreCase("0")) {
+          TXT_CreateBy.setText(vehicle.getCreatedBy());
         }
 
-        if (!rs.getProcessCode().equalsIgnoreCase("0")) {
-          TXT_Process.setText(rs.getProcessCode());
+        if (!vehicle.getCreationDate().equalsIgnoreCase("0")) {
+          TXT_CreateDate.setText(vehicle.getCreationDate());
         }
-        
-        if (!rs.getRcNo().equalsIgnoreCase("0")) {
-          TXT_RC_NO.setText(rs.getRcNo());
+
+        if (!vehicle.getCreationTime().equalsIgnoreCase("0")) {
+          TXT_CreateTime.setText(vehicle.getCreationTime());
         }
-        
-        if (rs.getCompVehTypeCode().equalsIgnoreCase("0")) {
+
+        if (!vehicle.getProcessCode().equalsIgnoreCase("0")) {
+          TXT_Process.setText(vehicle.getProcessCode());
+        }
+
+        if (!vehicle.getRcNo().equalsIgnoreCase("0")) {
+          TXT_RC_NO.setText(vehicle.getRcNo());
+        }
+
+        if (vehicle.getCompVehTypeCode().equalsIgnoreCase("0")) {
           VechileTypejComboBox.setEnabled(true);
           compVechileType = "N";
           ComboBoxChargeApplied.setSelectedIndex(0);
-         // TXT_Charge.setText("0");
+          // TXT_Charge.setText("0");
         } else {
           VechileTypejComboBox.setEnabled(false);
           ComboBoxChargeApplied.setEnabled(false);
@@ -2235,8 +2413,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
           compVechileType = "Y";
         }
 
-        if (!rs.getFt_tere_weight().equalsIgnoreCase("0")) {
-          ftTereWeight = rs.getFt_tere_weight();
+        if (!vehicle.getFt_tere_weight().equalsIgnoreCase("0")) {
+          ftTereWeight = vehicle.getFt_tere_weight();
         }
       }
 
@@ -2251,7 +2429,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    
+
     if (filteredList.size() <= 0) {
       String message = "Please Enter Valid Vehicle no/Slip No";
       JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
@@ -2273,7 +2451,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
       con.setRequestProperty("Content-Type", "application/json");
       con.setRequestProperty("Accept", "application/json");
       con.setDoOutput(true);
-      String jsonInputString = "{\"vechileNo\":\"" + TXT_VechileNo.getText() + "\",\"trolly\":\"" + TXT_TrollyNo.getText() + "\"}";
+      String jsonInputString =
+        "{\"vechileNo\":\"" + TXT_VechileNo.getText() + "\",\"trolly\":\"" + TXT_TrollyNo.getText() + "\"}";
       try (OutputStream os = con.getOutputStream()) {
         byte[] input = jsonInputString.getBytes("utf-8");
         os.write(input, 0, input.length);
@@ -2435,258 +2614,275 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     }
   }
 
-  public static String getDate(LocalDate localDate) {
-    return localDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+  public static String getCurrentDate() {
+    return LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
   }
 
-  public static String getTime(LocalDateTime localDateTime) {
-    return localDateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+  public static String getCurrentTime() {
+    return LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
   }
-  
-    public void oncallApiVehicleSlipNo(String slipNo) throws JSONException {
 
-        // Try-catch block to handle potential IOExceptions and other exceptions
-        List<PrintSlipDetails> filteredList = null;
+  public void oncallApiVehicleSlipNo(String slipNo) throws JSONException {
+    List<PrintSlipDetails> filteredList = null;
+    try {
+      // URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/printslip");
+      // URL url = new URL("http://10.0.6.204:7003/RestApiWeightBridge/resources/printslip");
+      URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/printslip");
+      HttpURLConnection con = (HttpURLConnection) url.openConnection();
+      con.setRequestMethod("POST");
+      con.setRequestProperty("Content-Type", "application/json");
+      con.setRequestProperty("Accept", "application/json");
+      con.setDoOutput(true);
+
+      JsonObject jsonObject = new JsonObject();
+      jsonObject.addProperty("slipNo", slipNo);
+      String jsonInputString = jsonObject.toString();
+
+      try (OutputStream os = con.getOutputStream()) {
+        byte[] input = jsonInputString.getBytes("utf-8");
+        os.write(input, 0, input.length);
+      }
+
+      BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+      String inputLine;
+      StringBuilder response = new StringBuilder();
+      while ((inputLine = in.readLine()) != null) {
+        response.append(inputLine);
+      }
+      in.close();
+      String jsonResponse = response.toString();
+      JSONArray jsonArray = new JSONArray(jsonResponse);
+      int count = jsonArray.length();
+      if (count <= 0) {
+        JOptionPane.showMessageDialog(null, "Please Enter Valid  Slip No", "Message", JOptionPane.INFORMATION_MESSAGE);
+        return;
+      }
+
+      for (int i = 0; i < jsonArray.length(); i++) {
+        JSONObject rs = jsonArray.getJSONObject(i);
         try {
-           // URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/printslip");
-            //URL url = new URL("http://10.0.6.204:7003/RestApiWeightBridge/resources/printslip");
-            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/printslip");
-          
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("POST");
-            con.setRequestProperty("Content-Type", "application/json");
-            con.setRequestProperty("Accept", "application/json");
-            con.setDoOutput(true);
-
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("slipNo", slipNo);
-
-
-            // Convert JsonObject to JSON string
-            String jsonInputString = jsonObject.toString();
-
-            try (OutputStream os = con.getOutputStream()) {
-                byte[] input = jsonInputString.getBytes("utf-8");
-                os.write(input, 0, input.length);
-            }
-
-            // Read the response from the input stream
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuilder response = new StringBuilder(); // Use StringBuilder for efficient string concatenation
-            // Read the response line by line
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            // Close the BufferedReader
-            in.close();
-            // Convert the response to a string
-            String jsonResponse = response.toString();
-            System.out.println("jsonResponse--" + jsonResponse);
-            JSONArray jsonArray = new JSONArray(jsonResponse);
-             int count= jsonArray.length();
-            if(count<=0){
-                JOptionPane.showMessageDialog(null, "Please Enter Valid  Slip No", "Message", JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-
-            // Loop through each element in the array (each vehicle entry)
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject rs = jsonArray.getJSONObject(i);
-                try{
-                if (rs.getString("vehicleNo") != null) {
-                    vechileNo = rs.getString("vehicleNo").toUpperCase();
-                   // TXT_VechileNo.setText(vechileNo);
-                }
-                }catch(Exception ex){
-                    
-                }
-                try{
-                if (rs.getString("slipNo") != null) {
-                  // String printslipNo = 
-                  //  TXT_SlipNo.setText(slipNo);
-                  slipNo=rs.getString("slipNo").toUpperCase();
-                }
-                }catch(Exception ex){
-                    
-                }
-                try{
-                if (rs.getString("tokenNo") != null) {
-                    tokenNo = rs.getString("tokenNo").toUpperCase();
-                   // TXT_TokenNo.setText(tokenNo);
-                }
-                }catch(Exception ex){
-                    
-                }
-                try{
-                if (rs.getString("party") != null) {
-                    party = rs.getString("party").toUpperCase();
-                   // TXT_Part.setText(party);
-                }
-                }catch(Exception ex){
-                    
-                }
-               
-                try{
-                if (rs.getString("grossWeight") != null) {
-                    grossWeight = Integer.toString(rs.getInt("grossWeight"));
-                  //  TXT_GrossWeight.setText(grossWeight);
-                }
-                }catch(Exception ex){
-                    
-                }
-                try{
-                if (rs.getString("tereWeight") != null) {
-                    tareWeight = rs.getString("tereWeight").toUpperCase();
-                 //   TXT_TareWeight.setText(tareWeight);
-                }
-                }catch(Exception ex){
-                    
-                }
-                try{
-                if (rs.getString("netWeight") != null) {
-                    netWeight = rs.getString("netWeight").toUpperCase();
-                   // TXT_NetWeight.setText(netWeight);
-                }
-                }catch(Exception ex){
-                    
-                }
-                try{
-                if (rs.getString("finalEnteredDate") != null && rs.getString("finalEnteredTime") != null) {
-                    finaldate =  rs.getString("finalEnteredDate").toUpperCase() + " " + rs.getString("finalEnteredTime");
-                  //  TXT_FinealEnterDate.setText(rs.getString("finalEnteredDate").toUpperCase());
-                 //   TXT_FinealEnterTime.setText(rs.getString("finalEnteredTime").toUpperCase());
-                   // TXT_FinealEnterBy.setText(rs.getString("finalEnteredBy").toUpperCase());
-                }
-                }catch(Exception ex){
-                    
-                }
-                try{
-                if (rs.getString("charge") != null) {
-                    charge = rs.getString("charge").toUpperCase();
-                   // TXT_Charge.setText(rs.getString("charge").toUpperCase());
-                }
-                }catch(Exception ex){
-                    
-                }
-                try{
-                if (rs.getString("remarks") != null) {
-                    remarks = rs.getString("remarks").toUpperCase();
-                    
-                    //TXT_RE.setText(rs.getString("CHARGE").toUpperCase());
-                }
-                }catch(Exception ex){
-                    
-                }
-                
-               
-                
-                try{
-                if (rs.getString("gateEntryNumber") != null) {
-                    gateNo = rs.getString("gateEntryNumber").toUpperCase();
-                   // TXT_GateEntry.setText(gateNo);
-                }
-                }catch(Exception ex){
-                    
-                }
-                try{
-                if (rs.getString("rcNo") != null) {
-
-                   // TXT_RC_NO.setText(rs.getString("rcNo").toUpperCase());
-                }
-                }catch(Exception ex){
-                    
-                }
-                try{
-                if (rs.getString("machineNo") != null) {
-
-                  //  TXT_Machine.setText(rs.getString("machineNo").toUpperCase());
-                }
-                }catch(Exception ex){
-                    
-                }
-                
-                try{
-                if (rs.getString("subtypeDesc") != null) {
-                    vechileType = rs.getString("subtypeDesc").toUpperCase();
-                  //  txt_.setText(vechileType);
-                }
-                }catch(Exception ex){
-                    
-                }
-                try{
-                if (rs.getString("processCode") != null) {
-                    product=rs.getString("processCode").toUpperCase();
-                  //  TXT_Process.setText(rs.getString("processCode").toUpperCase());
-                }
-                }catch(Exception ex){
-                    
-                }
-                try{
-                if (rs.getString("createdBy") != null) {
-
-                  //  TXT_CreateBy.setText(rs.getString("createdBy").toUpperCase());
-                }
-                }catch(Exception ex){
-                    
-                }
-                try{
-                if (rs.getString("creationDate") != null) {
-
-                  //  TXT_CreateDate.setText(rs.getString("creationDate").toUpperCase());
-                }
-                }catch(Exception ex){
-                    
-                }
-                try{
-                if (rs.getString("creationTime") != null) {
-
-                  //  TXT_CreateTime.setText(rs.getString("creationTime").toUpperCase());
-                    create = rs.getString("creationDate") + " " + rs.getString("creationTime");
-                }
-                }catch(Exception ex){
-                    
-                }
-                
-                try {
-                  InputStream inputStream = new FileInputStream("C:/jasperfile/Bridge_Entry.jasper");
-                  JasperReport design = (JasperReport) JRLoader.loadObject(inputStream);
-                  Map<String, Object> parameters = new HashMap<>();
-                  parameters.put("SlipNo", slipNo);
-                  parameters.put("TokenNo", tokenNo);
-                  parameters.put("GateEntry", gateNo);
-                  parameters.put("GrossWeight", grossWeight);
-                  parameters.put("TareWeight", tareWeight);
-                  parameters.put("NetWeight", netWeight);
-                  parameters.put("Party", party);
-                  parameters.put("Remarks", remarks);
-                  parameters.put("TruckNo", vechileNo);
-                  parameters.put("TruckType", vechileType);
-                  parameters.put("CreatedOn", create);
-                  parameters.put("Final", finaldate);
-                  parameters.put("Charge", charge);
-                  parameters.put("Product", product);
-                  parameters.put("Copy", "Orginal");
-
-                  net.sf.jasperreports.engine.JasperPrint print =
-                  JasperFillManager.fillReport(design, parameters, new JREmptyDataSource());
-                  JasperViewer.viewReport(print, false);
-                  resetValueAfterPrint();
-                } catch (FileNotFoundException ex) {
-                  JOptionPane.showMessageDialog(null, ex.toString(), "Message", JOptionPane.ERROR_MESSAGE);
-                } catch (JRException ex) {
-                  JOptionPane.showMessageDialog(null, ex.toString(), "Message", JOptionPane.ERROR_MESSAGE);
-                }
-                
-            }
-
-
-        } catch (IOException e) {
-            // Print the exception message if an error occurs
-            System.err.println("Error during API call: " + e.getMessage());
-            e.printStackTrace();
+          if (rs.getString("vehicleNo") != null) {
+            vechileNo = rs.getString("vehicleNo").toUpperCase();
+            // TXT_VechileNo.setText(vechileNo);
+          }
+        } catch (Exception ex) {
+          ex.printStackTrace();
         }
-      
+        try {
+          if (rs.getString("slipNo") != null) {
+            slipNo = rs.getString("slipNo").toUpperCase();
+          }
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
+        try {
+          if (rs.getString("tokenNo") != null) {
+            tokenNo = rs.getString("tokenNo").toUpperCase();
+            // TXT_TokenNo.setText(tokenNo);
+          }
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
+        try {
+          if (rs.getString("party") != null) {
+            party = rs.getString("party").toUpperCase();
+            // TXT_Part.setText(party);
+          }
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
+        try {
+          if (rs.getString("grossWeight") != null) {
+            grossWeight = Integer.toString(rs.getInt("grossWeight"));
+            // TXT_GrossWeight.setText(grossWeight);
+          }
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
+        try {
+          if (rs.getString("tereWeight") != null) {
+            tareWeight = rs.getString("tereWeight").toUpperCase();
+            // TXT_TareWeight.setText(tareWeight);
+          }
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
+        try {
+          if (rs.getString("netWeight") != null) {
+            netWeight = rs.getString("netWeight").toUpperCase();
+            // TXT_NetWeight.setText(netWeight);
+          }
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
+        try {
+          if (rs.getString("finalEnteredDate") != null && rs.getString("finalEnteredTime") != null) {
+            finaldate = rs.getString("finalEnteredDate").toUpperCase() + " " + rs.getString("finalEnteredTime");
+            // TXT_FinealEnterDate.setText(rs.getString("finalEnteredDate").toUpperCase());
+            // TXT_FinealEnterTime.setText(rs.getString("finalEnteredTime").toUpperCase());
+            // TXT_FinealEnterBy.setText(rs.getString("finalEnteredBy").toUpperCase());
+          }
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
+        try {
+          if (rs.getString("charge") != null) {
+            charge = rs.getString("charge").toUpperCase();
+            // TXT_Charge.setText(rs.getString("charge").toUpperCase());
+          }
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
+        try {
+          if (rs.getString("remarks") != null) {
+            remarks = rs.getString("remarks").toUpperCase();
+            // TXT_RE.setText(rs.getString("CHARGE").toUpperCase());
+          }
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
+        try {
+          if (rs.getString("gateEntryNumber") != null) {
+            gateNo = rs.getString("gateEntryNumber").toUpperCase();
+            // TXT_GateEntry.setText(gateNo);
+          }
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
+        try {
+          if (rs.getString("rcNo") != null) {
+            // TXT_RC_NO.setText(rs.getString("rcNo").toUpperCase());
 
+
+
+
+
+
+
+
+
+
+
+
+          }
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
+        try {
+          if (rs.getString("machineNo") != null) {
+            //  TXT_Machine.setText(rs.getString("machineNo").toUpperCase());
+
+
+
+
+
+
+
+
+
+
+
+
+          }
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
+        try {
+          if (rs.getString("subtypeDesc") != null) {
+            vechileType = rs.getString("subtypeDesc").toUpperCase();
+            //  txt_.setText(vechileType);
+          }
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
+        try {
+          if (rs.getString("processCode") != null) {
+            product = rs.getString("processCode").toUpperCase();
+            //  TXT_Process.setText(rs.getString("processCode").toUpperCase());
+          }
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
+        try {
+          if (rs.getString("createdBy") != null) {
+            //  TXT_CreateBy.setText(rs.getString("createdBy").toUpperCase());
+
+
+
+
+
+
+
+
+
+
+
+
+          }
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
+        try {
+          if (rs.getString("creationDate") != null) {
+            //  TXT_CreateDate.setText(rs.getString("creationDate").toUpperCase());
+
+
+
+
+
+
+
+
+
+
+
+
+          }
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
+        try {
+          if (rs.getString("creationTime") != null) {
+            //  TXT_CreateTime.setText(rs.getString("creationTime").toUpperCase());
+            create = rs.getString("creationDate") + " " + rs.getString("creationTime");
+          }
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
+
+        try {
+          InputStream inputStream = new FileInputStream("C:/jasperfile/Bridge_Entry.jasper");
+          JasperReport design = (JasperReport) JRLoader.loadObject(inputStream);
+          Map<String, Object> parameters = new HashMap<>();
+          parameters.put("SlipNo", slipNo);
+          parameters.put("TokenNo", tokenNo);
+          parameters.put("GateEntry", gateNo);
+          parameters.put("GrossWeight", grossWeight);
+          parameters.put("TareWeight", tareWeight);
+          parameters.put("NetWeight", netWeight);
+          parameters.put("Party", party);
+          parameters.put("Remarks", remarks);
+          parameters.put("TruckNo", vechileNo);
+          parameters.put("TruckType", vechileType);
+          parameters.put("CreatedOn", create);
+          parameters.put("Final", finaldate);
+          parameters.put("Charge", charge);
+          parameters.put("Product", product);
+          parameters.put("Copy", "Orginal");
+
+          net.sf.jasperreports.engine.JasperPrint print =
+            JasperFillManager.fillReport(design, parameters, new JREmptyDataSource());
+          JasperViewer.viewReport(print, false);
+          resetValueAfterPrint();
+        } catch (FileNotFoundException ex) {
+          JOptionPane.showMessageDialog(null, ex.toString(), "Message", JOptionPane.ERROR_MESSAGE);
+        } catch (JRException ex) {
+          JOptionPane.showMessageDialog(null, ex.toString(), "Message", JOptionPane.ERROR_MESSAGE);
+        }
+      }
+    } catch (IOException e) {
+      System.err.println("Error during API call: " + e.getMessage());
+      e.printStackTrace();
     }
+  }
 }

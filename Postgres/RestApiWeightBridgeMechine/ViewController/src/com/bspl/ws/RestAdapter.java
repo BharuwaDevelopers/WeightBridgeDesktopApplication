@@ -122,8 +122,7 @@ public class RestAdapter {
   }
 
 
-  public String getVehicleTypeAutoSuggest() {
-    // Connection conn = null;
+  public String getVehicleTypeAutoSuggest(String machineCode) {
     Statement stmt = null;
     String query = null;
     RestAdapterDao obj = new RestAdapterDao();
@@ -165,13 +164,19 @@ public class RestAdapter {
       }
 
       // ResultSet rs2 = stmt.executeQuery("select distinct PARTY,'PARTY'  AS COLUMN_NAME from WEIGHING_BRIDGE union all select distinct PRODUCT,'PRODUCT'  AS COLUMN_NAME from WEIGHING_BRIDGE union all select distinct REMARKS,'REMARKS'  AS COLUMN_NAME from WEIGHING_BRIDGE union all select distinct vehicle_no,'vehicle_no'  AS COLUMN_NAME from WEIGHING_BRIDGE");
-      ResultSet rs2 = stmt.executeQuery(
-      "SELECT PARTY, 'PARTY' AS COLUMN_NAME FROM WEIGHING_BRIDGE\n" + 
-      "UNION SELECT PRODUCT, 'PRODUCT' FROM WEIGHING_BRIDGE\n" + 
-      "UNION SELECT REMARKS, 'REMARKS' FROM WEIGHING_BRIDGE\n" + 
-      "UNION SELECT VEHICLE_NO, 'VEHICLE_NO' FROM WEIGHING_BRIDGE\n" + 
-      "UNION SELECT TROLLEY_NO, 'TROLLEY_NO' FROM VEHICLE_TROLLEY_MAP\n" + 
-      "ORDER BY COLUMN_NAME, PARTY;");
+      ResultSet rs2 =
+        stmt.executeQuery(
+        //      "SELECT PARTY, 'PARTY' AS COLUMN_NAME FROM WEIGHING_BRIDGE\n" +
+        //      "UNION SELECT PRODUCT, 'PRODUCT' FROM WEIGHING_BRIDGE\n" +
+        //      "UNION SELECT REMARKS, 'REMARKS' FROM WEIGHING_BRIDGE\n" +
+        //      "UNION SELECT VEHICLE_NO, 'VEHICLE_NO' FROM WEIGHING_BRIDGE\n" +
+        //      "UNION SELECT TROLLEY_NO, 'TROLLEY_NO' FROM VEHICLE_TROLLEY_MAP\n" +
+        //      "ORDER BY COLUMN_NAME, PARTY;");
+        "SELECT PARTY, 'PARTY' AS COLUMN_NAME FROM WEIGHING_BRIDGE WHERE MACHINE_NO = '" + machineCode + "'\n" +
+        "UNION SELECT PRODUCT, 'PRODUCT' FROM WEIGHING_BRIDGE WHERE MACHINE_NO = '" + machineCode + "'\n" +
+        "UNION SELECT REMARKS, 'REMARKS' FROM WEIGHING_BRIDGE WHERE MACHINE_NO = '" + machineCode + "'\n" +
+        "UNION SELECT VEHICLE_NO, 'VEHICLE_NO' FROM WEIGHING_BRIDGE WHERE MACHINE_NO = '" + machineCode + "'\n" +
+        "UNION SELECT TROLLEY_NO, 'TROLLEY_NO' FROM VEHICLE_TROLLEY_MAP\n" + "ORDER BY COLUMN_NAME, PARTY;");
       while (rs2.next()) {
 
         autoSuggestDetailsobj = new AutoSuggestDetails();
