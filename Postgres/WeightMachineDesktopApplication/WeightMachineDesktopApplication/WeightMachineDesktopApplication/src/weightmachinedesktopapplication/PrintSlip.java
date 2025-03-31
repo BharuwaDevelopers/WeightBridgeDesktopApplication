@@ -847,6 +847,7 @@ public class PrintSlip extends javax.swing.JFrame {
             parameters.put("Charge", charge);
             parameters.put("Product", product);
             parameters.put("Copy", "Duplicate");
+            parameters.put("M_no",machine_code);
 
             //            parameters.put("SlipNo", "9393595435");
             //            parameters.put("TokenNo", "73453dgddf");
@@ -994,8 +995,8 @@ public class PrintSlip extends javax.swing.JFrame {
         try {
            // URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/printslip");
             //URL url = new URL("http://10.0.6.204:7003/RestApiWeightBridge/resources/printslip");
-            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/printslip");
-          
+           // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/printslip");
+            URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/printslip");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
