@@ -678,7 +678,7 @@ public class RestAdapter {
         preparedStatement.setString(12, party.toUpperCase());
         preparedStatement.setString(13, product.toUpperCase());
         preparedStatement.setString(14, rcNo.toUpperCase());
-        if (Integer.parseInt(netWeight) > 0) {
+        if (Integer.parseInt(grossWeight) > 0 && Integer.parseInt(tereWeight) > 0) {
           flag = "Y";
         }
         preparedStatement.setString(15, flag);
