@@ -299,7 +299,7 @@ public class LoginJFrame extends javax.swing.JFrame {
  
 
     public void loginApiCall() {
-        InetAddress inetAddress=null;
+        InetAddress inetAddress = null;
         if (TXT_USERNAME.getText().isEmpty() || TXT_USERNAME.getText() == null || TXT_USERNAME.getText() == "") {
             JOptionPane.showMessageDialog(null, "Please Enter User Name", "Message", JOptionPane.INFORMATION_MESSAGE);
             return;
@@ -347,8 +347,8 @@ public class LoginJFrame extends javax.swing.JFrame {
                 if (status == 200) {
                     try {
                         // Get the local machine's IP address
-                         inetAddress = InetAddress.getLocalHost();
-                        System.out.println("IP Address details--: " +inetAddress);
+                        inetAddress = InetAddress.getLocalHost();
+                        System.out.println("IP Address details--: " + inetAddress);
                         // Print the IP address
                         System.out.println("IP Address: " + inetAddress.getHostAddress());
                     } catch (UnknownHostException e) {
@@ -359,24 +359,31 @@ public class LoginJFrame extends javax.swing.JFrame {
                     String unitCode = responseObject.getString("unitCd");
                     String machine_code = responseObject.getString("machine_code");
                     String comport = responseObject.getString("comport");
-                    if(machine_code==null ||machine_code.isEmpty()||machine_code==""||comport==""){
+                    if (machine_code == null || machine_code.isEmpty() || machine_code == "" || comport == "") {
                         JOptionPane.showMessageDialog(null, "Please maintain machine code,com port", "Message",
                                                       JOptionPane.INFORMATION_MESSAGE);
                     }
                     if (ipAddress.trim().equalsIgnoreCase(inetAddress.getHostAddress().toString())) {
                         System.out.println("Response Message: " + message);
-                        WeightMechineJFrame weightFrame = new WeightMechineJFrame(userName,unitCode,machine_code,comport);
+                        WeightMechineJFrame weightFrame =
+                            new WeightMechineJFrame(userName, unitCode, machine_code, comport);
                         weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                         weightFrame.setSize(1200, 730);
                         weightFrame.setVisible(true);
                         // super.setVisible(false);
                         super.dispose();
-                    }
-                    else{
-                        JOptionPane.showMessageDialog(null, "you are not an authorized user, ip address is- "+inetAddress.getHostAddress(), "Message",
+                    } else {
+                        JOptionPane.showMessageDialog(null,
+                                                      "you are not an authorized user, ip address is- " +
+                                                      inetAddress.getHostAddress(), "Message",
                                                       JOptionPane.INFORMATION_MESSAGE);
                     }
-                   
+
+                }
+                if (status == 500) {
+                    JOptionPane.showMessageDialog(null,
+                                                  "you are not an authorized user, Please Enter valid Username/Password",
+                                                  "Message", JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
                 }
