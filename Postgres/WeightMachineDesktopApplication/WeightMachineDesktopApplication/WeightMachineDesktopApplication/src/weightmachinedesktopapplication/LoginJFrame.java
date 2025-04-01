@@ -317,7 +317,7 @@ public class LoginJFrame extends javax.swing.JFrame {
         try {
             //  URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/Login");
             // URL url = new URL("http://10.0.6.204:7003/RestApiWeightBridge/resources/Login");
-            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/Login");
+            URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/Login");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
@@ -378,6 +378,7 @@ public class LoginJFrame extends javax.swing.JFrame {
                                                       inetAddress.getHostAddress(), "Message",
                                                       JOptionPane.INFORMATION_MESSAGE);
                     }
+                                      
 
                 }
                 if (status == 500) {
@@ -385,13 +386,13 @@ public class LoginJFrame extends javax.swing.JFrame {
                                                   "you are not an authorized user, Please Enter valid Username/Password",
                                                   "Message", JOptionPane.INFORMATION_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
+                 //   JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
                 }
 
 
             }
         } catch (Exception ex) {
-
+            JOptionPane.showMessageDialog(null, ex.toString(), "Message", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
