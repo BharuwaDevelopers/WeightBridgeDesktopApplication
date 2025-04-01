@@ -1428,6 +1428,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 return;
             }
         }
+        
+    
         // JOptionPane.showMessageDialog(null, "valuueueueu----3", "Message", JOptionPane.INFORMATION_MESSAGE);
         String selectedItem = (String) VechileTypejComboBox.getSelectedItem();
         if (selectedItem.equalsIgnoreCase("Please Select")) {
@@ -2309,6 +2311,20 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 if (!vehicle.getTokenNo().equalsIgnoreCase("0")) {
                     TXT_TokenNo.setText(vehicle.getTokenNo());
                 }
+                //COMMENT UPDATE HARE
+                if (vehicle.getCompVehTypeCode().equalsIgnoreCase("0")) {
+                    VechileTypejComboBox.setEnabled(true);
+                    compVechileType = "N";
+                    ComboBoxChargeApplied.setSelectedIndex(0);
+                    // TXT_Charge.setText("0");
+                } else {
+                    VechileTypejComboBox.setEnabled(false);
+                    ComboBoxChargeApplied.setEnabled(false);
+                    ComboBoxChargeApplied.setSelectedIndex(1);
+                    TXT_Charge.setText("0");
+                    compVechileType = "Y";
+                }
+                
                 if (vehicle.getTrolly_req().equalsIgnoreCase("Y")) {
                     TXT_TrollyNo.setEnabled(true);
                     trollyReq = "Y";
@@ -2426,19 +2442,21 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 if (!vehicle.getRcNo().equalsIgnoreCase("0")) {
                     TXT_RC_NO.setText(vehicle.getRcNo());
                 }
+                
+                //COMMENT BY SAWAN
 
-                if (vehicle.getCompVehTypeCode().equalsIgnoreCase("0")) {
-                    VechileTypejComboBox.setEnabled(true);
-                    compVechileType = "N";
-                    ComboBoxChargeApplied.setSelectedIndex(0);
-                    // TXT_Charge.setText("0");
-                } else {
-                    VechileTypejComboBox.setEnabled(false);
-                    ComboBoxChargeApplied.setEnabled(false);
-                    ComboBoxChargeApplied.setSelectedIndex(1);
-                    TXT_Charge.setText("0");
-                    compVechileType = "Y";
-                }
+//                if (vehicle.getCompVehTypeCode().equalsIgnoreCase("0")) {
+//                    VechileTypejComboBox.setEnabled(true);
+//                    compVechileType = "N";
+//                    ComboBoxChargeApplied.setSelectedIndex(0);
+//                    // TXT_Charge.setText("0");
+//                } else {
+//                    VechileTypejComboBox.setEnabled(false);
+//                    ComboBoxChargeApplied.setEnabled(false);
+//                    ComboBoxChargeApplied.setSelectedIndex(1);
+//                    TXT_Charge.setText("0");
+//                    compVechileType = "Y";
+//                }
 
                 if (!vehicle.getFt_tere_weight().equalsIgnoreCase("0")) {
                     ftTereWeight = vehicle.getFt_tere_weight();
@@ -2467,6 +2485,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     }
 
     public void trollyDeatilsApiCall() throws JSONException, IOException {
+        JSONObject jsonObject =null;
         if (TXT_TrollyNo.getText().isEmpty() || TXT_VechileNo.getText() == null) {
             JOptionPane.showMessageDialog(null, "Please Trolley Number", "Message", JOptionPane.INFORMATION_MESSAGE);
             return;
@@ -2492,7 +2511,10 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     response.append(responseLine.trim());
                 }
                 String jsonResponse = response.toString();
-                JSONObject jsonObject = new JSONObject(jsonResponse);
+                 
+                System.out.println("jsonResponse--"+jsonResponse.length()+"jsonResponse---"+jsonResponse.trim());
+               
+                 jsonObject = new JSONObject(jsonResponse);
                 if (jsonObject == null) {
                     onLoad();
                     onLoadDate();
@@ -2505,6 +2527,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     TXT_SlipNo.setEnabled(true);
                     return;
                 }
+                
 
                 if (jsonObject.getString("slip_no") != "0") {
                     TXT_SlipNo.setText(jsonObject.getString("slip_no"));
