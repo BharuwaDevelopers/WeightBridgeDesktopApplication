@@ -10,6 +10,14 @@ public class LoginBean {
     private String comport;
     private String bypass_flag;
 
+    public void setBypass_flag(String bypass_flag) {
+        this.bypass_flag = bypass_flag;
+    }
+
+    public String getBypass_flag() {
+        return bypass_flag;
+    }
+
     public void setUnitCd(String unitCd) {
         this.unitCd = unitCd;
     }
