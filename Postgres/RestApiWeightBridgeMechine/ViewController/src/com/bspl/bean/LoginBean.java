@@ -8,6 +8,7 @@ public class LoginBean {
     private String unitCd;
     private String machine_code;
     private String comport;
+    private String bypass_flag;
 
     public void setUnitCd(String unitCd) {
         this.unitCd = unitCd;
