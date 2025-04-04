@@ -7,6 +7,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 
+import java.awt.event.KeyEvent;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -51,7 +53,7 @@ import org.json.JSONObject;
 public class PrintSlip extends javax.swing.JFrame {
     String printslipNo = null, tokenNo = null, gateNo = null, grossWeight = null, tareWeight = null, netWeight =
         null, party = null, vechileNo = null, vechileType = null, create = null, finaldate = null, charge =
-        null, product = null, remarks = null,unit_Code=null,machine_code=null,comportNo=null,user_Name=null;
+        null, product = null, remarks = null,unit_Code=null,machine_code=null,comportNo=null,user_Name=null,bypassflage;
     /** Creates new form PrintSlip */
     public PrintSlip(String userName,String unitCode,String machinecode,String comport) {
         unit_Code=unitCode;
@@ -239,6 +241,7 @@ public class PrintSlip extends javax.swing.JFrame {
         jLabel20.setText("Net Weight");
 
         TXT_NetWeight.setEditable(false);
+        TXT_NetWeight.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         TXT_NetWeight.setEnabled(false);
         jScrollPane10.setViewportView(TXT_NetWeight);
 
@@ -354,6 +357,7 @@ public class PrintSlip extends javax.swing.JFrame {
 
         TXT_CreateDate.setEditable(false);
         TXT_CreateDate.setBackground(new java.awt.Color(204, 204, 204));
+        TXT_CreateDate.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         TXT_CreateDate.setEnabled(false);
         jScrollPane4.setViewportView(TXT_CreateDate);
 
@@ -379,6 +383,7 @@ public class PrintSlip extends javax.swing.JFrame {
         TXT_SlipNo.setEnabled(false);
 
         TXT_RC_NO.setEditable(false);
+        TXT_RC_NO.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         TXT_RC_NO.setEnabled(false);
 
         jLabel12.setText("Charge Applied Or Not");
@@ -391,6 +396,7 @@ public class PrintSlip extends javax.swing.JFrame {
 
         TXT_VECHILE_TYPE.setEditable(false);
         TXT_VECHILE_TYPE.setBackground(new java.awt.Color(204, 204, 204));
+        TXT_VECHILE_TYPE.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         TXT_VECHILE_TYPE.setEnabled(false);
         jScrollPane12.setViewportView(TXT_VECHILE_TYPE);
 
@@ -473,10 +479,12 @@ public class PrintSlip extends javax.swing.JFrame {
         jLabel17.setText("Final Entered Time");
 
         TXT_FinealEnterTime.setEditable(false);
+        TXT_FinealEnterTime.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         TXT_FinealEnterTime.setEnabled(false);
         jScrollPane7.setViewportView(TXT_FinealEnterTime);
 
         TXT_FinealEnterBy.setEditable(false);
+        TXT_FinealEnterBy.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         TXT_FinealEnterBy.setEnabled(false);
 
         jLabel16.setText("Final Entered Date");
@@ -509,6 +517,7 @@ public class PrintSlip extends javax.swing.JFrame {
         TXT_FinealEnterDate.setEnabled(false);
         jScrollPane6.setViewportView(TXT_FinealEnterDate);
 
+        TXT_Charge.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         TXT_Charge.setEnabled(false);
 
         jLabel14.setText("Charge");
@@ -671,7 +680,7 @@ public class PrintSlip extends javax.swing.JFrame {
         } else {
             // VechileDetails(TXT_SLIP_NO.getText());
             try {
-                oncallApiVehicleSlipNo(TXT_SLIP_NO.getText());
+                oncallApiVehicleSlipNo(TXT_SLIP_NO.getText().toUpperCase());
             } catch (JSONException e) {
             }
         }
@@ -687,7 +696,7 @@ public class PrintSlip extends javax.swing.JFrame {
 
     private void jBtnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnBackActionPerformed
         // TODO add your handling code here:
-        WeightMechineJFrame weightFrame = new WeightMechineJFrame(user_Name,unit_Code,machine_code,comportNo);
+        WeightMechineJFrame weightFrame = new WeightMechineJFrame(user_Name,unit_Code,machine_code,comportNo,"");
         weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         weightFrame.setSize(1200, 730);
         weightFrame.setVisible(true);
@@ -995,8 +1004,8 @@ public class PrintSlip extends javax.swing.JFrame {
         try {
            // URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/printslip");
             //URL url = new URL("http://10.0.6.204:7003/RestApiWeightBridge/resources/printslip");
-           // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/printslip");
-            URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/printslip");
+           // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/printslip");
+            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/printslip");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
