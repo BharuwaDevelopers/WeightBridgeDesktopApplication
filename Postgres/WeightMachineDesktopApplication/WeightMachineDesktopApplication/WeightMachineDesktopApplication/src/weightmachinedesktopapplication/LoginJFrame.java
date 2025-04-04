@@ -296,7 +296,6 @@ public class LoginJFrame extends javax.swing.JFrame {
 
     }
 
- 
 
     public void loginApiCall() {
         InetAddress inetAddress = null;
@@ -359,6 +358,7 @@ public class LoginJFrame extends javax.swing.JFrame {
                     String unitCode = responseObject.getString("unitCd");
                     String machine_code = responseObject.getString("machine_code");
                     String comport = responseObject.getString("comport");
+                    String bypass_flag = responseObject.getString("bypass_flag");
                     if (machine_code == null || machine_code.isEmpty() || machine_code == "" || comport == "") {
                         JOptionPane.showMessageDialog(null, "Please maintain machine code,com port", "Message",
                                                       JOptionPane.INFORMATION_MESSAGE);
@@ -366,7 +366,7 @@ public class LoginJFrame extends javax.swing.JFrame {
                     if (ipAddress.trim().equalsIgnoreCase(inetAddress.getHostAddress().toString())) {
                         System.out.println("Response Message: " + message);
                         WeightMechineJFrame weightFrame =
-                            new WeightMechineJFrame(userName, unitCode, machine_code, comport);
+                            new WeightMechineJFrame(userName, unitCode, machine_code, comport, bypass_flag);
                         weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                         weightFrame.setSize(1200, 730);
                         weightFrame.setVisible(true);
@@ -378,7 +378,15 @@ public class LoginJFrame extends javax.swing.JFrame {
                                                       inetAddress.getHostAddress(), "Message",
                                                       JOptionPane.INFORMATION_MESSAGE);
                     }
-                                      
+
+                    //                    WeightMechineJFrame weightFrame =
+                    //                        new WeightMechineJFrame(userName, unitCode, machine_code, comport,bypass_flag);
+                    //                    weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                    //                    weightFrame.setSize(1200, 730);
+                    //                    weightFrame.setVisible(true);
+                    //                    // super.setVisible(false);
+                    //                    super.dispose();
+
 
                 }
                 if (status == 500) {
@@ -386,7 +394,7 @@ public class LoginJFrame extends javax.swing.JFrame {
                                                   "you are not an authorized user, Please Enter valid Username/Password",
                                                   "Message", JOptionPane.INFORMATION_MESSAGE);
                 } else {
-                 //   JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
+                    //   JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
                 }
 
 

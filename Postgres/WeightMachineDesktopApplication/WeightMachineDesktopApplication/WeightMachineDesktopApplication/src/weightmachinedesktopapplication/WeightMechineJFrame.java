@@ -5,8 +5,11 @@ import com.fazecast.jSerialComm.SerialPort;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import java.awt.BorderLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+
+import java.awt.print.PrinterJob;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -78,7 +81,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
     String slipNo = null, tokenNo = null, gateNo = null, grossWeight = null, tareWeight = null, netWeight =
         null, party = null, vechileNo = null, vechileType = null, create = null, finaldate = null, charge =
-        null, product = null, remarks = null, comport_no = null, machinecode = null, ftTereWeight = "0";
+        null, product = null, remarks = null, comport_no = null, machinecode = null, ftTereWeight = "0", bypass_flag =
+        null;
 
     private JPopupMenu suggestionMenuParty;
     private JPopupMenu suggestionMenuProduct;
@@ -105,7 +109,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     int[] trollyNoSelectedIndex = { -1 };
 
     /** Creates new form WeightMechineJFrame */
-    public WeightMechineJFrame(String userName, String unitCd, String machine_code, String comPort) {
+    public WeightMechineJFrame(String userName, String unitCd, String machine_code, String comPort, String bypassflag) {
         if (userName == null || userName.isEmpty() || userName == "") {
             userName = "E-001";
         }
@@ -113,6 +117,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         unitCode = unitCd;
         comport_no = comPort;
         machinecode = machine_code;
+        bypass_flag = bypassflag;
         initComponents();
         onLoad();
         onLoadApiVehicleTypeAutoSugest();
@@ -1137,8 +1142,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                                 .addGap(0, 88, Short.MAX_VALUE))))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(TXT_TrollyNo, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(84, 84, 84)))
+                        .addComponent(TXT_TrollyNo, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(95, 95, 95)))
                 .addContainerGap())
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1430,8 +1435,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 return;
             }
         }
-        
-    
+
+
         // JOptionPane.showMessageDialog(null, "valuueueueu----3", "Message", JOptionPane.INFORMATION_MESSAGE);
         String selectedItem = (String) VechileTypejComboBox.getSelectedItem();
         if (selectedItem.equalsIgnoreCase("Please Select")) {
@@ -1486,10 +1491,10 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     public void insertdateCallApi() {
         try {
             //quality
-           // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/insert");
-           //Production
+            // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/insert");
+            //Production
             URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/insert");
-           
+
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
@@ -1557,9 +1562,9 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     public void updatedateCallApi() {
         try {
             //quality
-           // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/update");
+            // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/update");
             //prd
-           URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/update");
+            URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/update");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
@@ -1768,7 +1773,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
-        ReportsJFrame weightFrame = new ReportsJFrame(userNamevalue, unitCode, machinecode, comport_no);
+        ReportsJFrame weightFrame = new ReportsJFrame(userNamevalue, unitCode, machinecode, comport_no, bypass_flag);
         weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         weightFrame.setSize(1150, 700);
         weightFrame.setVisible(true);
@@ -1811,7 +1816,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         }
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new WeightMechineJFrame("", "", "", "").setVisible(true);
+                new WeightMechineJFrame("", "", "", "", "").setVisible(true);
             }
         });
     }
@@ -2212,9 +2217,10 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         suggestionsListTrollyNo = new ArrayList<>();
         try {
             //quality
-           // URL obj = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/vehicleType?machineCode=" + machinecode);
-          //prd
-            URL obj = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/vehicleType?machineCode=" + machinecode);
+            // URL obj = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/vehicleType?machineCode=" + machinecode);
+            //prd
+            URL obj =
+                new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/vehicleType?machineCode=" + machinecode);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
             con.setRequestMethod("GET");
             con.setRequestProperty("User-Agent", "Mozilla/5.0");
@@ -2259,11 +2265,10 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
     public void oncallApiVehicleSlipNo(String vechileNo, String slipNo) {
         List<VehicleDetails> filteredList = null;
+        List<VehicleDetails> filteredListMachineCode = null;
         try {
-    //  URL obj = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/vehicleDetails");
-            
-           URL obj = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/vehicleDetails");
-            
+            //  URL obj = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/vehicleDetails");
+            URL obj = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/vehicleDetails");
             HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("User-Agent", "Mozilla/5.0");
@@ -2275,226 +2280,468 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             }
             bufferedReader.close();
             Gson gson = new Gson();
+            //            ApiResponse apiResponse = gson.fromJson(stringBuilder.toString(), ApiResponse.class);
+            //            List<VehicleDetails> vehicleDetailsList = apiResponse.getVehicleDetailsList();
+            //            int size = vehicleDetailsList.size();
+            //            if (vechileNo != null) {
+            //                for (int i = 0; i < size; i++) {
+            //
+            //                    filteredList =
+            //                        vehicleDetailsList.stream().filter(vehicle -> vehicle.getVehicleNo().equals(vechileNo)).collect(Collectors.toList());
+            //                }
+            //            }
+            //            if (slipNo != null) {
+            //                for (int i = 0; i < size; i++) {
+            //
+            //                    filteredList =
+            //                        vehicleDetailsList.stream().filter(vehicle -> vehicle.getMachineNo().equalsIgnoreCase(machinecode)).filter(vehicle -> vehicle.getSlipNo().equals(slipNo)).collect(Collectors.toList());
+            //
+            //                }
+            //            }
+
+
             ApiResponse apiResponse = gson.fromJson(stringBuilder.toString(), ApiResponse.class);
             List<VehicleDetails> vehicleDetailsList = apiResponse.getVehicleDetailsList();
-            int size = vehicleDetailsList.size();
+
+            // If vehicleNo is not null, filter the list directly without using a loop
+            // List<VehicleDetails> filteredList = new ArrayList<>();
+            filteredList = new ArrayList<>();
             if (vechileNo != null) {
-                for (int i = 0; i < size; i++) {
+
+                //                filteredList =
+                //                            vehicleDetailsList.stream().filter(vehicle -> vehicle.getVehicleNo().equalsIgnoreCase(vechileNo)).collect(Collectors.toList());
+                filteredList =
+                    vehicleDetailsList.stream().filter(vehicle -> vehicle.getMachineNo().equalsIgnoreCase(machinecode)).filter(vehicle -> vehicle.getVehicleNo().equalsIgnoreCase(vechileNo)).collect(Collectors.toList());
+                if (filteredList.size() <= 0) {
                     filteredList =
-                        vehicleDetailsList.stream().filter(vehicle -> vehicle.getVehicleNo().equals(vechileNo)).collect(Collectors.toList());
+                        vehicleDetailsList.stream().filter(vehicle -> vehicle.getVehicleNo().equalsIgnoreCase(vechileNo)).collect(Collectors.toList());
                 }
+
             }
+            //            else {
+            //                // If vehicleNo is null, you can either return the entire list or handle as needed
+            //                filteredList = vehicleDetailsList;
+            //            }
+            //System.out.println("slipNo.trim()---" + slipNo.trim());
             if (slipNo != null) {
-                for (int i = 0; i < size; i++) {
+                filteredList =
+                    vehicleDetailsList.stream().filter(vehicle -> vehicle.getMachineNo().equalsIgnoreCase(machinecode)).filter(vehicle -> vehicle.getSlipNo().equalsIgnoreCase(slipNo)).collect(Collectors.toList());
+                if (filteredList.size() <= 0) {
                     filteredList =
-                        vehicleDetailsList.stream().filter(vehicle -> vehicle.getMachineNo().equalsIgnoreCase(machinecode)).filter(vehicle -> vehicle.getSlipNo().equals(slipNo)).collect(Collectors.toList());
+                        vehicleDetailsList.stream().filter(vehicle -> vehicle.getSlipNo().equalsIgnoreCase(slipNo)).collect(Collectors.toList());
                 }
             }
+
+            //            else {
+            //                filteredList = vehicleDetailsList;
+            //            }
 
             VechileTypejComboBox.setEnabled(true);
             filteredList.forEach(System.out::println);
             for (VehicleDetails vehicle : filteredList) {
                 System.out.println(vehicle.getVehicleNo() + " - " + vehicle.getTokenNo());
-                if (!vehicle.getMachineNo().equalsIgnoreCase("0")) {
-                    if (vehicle.getMachineNo().equalsIgnoreCase(TXT_Machine.getText())) {
-                        TXT_Machine.setText(vehicle.getMachineNo().toUpperCase());
-                    } else {
-                        String message = "Please Enter Valid Vehicle no/Slip No";
-                        JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
-                        return;
-                    }
-                }
-                if (vehicle.getVehicleNo() != null) {
-                    TXT_VechileNo.setText(vehicle.getVehicleNo().toUpperCase());
-                    if (vechileNo != null) {
-                        TXT_SlipNo.setEnabled(false);
-                    }
-                }
                 if (!vehicle.getTokenNo().equalsIgnoreCase("0")) {
-                    TXT_TokenNo.setText(vehicle.getTokenNo());
-                }
-                //COMMENT UPDATE HARE
-                if (vehicle.getCompVehTypeCode().equalsIgnoreCase("0")) {
-                    VechileTypejComboBox.setEnabled(true);
-                    compVechileType = "N";
-                    ComboBoxChargeApplied.setSelectedIndex(0);
-                    // TXT_Charge.setText("0");
-                } else {
-                    VechileTypejComboBox.setEnabled(false);
-                    ComboBoxChargeApplied.setEnabled(false);
-                    ComboBoxChargeApplied.setSelectedIndex(1);
-                    TXT_Charge.setText("0");
-                    compVechileType = "Y";
-                }
-                
-                if (vehicle.getTrolly_req().equalsIgnoreCase("Y")) {
-                    TXT_TrollyNo.setEnabled(true);
-                    trollyReq = "Y";
-                    VechileTypejComboBox.setSelectedItem("TRACTOR");
-                    ComboBoxChargeApplied.setSelectedIndex(1);
-                    ComboBoxChargeApplied.setEnabled(false);
-                    TXT_Charge.setText("0");
-                    System.out.println("Slip Number is: " + TXT_SlipNo.getText());
-                    if (TXT_SlipNo.getText().trim() == null || TXT_SlipNo.getText().isEmpty()) {
-                        if (TXT_TrollyNo.getText().isEmpty() || TXT_TrollyNo.getText().trim() == null ||
-                            TXT_TrollyNo.getText().trim() == "") {
-                            String message = "Please enter trolley no.";
-                            JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
+                    System.out.println("bypass_flag---" + bypass_flag);
+                    if (bypass_flag.equalsIgnoreCase("Y")) {
+                        if (!vehicle.getSlipNo().equalsIgnoreCase("0")) {
+                            if (vehicle.getMachineNo().equalsIgnoreCase(TXT_Machine.getText())) {
+                                withoutByPassMachine(vehicle);
+                            } else {
+                                ByPassMachine(vehicle);
+                            }
+                        } else {
+                            withoutByPassMachine(vehicle);
                         }
-                        return;
-                    }
-                } else {
-                    TXT_TrollyNo.setEnabled(false);
-                }
-                if (slipNo == null) {
-                    if (!vehicle.getSlipNo().equalsIgnoreCase("0")) {
-                        TXT_SlipNo.setText(vehicle.getSlipNo());
-                        TXT_VechileNo.setEnabled(false);
-                    }
-                }
-                if (!vehicle.getParty().equalsIgnoreCase("0")) {
-                    TXT_Part.setText(vehicle.getParty().toUpperCase());
-                }
-
-                if (!vehicle.getProduct().equalsIgnoreCase("0")) {
-                    TXT_Product.setText(vehicle.getProduct().toUpperCase());
-                }
-
-                if (vehicle.getGrossWeight().equalsIgnoreCase("0")) {
-                    TXT_GrossWeight.setText(vehicle.getGrossWeight());
-                } else {
-                    Integer grossWeight = Integer.parseInt(vehicle.getGrossWeight());
-                    if (grossWeight > 0) {
-                        BtnGross.setEnabled(false);
-                    }
-                    TXT_GrossWeight.setText(vehicle.getGrossWeight());
-                }
-
-                if (vehicle.getTereWeight().equalsIgnoreCase("0")) {
-                    TXT_TareWeight.setText(vehicle.getTereWeight());
-                } else {
-                    Integer tareWeight = Integer.parseInt(vehicle.getTereWeight());
-                    if (tareWeight > 0) {
-                        BtnTare.setEnabled(false);
-                    }
-                    TXT_TareWeight.setText(vehicle.getTereWeight());
-                }
-
-                if (vehicle.getNetWeight().equalsIgnoreCase("0")) {
-                    TXT_NetWeight.setText(vehicle.getNetWeight());
-                } else {
-                    Integer tareWeight = Integer.parseInt(vehicle.getNetWeight());
-                    if (tareWeight > 0) {
-                        BtnSubmit.setEnabled(false);
-                        BtnActionClear.setEnabled(false);
-                    }
-                    TXT_TareWeight.setText(vehicle.getNetWeight());
-                }
-
-                if (!vehicle.getFinalEnteredBy().equalsIgnoreCase("0")) {
-                    TXT_FinealEnterBy.setText(vehicle.getFinalEnteredBy());
-                }
-
-                if (!vehicle.getTrolleyNo().equalsIgnoreCase("0")) {
-                    TXT_TrollyNo.setText(vehicle.getTrolleyNo());
-                }
-
-                if (vehicle.getCharge().equalsIgnoreCase("0") || vehicle.getCharge() == "0") {
-                    TXT_Charge.setText("0");
-                } else {
-                    TXT_Charge.setText(vehicle.getCharge());
-                }
-
-                if (!vehicle.getCharge_applicable().equalsIgnoreCase("0")) {
-                    if (vehicle.getCharge_applicable().equalsIgnoreCase("Yes")) {
-                        ComboBoxChargeApplied.setSelectedIndex(0);
                     } else {
-                        ComboBoxChargeApplied.setSelectedIndex(1);
+                        if (!vehicle.getSlipNo().equalsIgnoreCase("0")) {
+                            if (vehicle.getMachineNo().equalsIgnoreCase(TXT_Machine.getText())) {
+                                TXT_Machine.setText(vehicle.getMachineNo().toUpperCase());
+                            } else {
+                                String message = "Slip pending on other user";
+                                JOptionPane.showMessageDialog(null, message, "Message",
+                                                              JOptionPane.INFORMATION_MESSAGE);
+                                return;
+                            }
+                        }
+
+                        withoutByPassMachine(vehicle);
                     }
+                    forPrint();
+                } else {
+                    String message = "Slip pending on other user!";
+                    JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
+                    resetValue();
                 }
-
-                if (!vehicle.getVeh_subtype_desc().equalsIgnoreCase("0")) {
-                    VechileTypejComboBox.setSelectedItem(vehicle.getVeh_subtype_desc());
-                }
-
-                if (!vehicle.getRemarks().equalsIgnoreCase("0")) {
-                    TXT_REMARKS.setText(vehicle.getRemarks().toUpperCase());
-                }
-
-                if (!vehicle.getGateEntryNumber().equalsIgnoreCase("0")) {
-                    TXT_GateEntry.setText(vehicle.getGateEntryNumber());
-                }
-
-                if (!vehicle.getCreatedBy().equalsIgnoreCase("0")) {
-                    TXT_CreateBy.setText(vehicle.getCreatedBy());
-                }
-
-                if (!vehicle.getCreationDate().equalsIgnoreCase("0")) {
-                    TXT_CreateDate.setText(vehicle.getCreationDate());
-                }
-
-                if (!vehicle.getCreationTime().equalsIgnoreCase("0")) {
-                    TXT_CreateTime.setText(vehicle.getCreationTime());
-                }
-
-                if (!vehicle.getProcessCode().equalsIgnoreCase("0")) {
-                    TXT_Process.setText(vehicle.getProcessCode());
-                }
-
-                if (!vehicle.getRcNo().equalsIgnoreCase("0")) {
-                    TXT_RC_NO.setText(vehicle.getRcNo());
-                }
-                
-                //COMMENT BY SAWAN
-
-//                if (vehicle.getCompVehTypeCode().equalsIgnoreCase("0")) {
-//                    VechileTypejComboBox.setEnabled(true);
-//                    compVechileType = "N";
-//                    ComboBoxChargeApplied.setSelectedIndex(0);
-//                    // TXT_Charge.setText("0");
-//                } else {
-//                    VechileTypejComboBox.setEnabled(false);
-//                    ComboBoxChargeApplied.setEnabled(false);
-//                    ComboBoxChargeApplied.setSelectedIndex(1);
-//                    TXT_Charge.setText("0");
-//                    compVechileType = "Y";
-//                }
-
-                if (!vehicle.getFt_tere_weight().equalsIgnoreCase("0")) {
-                    ftTereWeight = vehicle.getFt_tere_weight();
-                }
-            }
-
-            if (TXT_SlipNo.getText() == null || TXT_SlipNo.getText().equalsIgnoreCase("0") ||
-                TXT_SlipNo.getText().isEmpty() || TXT_SlipNo.getText() == "" || TXT_SlipNo.getText().equals("")) {
-                VechileTypejComboBox.setEnabled(true);
-                ComboBoxChargeApplied.setEnabled(true);
-            } else {
-                VechileTypejComboBox.setEnabled(false);
-                ComboBoxChargeApplied.setEnabled(false);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        if (filteredList.size() <= 0) {
-            String message = "Please Enter Valid Vehicle no/Slip No";
-            JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
-            resetValue();
-        } else {
-            forPrint();
+        //        if (filteredList.size() <= 0) {
+        //            String message = "Please Enter Valid Vehicle no/Slip No";
+        //            JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
+        //            resetValue();
+        //        } else {
+        //            forPrint();
+        //        }
+    }
+
+
+    public void withoutByPassMachine(VehicleDetails vehicle) {
+        if (vehicle.getVehicleNo() != null) {
+            TXT_VechileNo.setText(vehicle.getVehicleNo().toUpperCase());
+            if (vechileNo != null) {
+                TXT_SlipNo.setEnabled(false);
+            }
         }
+        if (!vehicle.getTokenNo().equalsIgnoreCase("0")) {
+            TXT_TokenNo.setText(vehicle.getTokenNo());
+        }
+        //COMMENT UPDATE HARE
+        if (vehicle.getCompVehTypeCode().equalsIgnoreCase("0")) {
+            VechileTypejComboBox.setEnabled(true);
+            compVechileType = "N";
+            ComboBoxChargeApplied.setSelectedIndex(0);
+            // TXT_Charge.setText("0");
+        } else {
+            VechileTypejComboBox.setEnabled(false);
+            ComboBoxChargeApplied.setEnabled(false);
+            ComboBoxChargeApplied.setSelectedIndex(1);
+            TXT_Charge.setText("0");
+            compVechileType = "Y";
+        }
+
+        if (vehicle.getTrolly_req().equalsIgnoreCase("Y")) {
+            TXT_TrollyNo.setEnabled(true);
+            trollyReq = "Y";
+            VechileTypejComboBox.setSelectedItem("TRACTOR");
+            ComboBoxChargeApplied.setSelectedIndex(1);
+            ComboBoxChargeApplied.setEnabled(false);
+            TXT_Charge.setText("0");
+            System.out.println("Slip Number is: " + TXT_SlipNo.getText());
+            if (TXT_SlipNo.getText().trim() == null || TXT_SlipNo.getText().isEmpty()) {
+                if (TXT_TrollyNo.getText().isEmpty() || TXT_TrollyNo.getText().trim() == null ||
+                    TXT_TrollyNo.getText().trim() == "") {
+                    String message = "Please enter trolley no.";
+                    JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
+                }
+                return;
+            }
+        } else {
+            TXT_TrollyNo.setEnabled(false);
+        }
+
+        if (!vehicle.getSlipNo().equalsIgnoreCase("0")) {
+            TXT_SlipNo.setText(vehicle.getSlipNo());
+            TXT_VechileNo.setEnabled(false);
+        }
+
+        if (!vehicle.getParty().equalsIgnoreCase("0")) {
+            TXT_Part.setText(vehicle.getParty().toUpperCase());
+        }
+
+        if (!vehicle.getProduct().equalsIgnoreCase("0")) {
+            TXT_Product.setText(vehicle.getProduct().toUpperCase());
+        }
+
+        if (vehicle.getGrossWeight().equalsIgnoreCase("0")) {
+            TXT_GrossWeight.setText(vehicle.getGrossWeight());
+        } else {
+            Integer grossWeight = Integer.parseInt(vehicle.getGrossWeight());
+            if (grossWeight > 0) {
+                BtnGross.setEnabled(false);
+            }
+            TXT_GrossWeight.setText(vehicle.getGrossWeight());
+        }
+
+        if (vehicle.getTereWeight().equalsIgnoreCase("0")) {
+            TXT_TareWeight.setText(vehicle.getTereWeight());
+        } else {
+            Integer tareWeight = Integer.parseInt(vehicle.getTereWeight());
+            if (tareWeight > 0) {
+                BtnTare.setEnabled(false);
+            }
+            TXT_TareWeight.setText(vehicle.getTereWeight());
+        }
+
+        if (vehicle.getNetWeight().equalsIgnoreCase("0")) {
+            TXT_NetWeight.setText(vehicle.getNetWeight());
+        } else {
+            Integer tareWeight = Integer.parseInt(vehicle.getNetWeight());
+            if (tareWeight > 0) {
+                BtnSubmit.setEnabled(false);
+                BtnActionClear.setEnabled(false);
+            }
+            TXT_TareWeight.setText(vehicle.getNetWeight());
+        }
+
+        if (!vehicle.getFinalEnteredBy().equalsIgnoreCase("0")) {
+            if (Integer.parseInt(TXT_NetWeight.getText()) > 0) {
+                TXT_FinealEnterBy.setText(vehicle.getFinalEnteredBy());
+
+            } else {
+                TXT_FinealEnterBy.setText(userNamevalue);
+            }
+
+        }
+
+        if (!vehicle.getTrolleyNo().equalsIgnoreCase("0")) {
+            TXT_TrollyNo.setText(vehicle.getTrolleyNo());
+        }
+
+        if (vehicle.getCharge().equalsIgnoreCase("0") || vehicle.getCharge() == "0") {
+            TXT_Charge.setText("0");
+        } else {
+            TXT_Charge.setText(vehicle.getCharge());
+        }
+
+        if (!vehicle.getCharge_applicable().equalsIgnoreCase("0")) {
+            if (vehicle.getCharge_applicable().equalsIgnoreCase("Yes")) {
+                ComboBoxChargeApplied.setSelectedIndex(0);
+            } else {
+                ComboBoxChargeApplied.setSelectedIndex(1);
+            }
+        }
+
+        if (!vehicle.getVeh_subtype_desc().equalsIgnoreCase("0")) {
+            VechileTypejComboBox.setSelectedItem(vehicle.getVeh_subtype_desc());
+        }
+
+        if (!vehicle.getRemarks().equalsIgnoreCase("0")) {
+            TXT_REMARKS.setText(vehicle.getRemarks().toUpperCase());
+        }
+
+        if (!vehicle.getGateEntryNumber().equalsIgnoreCase("0")) {
+            TXT_GateEntry.setText(vehicle.getGateEntryNumber());
+        }
+
+        if (!vehicle.getCreatedBy().equalsIgnoreCase("0")) {
+            TXT_CreateBy.setText(vehicle.getCreatedBy());
+        }
+
+        if (!vehicle.getCreationDate().equalsIgnoreCase("0")) {
+            TXT_CreateDate.setText(vehicle.getCreationDate());
+        }
+
+        if (!vehicle.getCreationTime().equalsIgnoreCase("0")) {
+            TXT_CreateTime.setText(vehicle.getCreationTime());
+        }
+
+        if (!vehicle.getProcessCode().equalsIgnoreCase("0")) {
+            TXT_Process.setText(vehicle.getProcessCode());
+        }
+
+        if (!vehicle.getRcNo().equalsIgnoreCase("0")) {
+            TXT_RC_NO.setText(vehicle.getRcNo());
+        }
+
+        //COMMENT BY SAWAN
+
+        //                if (vehicle.getCompVehTypeCode().equalsIgnoreCase("0")) {
+        //                    VechileTypejComboBox.setEnabled(true);
+        //                    compVechileType = "N";
+        //                    ComboBoxChargeApplied.setSelectedIndex(0);
+        //                    // TXT_Charge.setText("0");
+        //                } else {
+        //                    VechileTypejComboBox.setEnabled(false);
+        //                    ComboBoxChargeApplied.setEnabled(false);
+        //                    ComboBoxChargeApplied.setSelectedIndex(1);
+        //                    TXT_Charge.setText("0");
+        //                    compVechileType = "Y";
+        //                }
+
+        if (!vehicle.getFt_tere_weight().equalsIgnoreCase("0")) {
+            ftTereWeight = vehicle.getFt_tere_weight();
+        }
+
+
+        if (TXT_SlipNo.getText() == null || TXT_SlipNo.getText().equalsIgnoreCase("0") ||
+            TXT_SlipNo.getText().isEmpty() || TXT_SlipNo.getText() == "" || TXT_SlipNo.getText().equals("")) {
+            VechileTypejComboBox.setEnabled(true);
+            ComboBoxChargeApplied.setEnabled(true);
+        } else {
+            VechileTypejComboBox.setEnabled(false);
+            ComboBoxChargeApplied.setEnabled(false);
+        }
+
+    }
+
+    public void ByPassMachine(VehicleDetails vehicle) {
+        if (vehicle.getVehicleNo() != null) {
+            TXT_VechileNo.setText(vehicle.getVehicleNo().toUpperCase());
+            if (vechileNo != null) {
+                TXT_SlipNo.setEnabled(false);
+            }
+        }
+        if (!vehicle.getTokenNo().equalsIgnoreCase("0")) {
+            TXT_TokenNo.setText(vehicle.getTokenNo());
+        }
+        //COMMENT UPDATE HARE
+        if (vehicle.getCompVehTypeCode().equalsIgnoreCase("0")) {
+            VechileTypejComboBox.setEnabled(true);
+            compVechileType = "N";
+            ComboBoxChargeApplied.setSelectedIndex(0);
+            // TXT_Charge.setText("0");
+        } else {
+            VechileTypejComboBox.setEnabled(false);
+            ComboBoxChargeApplied.setEnabled(false);
+            ComboBoxChargeApplied.setSelectedIndex(1);
+            TXT_Charge.setText("0");
+            compVechileType = "Y";
+        }
+
+        if (vehicle.getTrolly_req().equalsIgnoreCase("Y")) {
+            TXT_TrollyNo.setEnabled(true);
+            trollyReq = "Y";
+            VechileTypejComboBox.setSelectedItem("TRACTOR");
+            ComboBoxChargeApplied.setSelectedIndex(1);
+            ComboBoxChargeApplied.setEnabled(false);
+            TXT_Charge.setText("0");
+            System.out.println("Slip Number is: " + TXT_SlipNo.getText());
+            if (TXT_SlipNo.getText().trim() == null || TXT_SlipNo.getText().isEmpty()) {
+                if (TXT_TrollyNo.getText().isEmpty() || TXT_TrollyNo.getText().trim() == null ||
+                    TXT_TrollyNo.getText().trim() == "") {
+                    String message = "Please enter trolley no.";
+                    JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
+                }
+                return;
+            }
+        } else {
+            TXT_TrollyNo.setEnabled(false);
+        }
+        if (slipNo == null) {
+            if (!vehicle.getSlipNo().equalsIgnoreCase("0")) {
+                TXT_SlipNo.setText(null);
+                // TXT_VechileNo.setEnabled(false);
+            }
+        }
+        if (!vehicle.getParty().equalsIgnoreCase("0")) {
+            TXT_Part.setText(null);
+        }
+
+        if (!vehicle.getProduct().equalsIgnoreCase("0")) {
+            TXT_Product.setText(null);
+        }
+
+        if (vehicle.getGrossWeight().equalsIgnoreCase("0")) {
+            TXT_GrossWeight.setText("0");
+        } else {
+
+            TXT_GrossWeight.setText("0");
+        }
+
+        if (vehicle.getTereWeight().equalsIgnoreCase("0")) {
+            TXT_TareWeight.setText("0");
+        } else {
+
+            TXT_TareWeight.setText("0");
+        }
+
+        if (vehicle.getNetWeight().equalsIgnoreCase("0")) {
+            TXT_NetWeight.setText("0");
+        } else {
+
+            TXT_TareWeight.setText("0");
+        }
+
+        if (!vehicle.getFinalEnteredBy().equalsIgnoreCase("0")) {
+            if (Integer.parseInt(TXT_NetWeight.getText()) > 0) {
+                TXT_FinealEnterBy.setText(vehicle.getFinalEnteredBy());
+            } else {
+                TXT_FinealEnterBy.setText(userNamevalue);
+            }
+        }
+
+        if (!vehicle.getTrolleyNo().equalsIgnoreCase("0")) {
+            TXT_TrollyNo.setText(vehicle.getTrolleyNo());
+        }
+
+        if (vehicle.getCharge().equalsIgnoreCase("0") || vehicle.getCharge() == "0") {
+            TXT_Charge.setText("0");
+        } else {
+            TXT_Charge.setText(vehicle.getCharge());
+        }
+
+        if (!vehicle.getCharge_applicable().equalsIgnoreCase("0")) {
+            if (vehicle.getCharge_applicable().equalsIgnoreCase("Yes")) {
+                ComboBoxChargeApplied.setSelectedIndex(0);
+            } else {
+                ComboBoxChargeApplied.setSelectedIndex(1);
+            }
+        }
+
+        if (!vehicle.getVeh_subtype_desc().equalsIgnoreCase("0")) {
+            VechileTypejComboBox.setSelectedItem(vehicle.getVeh_subtype_desc());
+        }
+
+        if (!vehicle.getRemarks().equalsIgnoreCase("0")) {
+            TXT_REMARKS.setText(null);
+        }
+
+        if (!vehicle.getGateEntryNumber().equalsIgnoreCase("0")) {
+            TXT_GateEntry.setText(null);
+        }
+
+        if (!vehicle.getCreatedBy().equalsIgnoreCase("0")) {
+            TXT_CreateBy.setText(null);
+        }
+
+        if (!vehicle.getCreationDate().equalsIgnoreCase("0")) {
+            TXT_CreateDate.setText(null);
+        }
+
+        if (!vehicle.getCreationTime().equalsIgnoreCase("0")) {
+            TXT_CreateTime.setText(null);
+        }
+
+        if (!vehicle.getProcessCode().equalsIgnoreCase("0")) {
+            TXT_Process.setText(null);
+        }
+
+        if (!vehicle.getRcNo().equalsIgnoreCase("0")) {
+            TXT_RC_NO.setText(null);
+        }
+
+        //COMMENT BY SAWAN
+
+        //                if (vehicle.getCompVehTypeCode().equalsIgnoreCase("0")) {
+        //                    VechileTypejComboBox.setEnabled(true);
+        //                    compVechileType = "N";
+        //                    ComboBoxChargeApplied.setSelectedIndex(0);
+        //                    // TXT_Charge.setText("0");
+        //                } else {
+        //                    VechileTypejComboBox.setEnabled(false);
+        //                    ComboBoxChargeApplied.setEnabled(false);
+        //                    ComboBoxChargeApplied.setSelectedIndex(1);
+        //                    TXT_Charge.setText("0");
+        //                    compVechileType = "Y";
+        //                }
+
+        if (!vehicle.getFt_tere_weight().equalsIgnoreCase("0")) {
+            ftTereWeight = vehicle.getFt_tere_weight();
+        }
+
+
+        if (TXT_SlipNo.getText() == null || TXT_SlipNo.getText().equalsIgnoreCase("0") ||
+            TXT_SlipNo.getText().isEmpty() || TXT_SlipNo.getText() == "" || TXT_SlipNo.getText().equals("")) {
+            VechileTypejComboBox.setEnabled(true);
+            ComboBoxChargeApplied.setEnabled(true);
+        } else {
+            VechileTypejComboBox.setEnabled(false);
+            ComboBoxChargeApplied.setEnabled(false);
+        }
+
     }
 
     public void trollyDeatilsApiCall() throws JSONException, IOException {
-        JSONObject jsonObject =null;
+        JSONObject jsonObject = null;
         if (TXT_TrollyNo.getText().isEmpty() || TXT_VechileNo.getText() == null) {
             JOptionPane.showMessageDialog(null, "Please Trolley Number", "Message", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
         try {
-           // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/trollyDtl");
-           URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/trollyDtl");
+            // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/trollyDtl");
+            URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/trollyDtl");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
@@ -2513,10 +2760,10 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     response.append(responseLine.trim());
                 }
                 String jsonResponse = response.toString();
-                 
-                System.out.println("jsonResponse--"+jsonResponse.length()+"jsonResponse---"+jsonResponse.trim());
-               
-                 jsonObject = new JSONObject(jsonResponse);
+
+                System.out.println("jsonResponse--" + jsonResponse.length() + "jsonResponse---" + jsonResponse.trim());
+
+                jsonObject = new JSONObject(jsonResponse);
                 if (jsonObject == null) {
                     onLoad();
                     onLoadDate();
@@ -2529,7 +2776,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     TXT_SlipNo.setEnabled(true);
                     return;
                 }
-                
+
 
                 if (jsonObject.getString("slip_no") != "0") {
                     TXT_SlipNo.setText(jsonObject.getString("slip_no"));
@@ -2676,12 +2923,12 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
     }
 
-    public void oncallApiVehicleSlipNo(String slipNo) throws JSONException {
+    public void oncallApiVehicleSlipNo11(String slipNo) throws JSONException {
         try {
             // URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/printslip");
             // URL url = new URL("http://10.0.6.204:7003/RestApiWeightBridge/resources/printslip");
             URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/printslip");
-          // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/printslip");
+            // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/printslip");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
@@ -2808,7 +3055,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     if (rs.getString("rcNo") != null) {
                         // TXT_RC_NO.setText(rs.getString("rcNo").toUpperCase());
 
-
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -2816,7 +3062,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 try {
                     if (rs.getString("machineNo") != null) {
                         //  TXT_Machine.setText(rs.getString("machineNo").toUpperCase());
-
 
                     }
                 } catch (Exception ex) {
@@ -2842,7 +3087,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     if (rs.getString("createdBy") != null) {
                         //  TXT_CreateBy.setText(rs.getString("createdBy").toUpperCase());
 
-
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -2850,7 +3094,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 try {
                     if (rs.getString("creationDate") != null) {
                         //  TXT_CreateDate.setText(rs.getString("creationDate").toUpperCase());
-
 
                     }
                 } catch (Exception ex) {
@@ -2884,10 +3127,39 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     parameters.put("Product", product);
                     parameters.put("Copy", "Orginal");
                     parameters.put("M_no", rs.getString("machineNo"));
-                   
 
+
+                    // Create JasperPrint
                     JasperPrint print = JasperFillManager.fillReport(design, parameters, new JREmptyDataSource());
-                    JasperViewer.viewReport(print, false);
+
+                    // Print the report
+//                    boolean printed =
+//                        print.print(print.getPages(), 0); // Print the report (this will send it to the default printer)
+//
+//                    // Check if printing was successful
+//                    if (printed) {
+//                        System.out.println("Report printed successfully!");
+//                    } else {
+//                        System.out.println("Failed to print the report.");
+//                    }
+
+                    // Create JasperViewer
+                    JasperViewer viewer = new JasperViewer(print, false);
+
+                    // Close the viewer automatically after printing
+                    SwingUtilities.invokeLater(() -> {
+                            try {
+                                Thread.sleep(4000); // Wait for 2 seconds after printing to allow printing time
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
+                            viewer.dispose(); // Dispose of the viewer after printing
+                        });
+
+                    // Show the JasperViewer
+                    viewer.setVisible(true);
+
+
                     resetValueAfterPrint();
                 } catch (FileNotFoundException ex) {
                     JOptionPane.showMessageDialog(null, ex.toString(), "Message", JOptionPane.ERROR_MESSAGE);
@@ -2898,6 +3170,261 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         } catch (IOException e) {
             System.err.println("Error during API call: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    public void oncallApiVehicleSlipNo(String slipNo) throws JSONException {
+        try {
+            // URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/printslip");
+            // URL url = new URL("http://10.0.6.204:7003/RestApiWeightBridge/resources/printslip");
+            URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/printslip");
+            // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/printslip");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setDoOutput(true);
+
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("slipNo", slipNo);
+
+            try (OutputStream outputStream = connection.getOutputStream()) {
+                byte[] input = jsonObject.toString().getBytes("utf-8");
+                outputStream.write(input, 0, input.length);
+            }
+
+            StringBuilder response = null;
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                String inputLine;
+                response = new StringBuilder();
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+            }
+
+            JSONArray jsonArray = new JSONArray(response.toString());
+            if (jsonArray.length() <= 0) {
+                JOptionPane.showMessageDialog(null, "Please Enter Valid Slip No", "Message",
+                                              JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject rs = jsonArray.getJSONObject(i);
+                try {
+                    if (rs.getString("vehicleNo") != null) {
+                        vechileNo = rs.getString("vehicleNo").toUpperCase();
+                        // TXT_VechileNo.setText(vechileNo);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    if (rs.getString("slipNo") != null) {
+                        slipNo = rs.getString("slipNo").toUpperCase();
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    if (rs.getString("tokenNo") != null) {
+                        tokenNo = rs.getString("tokenNo").toUpperCase();
+                        // TXT_TokenNo.setText(tokenNo);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    if (rs.getString("party") != null) {
+                        party = rs.getString("party").toUpperCase();
+                        // TXT_Part.setText(party);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    if (rs.getString("grossWeight") != null) {
+                        grossWeight = Integer.toString(rs.getInt("grossWeight"));
+                        // TXT_GrossWeight.setText(grossWeight);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    if (rs.getString("tereWeight") != null) {
+                        tareWeight = rs.getString("tereWeight").toUpperCase();
+                        // TXT_TareWeight.setText(tareWeight);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    if (rs.getString("netWeight") != null) {
+                        netWeight = rs.getString("netWeight").toUpperCase();
+                        // TXT_NetWeight.setText(netWeight);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    if (rs.getString("finalEnteredDate") != null && rs.getString("finalEnteredTime") != null) {
+                        finaldate =
+                            rs.getString("finalEnteredDate").toUpperCase() + " " + rs.getString("finalEnteredTime");
+                        // TXT_FinealEnterDate.setText(rs.getString("finalEnteredDate").toUpperCase());
+                        // TXT_FinealEnterTime.setText(rs.getString("finalEnteredTime").toUpperCase());
+                        // TXT_FinealEnterBy.setText(rs.getString("finalEnteredBy").toUpperCase());
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    if (rs.getString("charge") != null) {
+                        charge = rs.getString("charge").toUpperCase();
+                        // TXT_Charge.setText(rs.getString("charge").toUpperCase());
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    if (rs.getString("remarks") != null) {
+                        remarks = rs.getString("remarks").toUpperCase();
+                        // TXT_RE.setText(rs.getString("CHARGE").toUpperCase());
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    if (rs.getString("gateEntryNumber") != null) {
+                        gateNo = rs.getString("gateEntryNumber").toUpperCase();
+                        // TXT_GateEntry.setText(gateNo);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    if (rs.getString("rcNo") != null) {
+                        // TXT_RC_NO.setText(rs.getString("rcNo").toUpperCase());
+
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    if (rs.getString("machineNo") != null) {
+                        //  TXT_Machine.setText(rs.getString("machineNo").toUpperCase());
+
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    if (rs.getString("subtypeDesc") != null) {
+                        vechileType = rs.getString("subtypeDesc").toUpperCase();
+                        //  txt_.setText(vechileType);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    if (rs.getString("product") != null) {
+                        product = rs.getString("product").toUpperCase();
+                        //  TXT_Process.setText(rs.getString("processCode").toUpperCase());
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    if (rs.getString("createdBy") != null) {
+                        //  TXT_CreateBy.setText(rs.getString("createdBy").toUpperCase());
+
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    if (rs.getString("creationDate") != null) {
+                        //  TXT_CreateDate.setText(rs.getString("creationDate").toUpperCase());
+
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    if (rs.getString("creationTime") != null) {
+                        //  TXT_CreateTime.setText(rs.getString("creationTime").toUpperCase());
+                        create = rs.getString("creationDate") + " " + rs.getString("creationTime");
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+              
+                    InputStream inputStream = new FileInputStream(jasperPath);
+                    JasperReport design = (JasperReport) JRLoader.loadObject(inputStream);
+                    Map<String, Object> parameters = new HashMap<>();
+                    parameters.put("SlipNo", slipNo);
+                    parameters.put("TokenNo", tokenNo);
+                    parameters.put("GateEntry", gateNo);
+                    parameters.put("GrossWeight", grossWeight);
+                    parameters.put("TareWeight", tareWeight);
+                    parameters.put("NetWeight", netWeight);
+                    parameters.put("Party", party);
+                    parameters.put("Remarks", remarks);
+                    parameters.put("TruckNo", vechileNo);
+                    parameters.put("TruckType", vechileType);
+                    parameters.put("CreatedOn", create);
+                    parameters.put("Final", finaldate);
+                    parameters.put("Charge", charge);
+                    parameters.put("Product", product);
+                    parameters.put("Copy", "Orginal");
+                    parameters.put("M_no", rs.getString("machineNo"));
+
+                // Create JasperPrint
+                JasperPrint print = JasperFillManager.fillReport(design, parameters, new JREmptyDataSource());
+
+                // Create JasperViewer
+                JasperViewer viewer = new JasperViewer(print, false);
+
+                // Create a Print Button
+                JButton printButton = new JButton("Print & Close");
+                
+                // ActionListener for the print button
+                printButton.addActionListener(e -> {
+                    try {
+                        // Create PrinterJob instance
+                        PrinterJob printerJob = PrinterJob.getPrinterJob();
+                      //  printerJob.setPrintService(print.getPrintService());
+
+                        // Show print dialog and start printing
+                        if (printerJob.printDialog()) {
+                            printerJob.print();
+                        }
+
+                        // Dispose of the viewer (close it)
+                        viewer.dispose();  // Close the JasperViewer window
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(null, ex.toString(), "Error", JOptionPane.ERROR_MESSAGE);
+                    
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "Error during printing", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                });
+
+                // Add the button to the viewer's panel (optional customization)
+                JPanel panel = new JPanel();
+                panel.add(printButton);  // Add the button to a panel
+                viewer.getContentPane().add(panel, BorderLayout.SOUTH);  // Add the panel to the bottom of the viewer
+
+                // Show the JasperViewer
+                viewer.setVisible(true);
+
+                // Optionally reset values after printing
+                resetValueAfterPrint();
+            }
+        } catch (IOException e) {
+            System.err.println("Error during API call: " + e.getMessage());
+            e.printStackTrace();
+        } catch (JRException ex) {
+            JOptionPane.showMessageDialog(null, ex.toString(), "Message", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

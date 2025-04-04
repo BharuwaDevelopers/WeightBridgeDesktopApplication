@@ -44,9 +44,9 @@ import org.apache.poi.ss.usermodel.*;
  */
 public class ReportsJFrame extends javax.swing.JFrame {
 
-String unit_Code=null,machine_code=null,comportNo=null,user_Name=null;
+String unit_Code=null,machine_code=null,comportNo=null,user_Name=null,bypassflag=null;
     /** Creates new form ReportsJFrame */
-    public ReportsJFrame(String userName,String unitCode,String machinecode,String comport) {
+    public ReportsJFrame(String userName,String unitCode,String machinecode,String comport,String bypass_flag) {
         initComponents();
         
         // reportsDetails();
@@ -60,6 +60,7 @@ String unit_Code=null,machine_code=null,comportNo=null,user_Name=null;
         machine_code=machinecode;
         comportNo=comport;
         user_Name=userName;
+        bypassflag=bypass_flag;
     }
 
     /** This method is called from within the constructor to
@@ -215,7 +216,7 @@ String unit_Code=null,machine_code=null,comportNo=null,user_Name=null;
     }//GEN-LAST:event_BtnExportExcelActionPerformed
 
     private void jBackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBackButtonActionPerformed
-    WeightMechineJFrame weightFrame = new WeightMechineJFrame(user_Name,unit_Code,machine_code,comportNo);
+    WeightMechineJFrame weightFrame = new WeightMechineJFrame(user_Name,unit_Code,machine_code,comportNo,bypassflag);
     weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     weightFrame.setSize(1200, 730);
     weightFrame.setVisible(true);
@@ -257,7 +258,7 @@ String unit_Code=null,machine_code=null,comportNo=null,user_Name=null;
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ReportsJFrame("","","","").setVisible(true);
+                new ReportsJFrame("","","","","").setVisible(true);
             }
         });
     }
@@ -306,7 +307,7 @@ String unit_Code=null,machine_code=null,comportNo=null,user_Name=null;
 
     public void callApiForReports() throws ProtocolException, MalformedURLException, JSONException {
         // String url = "http://10.0.6.204:7003/RestApiWeightBridge/resources/reports";
-        String url = "http://10.0.6.171:9090/RestApiWeightBridge/resources/reports";
+        String url = "http://10.0.6.170:9090/RestApiWeightBridge/resources/reports";
         //String url = "http://127.0.0.1:7101/RestApiWeightBridge/resources/reports";
         // Try-catch block to handle potential IOExceptions and other exceptions
         List<VehicleDetails> filteredList = null;
