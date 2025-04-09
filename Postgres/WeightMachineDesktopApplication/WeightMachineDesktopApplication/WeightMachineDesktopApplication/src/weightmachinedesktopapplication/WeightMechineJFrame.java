@@ -81,6 +81,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     String vechileCode = null;
     String compVechileType = "N";
     String trollyReq = "N";
+    String  vechileNumberFromDb = null;
 
     String slipNo = null, tokenNo = null, gateNo = null, grossWeight = null, tareWeight = null, netWeight =
         null, party = null, vechileNo = null, vechileType = null, create = null, finaldate = null, charge =
@@ -997,7 +998,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel10.setText("Vechile Type");
+        jLabel10.setText("vehicle  Type");
 
         LBL_CreateTime.setText("Create Time");
 
@@ -1155,7 +1156,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         TXT_NetWeight.setEnabled(false);
         jScrollPane10.setViewportView(TXT_NetWeight);
 
-        jLabel21.setText("Vehicle Number");
+        jLabel21.setText("vehicle  Number");
 
         jLabel22.setText("Trolly Number");
 
@@ -1266,7 +1267,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         WeightBridgeJpanelLayout.setHorizontalGroup(
             WeightBridgeJpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(WeightBridgeJpanelLayout.createSequentialGroup()
-                .addContainerGap(37, Short.MAX_VALUE)
+                .addContainerGap(34, Short.MAX_VALUE)
                 .addGroup(WeightBridgeJpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(WeightBridgeJpanelLayout.createSequentialGroup()
                         .addComponent(jLabel14)
@@ -1438,14 +1439,31 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     }//GEN-END:initComponents
 
     private void BtnSubmitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnSubmitActionPerformed
-        if (TXT_GrossWeight.getText().equalsIgnoreCase("0") && TXT_TareWeight.getText().equalsIgnoreCase("0")) {
-            JOptionPane.showMessageDialog(null, "Gross Weight/Tare Weight 0", "Message",
-                                          JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
 
         if (TXT_TokenNo.getText().isEmpty() || TXT_TokenNo.getText() == null || TXT_TokenNo.getText() == "") {
             JOptionPane.showMessageDialog(null, "Token number not found.", "Message", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        if(vechileNumberFromDb.trim().equalsIgnoreCase(TXT_VechileNo.getText().trim())){
+            
+        }else{
+            JOptionPane.showMessageDialog(null, "This vehicle number doesn't match the token number ", "Message",
+                                          JOptionPane.INFORMATION_MESSAGE);
+            onLoad();
+            onLoadDate();
+            resetValue();
+            TXT_FinealEnterBy.setText(null);
+            TXT_FinealEnterDate.setText(null);
+            TXT_FinealEnterTime.setText(null);
+            TXT_SlipNo.setText(null);
+            TXT_VechileNo.setEnabled(true);
+            TXT_SlipNo.setEnabled(true);
+            return; 
+        }
+        
+        if (TXT_GrossWeight.getText().equalsIgnoreCase("0") && TXT_TareWeight.getText().equalsIgnoreCase("0")) {
+            JOptionPane.showMessageDialog(null, "Gross Weight/Tare Weight 0", "Message",
+                                          JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
@@ -2402,9 +2420,18 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
             VechileTypejComboBox.setEnabled(true);
             filteredList.forEach(System.out::println);
+            int count=  filteredList.size();
+            System.out.println("count---->"+count);
+            if(count<=0){
+                String message = "Please Enter Valid Vehicle no/Slip No";
+               JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
+              resetValue();
+              return;
+            }
             for (VehicleDetails vehicle : filteredList) {
                 System.out.println(vehicle.getVehicleNo() + " - " + vehicle.getTokenNo());
                 if (!vehicle.getTokenNo().equalsIgnoreCase("0")) {
+                    vechileNumberFromDb=vehicle.getVehicleNo();
                     System.out.println("bypass_flag---" + bypass_flag);
                     if (bypass_flag.equalsIgnoreCase("Y")) {
                         if (!vehicle.getSlipNo().equalsIgnoreCase("0")) {
