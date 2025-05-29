@@ -1566,9 +1566,9 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     public void insertdateCallApi() {
         try {
             //quality
-            // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/insert");
+            // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/insert");
             //Production
-            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/insert");
+            URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/insert");
 
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
@@ -1640,9 +1640,9 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     public void updatedateCallApi() {
         try {
             //quality
-            // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/update");
+            // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/update");
             //prd
-            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/update");
+            URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/update");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
@@ -1764,7 +1764,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         } else {
             if (compVechileType.equalsIgnoreCase("N")) {
                 //sawan-------
-                if (chargeApplied.equalsIgnoreCase("N") && slipNoCheck.equalsIgnoreCase("N")) {
+                System.out.println("slipNoCheck---chargeApplied--"+slipNoCheck+"===="+chargeApplied);
+                if (chargeApplied.equalsIgnoreCase("N") && (slipNoCheck.equalsIgnoreCase("N")||slipNoCheck.equalsIgnoreCase("0"))) {
                     ComboBoxChargeApplied.setSelectedIndex(0);
 
                     String firstValue = itemList.stream().filter(item -> item.getKey().equals(selectedItem)) // Filter based on the key
@@ -2315,10 +2316,10 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         suggestionsListTrollyNo = new ArrayList<>();
         try {
             //quality
-            // URL obj = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleType?machineCode=" + machinecode);
+            // URL obj = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/vehicleType?machineCode=" + machinecode);
             //prd
             URL obj =
-                new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleType?machineCode=" + machinecode);
+                new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/vehicleType?machineCode=" + machinecode);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
             con.setRequestMethod("GET");
             con.setRequestProperty("User-Agent", "Mozilla/5.0");
@@ -2365,8 +2366,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         List<VehicleDetails> filteredList = null;
         List<VehicleDetails> filteredListMachineCode = null;
         try {
-            //  URL obj = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleDetails");
-            URL obj = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleDetails");
+            //  URL obj = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/vehicleDetails");
+            URL obj = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/vehicleDetails");
             HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("User-Agent", "Mozilla/5.0");
@@ -2501,7 +2502,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             TXT_VechileNo.setText(vehicle.getVehicleNo().toUpperCase().trim());
             if (vechileNo != null) {
                 TXT_SlipNo.setEnabled(false);
-                TXT_SlipNo.setText(vehicle.getSlipNo());
+               // TXT_SlipNo.setText(vehicle.getSlipNo());
                 slipNoCheck = vehicle.getSlipNo();
             }
         }
@@ -2608,9 +2609,13 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             System.out.println("vehicle.getCharge()---" + vehicle.getCharge());
             TXT_Charge.setText(vehicle.getCharge());
         }
+        
+        if (!vehicle.getVeh_subtype_desc().equalsIgnoreCase("0")) {
+            VechileTypejComboBox.setSelectedItem(vehicle.getVeh_subtype_desc());
+        }
 
         if (!vehicle.getCharge_applicable().equalsIgnoreCase("0")) {
-            if (vehicle.getCharge_applicable().equalsIgnoreCase("Yes")) {
+            if (vehicle.getCharge_applicable().equalsIgnoreCase("Yes")|| vehicle.getCharge_applicable().equalsIgnoreCase("Y")) {
                 chargeApplied = "Y";
                 ComboBoxChargeApplied.setSelectedIndex(0);
             } else {
@@ -2620,9 +2625,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             }
         }
 
-        if (!vehicle.getVeh_subtype_desc().equalsIgnoreCase("0")) {
-            VechileTypejComboBox.setSelectedItem(vehicle.getVeh_subtype_desc());
-        }
+       
 
         if (!vehicle.getRemarks().equalsIgnoreCase("0")) {
             TXT_REMARKS.setText(vehicle.getRemarks().toUpperCase());
@@ -2861,8 +2864,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             return;
         }
         try {
-            // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/trollyDtl");
-            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/trollyDtl");
+            // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/trollyDtl");
+            URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/trollyDtl");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
@@ -3050,8 +3053,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         try {
             // URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/printslip");
             // URL url = new URL("http://10.0.6.204:7003/RestApiWeightBridge/resources/printslip");
-            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/printslip");
-            // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/printslip");
+           // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/printslip");
+             URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/printslip");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
@@ -3300,8 +3303,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         try {
             // URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/printslip");
             // URL url = new URL("http://10.0.6.204:7003/RestApiWeightBridge/resources/printslip");
-            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/printslip");
-            // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/printslip");
+           // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/printslip");
+         URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/printslip");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
