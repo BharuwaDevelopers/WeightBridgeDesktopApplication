@@ -214,6 +214,9 @@
       </Layout>
       <SubComponents>
         <Component class="javax.swing.JTextField" name="TXT_SLIP_NO">
+          <Events>
+            <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="TXT_SLIP_NOKeyPressed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="BtnPrintSlipNo">
           <Properties>

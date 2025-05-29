@@ -316,8 +316,8 @@ public class LoginJFrame extends javax.swing.JFrame {
         try {
             //  URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/Login");
             // URL url = new URL("http://10.0.6.204:7003/RestApiWeightBridge/resources/Login");
-          //  URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/Login");
-          URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/Login");
+            //  URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/Login");
+            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/Login");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
@@ -380,13 +380,13 @@ public class LoginJFrame extends javax.swing.JFrame {
                                                       JOptionPane.INFORMATION_MESSAGE);
                     }
 
-                    //                    WeightMechineJFrame weightFrame =
-                    //                        new WeightMechineJFrame(userName, unitCode, machine_code, comport,bypass_flag);
-                    //                    weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                    //                    weightFrame.setSize(1200, 730);
-                    //                    weightFrame.setVisible(true);
-                    //                    // super.setVisible(false);
-                    //                    super.dispose();
+                    //                                        WeightMechineJFrame weightFrame =
+                    //                                            new WeightMechineJFrame(userName, unitCode, machine_code, comport,bypass_flag);
+                    //                                        weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                    //                                        weightFrame.setSize(1200, 730);
+                    //                                        weightFrame.setVisible(true);
+                    //                                        // super.setVisible(false);
+                    //                                        super.dispose();
 
 
                 }

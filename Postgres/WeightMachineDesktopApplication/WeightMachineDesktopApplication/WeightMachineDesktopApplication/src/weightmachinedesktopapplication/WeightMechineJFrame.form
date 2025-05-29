@@ -933,6 +933,7 @@
                 </Property>
               </Properties>
               <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="TXT_VechileNoActionPerformed"/>
                 <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="TXT_VechileNoKeyPressed"/>
               </Events>
             </Component>

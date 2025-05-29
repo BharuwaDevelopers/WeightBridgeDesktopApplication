@@ -212,6 +212,12 @@ public class PrintSlip extends javax.swing.JFrame {
 
         BtnPrint.setBackground(new java.awt.Color(255, 255, 255));
 
+        TXT_SLIP_NO.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                TXT_SLIP_NOKeyPressed(evt);
+            }
+        });
+
         BtnPrintSlipNo.setText("Search");
         BtnPrintSlipNo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -704,6 +710,20 @@ public class PrintSlip extends javax.swing.JFrame {
         super.dispose();
         
     }//GEN-LAST:event_jBtnBackActionPerformed
+
+    private void TXT_SLIP_NOKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TXT_SLIP_NOKeyPressed
+    if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+        if (TXT_SLIP_NO.getText().isEmpty()) {
+
+        } else {
+            // VechileDetails(TXT_SLIP_NO.getText());
+            try {
+                oncallApiVehicleSlipNo(TXT_SLIP_NO.getText().toUpperCase());
+            } catch (JSONException e) {
+            }
+        }
+    }
+    }//GEN-LAST:event_TXT_SLIP_NOKeyPressed
 
 
 
