@@ -577,7 +577,7 @@
           <SubComponents>
             <Component class="javax.swing.JLabel" name="jLabel10">
               <Properties>
-                <Property name="text" type="java.lang.String" value="vehicle  Type"/>
+                <Property name="text" type="java.lang.String" value="Vehicle  Type"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="LBL_CreateTime">
@@ -905,7 +905,7 @@
             </Container>
             <Component class="javax.swing.JLabel" name="jLabel21">
               <Properties>
-                <Property name="text" type="java.lang.String" value="vehicle  Number"/>
+                <Property name="text" type="java.lang.String" value="Vehicle  Number"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel22">
