@@ -667,7 +667,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 }
             }
         });
-
         TXT_TrollyNo.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -1064,6 +1063,10 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 .addGap(23, 23, 23)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel12)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(ComboBoxChargeApplied, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                 .addComponent(jLabel10)
@@ -1084,11 +1087,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                             .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
                             .addComponent(VechileTypejComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(TXT_SlipNo)
-                            .addComponent(TXT_RC_NO)))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel12)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(ComboBoxChargeApplied, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(TXT_RC_NO))))
                 .addContainerGap(32, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -1476,11 +1475,11 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         }
 
         // String value = comPoartMechineConnection("SaveBtn");
-        if (comPoartMechineConnection("SaveBtn").equalsIgnoreCase("N")) {
-            String message = "Weight-bridge weight not match.";
-            JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
+                if (comPoartMechineConnection("SaveBtn").equalsIgnoreCase("N")) {
+                    String message = "Weight-bridge weight not match.";
+                    JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
         try {
             if (TXT_GrossWeight.getText() == "0") {
                 if (!ftTereWeight.equalsIgnoreCase("0")) {
@@ -1505,6 +1504,14 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 String message = "This vehicle outside charge is applied, please select vehicle type.";
                 //   JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
                 //  return;
+            }
+        }
+        System.out.println("ComboBoxChargeApplied.getSelectedItem().toString()--"+ComboBoxChargeApplied.getSelectedItem().toString());
+        if (chargeApplied.equalsIgnoreCase("N") && compVechileType.equalsIgnoreCase("N") && ComboBoxChargeApplied.getSelectedItem().toString()!="Yes") {
+            if (TXT_REMARKS.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Please Enter Remark", "Message",
+                                              JOptionPane.INFORMATION_MESSAGE);
+                return;
             }
         }
         // JOptionPane.showMessageDialog(null, "valuueueueu----3", "Message", JOptionPane.INFORMATION_MESSAGE);
@@ -1543,13 +1550,15 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             TXT_SlipNo.getText().trim() == "" || TXT_SlipNo.getText().equalsIgnoreCase("0")) {
             insertdateCallApi();
         } else {
-            //      if (TXT_REMARKS.getText().trim().isEmpty()) {
-            //        JOptionPane.showMessageDialog(null, "Please Enter Remark", "Message", JOptionPane.INFORMATION_MESSAGE);
-            //        return;
-            //      }
+            if (chargeApplied.equalsIgnoreCase("N")) {
+                if (TXT_REMARKS.getText().trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Please Enter Remark", "Message",
+                                                  JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+            }
             // tare and gross value is equal than bypass it
             // if (Integer.parseInt(TXT_TareWeight.getText()) == Integer.parseInt(TXT_GrossWeight.getText()))
-
             int grossWeight = Integer.valueOf(TXT_GrossWeight.getText().toString());
             Integer tareWeight = Integer.valueOf(TXT_TareWeight.getText().toString());
             if (tareWeight == grossWeight) {
@@ -1574,9 +1583,9 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     public void insertdateCallApi() {
         try {
             //quality
-            // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/insert");
+            // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/insert");
             //Production
-            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/insert");
+            URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/insert");
 
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
@@ -1603,8 +1612,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             jsonObject.addProperty("trolley_no", TXT_TrollyNo.getText());
             jsonObject.addProperty("charge", TXT_Charge.getText());
             jsonObject.addProperty("charge_applicable", ComboBoxChargeApplied.getSelectedItem().toString());
-            jsonObject.addProperty("party", TXT_Part.getText().toUpperCase());
-            jsonObject.addProperty("product", TXT_Product.getText().toUpperCase());
+            jsonObject.addProperty("party", TXT_Part.getText().toUpperCase().trim());
+            jsonObject.addProperty("product", TXT_Product.getText().toUpperCase().trim());
             jsonObject.addProperty("gate_entry_number", TXT_GateEntry.getText().toUpperCase());
             jsonObject.addProperty("remarks", TXT_REMARKS.getText().toUpperCase());
             if (TXT_CreateBy.getText() == null || TXT_CreateBy.getText().isEmpty()) {
@@ -1648,9 +1657,9 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     public void updatedateCallApi() {
         try {
             //quality
-            // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/update");
+            // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/update");
             //prd
-            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/update");
+            URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/update");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
@@ -1668,8 +1677,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             jsonObject.addProperty("trolley_no", TXT_TrollyNo.getText());
             jsonObject.addProperty("charge", TXT_Charge.getText());
             jsonObject.addProperty("charge_applicable", ComboBoxChargeApplied.getSelectedItem().toString());
-            jsonObject.addProperty("party", TXT_Part.getText().toUpperCase());
-            jsonObject.addProperty("product", TXT_Product.getText().toUpperCase());
+            jsonObject.addProperty("party", TXT_Part.getText().toUpperCase().trim());
+            jsonObject.addProperty("product", TXT_Product.getText().toUpperCase().trim());
             jsonObject.addProperty("remarks", TXT_REMARKS.getText().toUpperCase());
 
             try (OutputStream outputStream = con.getOutputStream()) {
@@ -2325,10 +2334,10 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         suggestionsListTrollyNo = new ArrayList<>();
         try {
             //quality
-            // URL obj = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleType?machineCode=" + machinecode);
+            // URL obj = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/vehicleType?machineCode=" + machinecode);
             //prd
             URL obj =
-                new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleType?machineCode=" + machinecode);
+                new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/vehicleType?machineCode=" + machinecode);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
             con.setRequestMethod("GET");
             con.setRequestProperty("User-Agent", "Mozilla/5.0");
@@ -2358,9 +2367,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 }
                 if (autosuggest.getRemarks() != null) {
                     // suggestionsListRemarks.add(autosuggest.getRemarks());
-
-
-
                 }
                 if (autosuggest.getVehicleNo() != null) {
                     suggestionsListVehicleNo.add(autosuggest.getVehicleNo());
@@ -2378,8 +2384,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         List<VehicleDetails> filteredList = null;
         List<VehicleDetails> filteredListMachineCode = null;
         try {
-            //  URL obj = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleDetails");
-            URL obj = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleDetails");
+            //  URL obj = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/vehicleDetails");
+            URL obj = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/vehicleDetails");
             HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("User-Agent", "Mozilla/5.0");
@@ -2876,8 +2882,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             return;
         }
         try {
-            // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/trollyDtl");
-            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/trollyDtl");
+            // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/trollyDtl");
+            URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/trollyDtl");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
@@ -2918,6 +2924,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
                 if (jsonObject.getString("machine_no") != "0") {
                     // TXT_Machine.setText(jsonObject.getString("machine_no"));
+
                 }
                 if (jsonObject.getString("trolly_req") != "0") {
                     if (jsonObject.getString("trolly_req").equalsIgnoreCase("Y")) {
@@ -3060,22 +3067,19 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         try {
             // URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/printslip");
             // URL url = new URL("http://10.0.6.204:7003/RestApiWeightBridge/resources/printslip");
-            // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/printslip");
-            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/printslip");
+            // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/printslip");
+            URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/printslip");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Accept", "application/json");
             connection.setDoOutput(true);
-
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("slipNo", slipNo);
-
             try (OutputStream outputStream = connection.getOutputStream()) {
                 byte[] input = jsonObject.toString().getBytes("utf-8");
                 outputStream.write(input, 0, input.length);
             }
-
             StringBuilder response = null;
             try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
                 String inputLine;
@@ -3188,9 +3192,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     if (rs.getString("rcNo") != null) {
                         // TXT_RC_NO.setText(rs.getString("rcNo").toUpperCase());
 
-
-
-
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -3198,9 +3199,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 try {
                     if (rs.getString("machineNo") != null) {
                         //  TXT_Machine.setText(rs.getString("machineNo").toUpperCase());
-
-
-
 
                     }
                 } catch (Exception ex) {
@@ -3226,9 +3224,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     if (rs.getString("createdBy") != null) {
                         //  TXT_CreateBy.setText(rs.getString("createdBy").toUpperCase());
 
-
-
-
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -3236,9 +3231,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 try {
                     if (rs.getString("creationDate") != null) {
                         //  TXT_CreateDate.setText(rs.getString("creationDate").toUpperCase());
-
-
-
 
                     }
                 } catch (Exception ex) {
@@ -3272,11 +3264,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     parameters.put("Product", product);
                     parameters.put("Copy", "Orginal");
                     parameters.put("M_no", rs.getString("machineNo"));
-
-
                     // Create JasperPrint
                     JasperPrint print = JasperFillManager.fillReport(design, parameters, new JREmptyDataSource());
-
                     // Print the report
                     //                    boolean printed =
                     //                        print.print(print.getPages(), 0); // Print the report (this will send it to the default printer)
@@ -3290,7 +3279,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
                     // Create JasperViewer
                     JasperViewer viewer = new JasperViewer(print, false);
-
                     // Close the viewer automatically after printing
                     SwingUtilities.invokeLater(() -> {
                             try {
@@ -3300,11 +3288,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                             }
                             viewer.dispose(); // Dispose of the viewer after printing
                         });
-
                     // Show the JasperViewer
                     viewer.setVisible(true);
-
-
                     resetValueAfterPrint();
                 } catch (FileNotFoundException ex) {
                     JOptionPane.showMessageDialog(null, ex.toString(), "Message", JOptionPane.ERROR_MESSAGE);
@@ -3322,17 +3307,15 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         try {
             // URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/printslip");
             // URL url = new URL("http://10.0.6.204:7003/RestApiWeightBridge/resources/printslip");
-            // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/printslip");
-            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/printslip");
+            // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/printslip");
+            URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/printslip");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Accept", "application/json");
             connection.setDoOutput(true);
-
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("slipNo", slipNo);
-
             try (OutputStream outputStream = connection.getOutputStream()) {
                 byte[] input = jsonObject.toString().getBytes("utf-8");
                 outputStream.write(input, 0, input.length);
@@ -3452,9 +3435,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     if (rs.getString("rcNo") != null) {
                         // TXT_RC_NO.setText(rs.getString("rcNo").toUpperCase());
 
-
-
-
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -3462,9 +3442,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 try {
                     if (rs.getString("machineNo") != null) {
                         //  TXT_Machine.setText(rs.getString("machineNo").toUpperCase());
-
-
-
 
                     }
                 } catch (Exception ex) {
@@ -3490,9 +3467,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     if (rs.getString("createdBy") != null) {
                         //  TXT_CreateBy.setText(rs.getString("createdBy").toUpperCase());
 
-
-
-
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -3500,9 +3474,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 try {
                     if (rs.getString("creationDate") != null) {
                         //  TXT_CreateDate.setText(rs.getString("creationDate").toUpperCase());
-
-
-
 
                     }
                 } catch (Exception ex) {
@@ -3536,27 +3507,21 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 parameters.put("Product", product);
                 parameters.put("Copy", "Orginal");
                 parameters.put("M_no", rs.getString("machineNo"));
-
                 // Create JasperPrint
                 JasperPrint print = JasperFillManager.fillReport(design, parameters, new JREmptyDataSource());
-
                 // Create JasperViewer
                 JasperViewer viewer = new JasperViewer(print, false);
-
                 // Create a Print Button
                 JButton printButton = new JButton("Print & Close");
-
                 // ActionListener for the print button
                 printButton.addActionListener(e -> { try {
                         // Create PrinterJob instance
                         PrinterJob printerJob = PrinterJob.getPrinterJob();
                         //  printerJob.setPrintService(print.getPrintService());
-
                         // Show print dialog and start printing
                         if (printerJob.printDialog()) {
                             printerJob.print();
                         }
-
                         // Dispose of the viewer (close it)
                         viewer.dispose(); // Close the JasperViewer window
                     } catch (Exception ex) {
@@ -3571,10 +3536,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 JPanel panel = new JPanel();
                 panel.add(printButton); // Add the button to a panel
                 viewer.getContentPane().add(panel, BorderLayout.SOUTH); // Add the panel to the bottom of the viewer
-
                 // Show the JasperViewer
                 viewer.setVisible(true);
-
                 // Optionally reset values after printing
                 resetValueAfterPrint();
             }
