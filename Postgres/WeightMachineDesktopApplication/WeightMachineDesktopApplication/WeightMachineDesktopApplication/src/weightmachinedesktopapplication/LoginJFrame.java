@@ -380,13 +380,13 @@ public class LoginJFrame extends javax.swing.JFrame {
                                                       JOptionPane.INFORMATION_MESSAGE);
                     }
 
-                    //                                        WeightMechineJFrame weightFrame =
-                    //                                            new WeightMechineJFrame(userName, unitCode, machine_code, comport,bypass_flag);
-                    //                                        weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                    //                                        weightFrame.setSize(1200, 730);
-                    //                                        weightFrame.setVisible(true);
-                    //                                        // super.setVisible(false);
-                    //                                        super.dispose();
+                         WeightMechineJFrame weightFrame =
+                         new WeightMechineJFrame(userName, unitCode, machine_code, comport,bypass_flag);
+                         weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                        weightFrame.setSize(1200, 730);
+                        weightFrame.setVisible(true);
+                        // super.setVisible(false);
+                        super.dispose();
 
 
                 }

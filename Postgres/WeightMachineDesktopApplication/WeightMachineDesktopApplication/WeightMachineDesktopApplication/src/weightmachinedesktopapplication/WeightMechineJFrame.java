@@ -1063,10 +1063,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 .addGap(23, 23, 23)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel12)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(ComboBoxChargeApplied, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                 .addComponent(jLabel10)
@@ -1087,7 +1083,11 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                             .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
                             .addComponent(VechileTypejComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(TXT_SlipNo)
-                            .addComponent(TXT_RC_NO))))
+                            .addComponent(TXT_RC_NO)))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel12)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(ComboBoxChargeApplied, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap(32, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -1476,10 +1476,10 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
         // String value = comPoartMechineConnection("SaveBtn");
                 if (comPoartMechineConnection("SaveBtn").equalsIgnoreCase("N")) {
-                    String message = "Weight-bridge weight not match.";
-                    JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
-                    return;
-                }
+                 String message = "Weight-bridge weight not match.";
+                 JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
+                  return;
+                 }
         try {
             if (TXT_GrossWeight.getText() == "0") {
                 if (!ftTereWeight.equalsIgnoreCase("0")) {
@@ -1506,11 +1506,12 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 //  return;
             }
         }
-        System.out.println("ComboBoxChargeApplied.getSelectedItem().toString()--"+ComboBoxChargeApplied.getSelectedItem().toString());
-        if (chargeApplied.equalsIgnoreCase("N") && compVechileType.equalsIgnoreCase("N") && ComboBoxChargeApplied.getSelectedItem().toString()!="Yes") {
+        System.out.println("ComboBoxChargeApplied.getSelectedItem().toString()--" +
+                           ComboBoxChargeApplied.getSelectedItem().toString());
+        if (chargeApplied.equalsIgnoreCase("N") && compVechileType.equalsIgnoreCase("N") &&
+            ComboBoxChargeApplied.getSelectedItem().toString() != "Yes") {
             if (TXT_REMARKS.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Please Enter Remark", "Message",
-                                              JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Please Enter Remark", "Message", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
         }
@@ -1536,8 +1537,16 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         // System.out.println("vechileCode----" + vechileCode);
         if (vechileCode == null || vechileCode == "" || ("").equals(vechileCode)) {
             String vechileType = (String) VechileTypejComboBox.getSelectedItem();
-            String codeValue = itemCodeList.stream().filter(item -> item.getKey().equals(selectedItem)) // Filter based on the key
-                .map(Item::getValue).findFirst().orElse(null);
+            System.out.println("vechileType---333---" + vechileType);
+            //            String codeValue = itemCodeList.stream().filter(item -> item.getKey().equals(vechileType)) // Filter based on the key
+            //                .map(Item::getValue).findFirst().orElse(null);
+            String codeValue = null;
+            try {
+                codeValue = oncallApiVehicleTypeSubCode(vechileType);
+                System.out.println("codeValue from api--"+codeValue);
+            } catch (JSONException e) {
+            }
+            System.out.println("codeValue----5555---" + codeValue);
             if (codeValue == null || codeValue == "" || codeValue.isEmpty() || ("").equals(codeValue)) {
                 JOptionPane.showMessageDialog(null, "Vehicle Code not Found", "Message",
                                               JOptionPane.INFORMATION_MESSAGE);
@@ -1545,12 +1554,15 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             } else {
                 vechileCode = codeValue;
             }
+            System.out.println("vechileCode----" + vechileCode);
         }
         if (TXT_SlipNo.getText().trim().isEmpty() || TXT_SlipNo.getText().trim() == null ||
             TXT_SlipNo.getText().trim() == "" || TXT_SlipNo.getText().equalsIgnoreCase("0")) {
+
             insertdateCallApi();
         } else {
-            if (chargeApplied.equalsIgnoreCase("N")) {
+            System.out.println("compVechileType---"+compVechileType);
+            if (chargeApplied.equalsIgnoreCase("N")&& compVechileType.equalsIgnoreCase("N")) {
                 if (TXT_REMARKS.getText().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Please Enter Remark", "Message",
                                                   JOptionPane.INFORMATION_MESSAGE);
@@ -1583,9 +1595,9 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     public void insertdateCallApi() {
         try {
             //quality
-            // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/insert");
+            // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/insert");
             //Production
-            URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/insert");
+            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/insert");
 
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
@@ -1657,9 +1669,9 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     public void updatedateCallApi() {
         try {
             //quality
-            // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/update");
+            // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/update");
             //prd
-            URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/update");
+            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/update");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
@@ -1775,10 +1787,18 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
   
     private void VechileTypejComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_VechileTypejComboBoxActionPerformed
         String selectedItem = (String) VechileTypejComboBox.getSelectedItem();
+        System.out.println("selectedItem---->" + selectedItem);
         if (selectedItem.equalsIgnoreCase("Please Select")) {
             TXT_Charge.setText("0");
             ComboBoxChargeApplied.setSelectedIndex(1);
         } else {
+            String codeValue = null;
+            try {
+                codeValue = oncallApiVehicleTypeSubCode(selectedItem);
+                System.out.println("codeValue from api--"+codeValue);
+            } catch (JSONException e) {
+            }
+          
             if (compVechileType.equalsIgnoreCase("N")) {
                 //sawan-------
                 System.out.println("slipNoCheck---chargeApplied--" + slipNoCheck + "====" + chargeApplied);
@@ -1802,13 +1822,18 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                         }
                     }
                 }
-                String codeValue = itemCodeList.stream().filter(item -> item.getKey().equals(selectedItem)) // Filter based on the key
-                    .map(Item::getValue).findFirst().orElse(null);
+                //                String codeValue = itemCodeList.stream().filter(item -> item.getKey().equals(selectedItem)) // Filter based on the key
+                //                    .map(Item::getValue).findFirst().orElse(null);
+
+               
+
                 if (codeValue != null) {
                     vechileCode = codeValue;
                 }
             }
         }
+
+        System.out.println("vechileCode---777---" + vechileCode);
         onLoadDate();
     }//GEN-LAST:event_VechileTypejComboBoxActionPerformed
 
@@ -2334,10 +2359,10 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         suggestionsListTrollyNo = new ArrayList<>();
         try {
             //quality
-            // URL obj = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/vehicleType?machineCode=" + machinecode);
+            // URL obj = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleType?machineCode=" + machinecode);
             //prd
             URL obj =
-                new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/vehicleType?machineCode=" + machinecode);
+                new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleType?machineCode=" + machinecode);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
             con.setRequestMethod("GET");
             con.setRequestProperty("User-Agent", "Mozilla/5.0");
@@ -2367,6 +2392,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 }
                 if (autosuggest.getRemarks() != null) {
                     // suggestionsListRemarks.add(autosuggest.getRemarks());
+
+
                 }
                 if (autosuggest.getVehicleNo() != null) {
                     suggestionsListVehicleNo.add(autosuggest.getVehicleNo());
@@ -2384,8 +2411,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         List<VehicleDetails> filteredList = null;
         List<VehicleDetails> filteredListMachineCode = null;
         try {
-            //  URL obj = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/vehicleDetails");
-            URL obj = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/vehicleDetails");
+            //  URL obj = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleDetails");
+            URL obj = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleDetails");
             HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("User-Agent", "Mozilla/5.0");
@@ -2882,8 +2909,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             return;
         }
         try {
-            // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/trollyDtl");
-            URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/trollyDtl");
+            // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/trollyDtl");
+            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/trollyDtl");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
@@ -2924,6 +2951,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
                 if (jsonObject.getString("machine_no") != "0") {
                     // TXT_Machine.setText(jsonObject.getString("machine_no"));
+
+
 
                 }
                 if (jsonObject.getString("trolly_req") != "0") {
@@ -3063,252 +3092,252 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
     }
 
-    public void oncallApiVehicleSlipNo11(String slipNo) throws JSONException {
-        try {
-            // URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/printslip");
-            // URL url = new URL("http://10.0.6.204:7003/RestApiWeightBridge/resources/printslip");
-            // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/printslip");
-            URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/printslip");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("Accept", "application/json");
-            connection.setDoOutput(true);
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("slipNo", slipNo);
-            try (OutputStream outputStream = connection.getOutputStream()) {
-                byte[] input = jsonObject.toString().getBytes("utf-8");
-                outputStream.write(input, 0, input.length);
-            }
-            StringBuilder response = null;
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                String inputLine;
-                response = new StringBuilder();
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-            }
-
-            JSONArray jsonArray = new JSONArray(response.toString());
-            if (jsonArray.length() <= 0) {
-                JOptionPane.showMessageDialog(null, "Please Enter Valid Slip No", "Message",
-                                              JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject rs = jsonArray.getJSONObject(i);
-                try {
-                    if (rs.getString("vehicleNo") != null) {
-                        vechileNo = rs.getString("vehicleNo").toUpperCase();
-                        // TXT_VechileNo.setText(vechileNo);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                try {
-                    if (rs.getString("slipNo") != null) {
-                        slipNo = rs.getString("slipNo").toUpperCase();
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                try {
-                    if (rs.getString("tokenNo") != null) {
-                        tokenNo = rs.getString("tokenNo").toUpperCase();
-                        // TXT_TokenNo.setText(tokenNo);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                try {
-                    if (rs.getString("party") != null) {
-                        party = rs.getString("party").toUpperCase();
-                        // TXT_Part.setText(party);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                try {
-                    if (rs.getString("grossWeight") != null) {
-                        grossWeight = Integer.toString(rs.getInt("grossWeight"));
-                        // TXT_GrossWeight.setText(grossWeight);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                try {
-                    if (rs.getString("tereWeight") != null) {
-                        tareWeight = rs.getString("tereWeight").toUpperCase();
-                        // TXT_TareWeight.setText(tareWeight);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                try {
-                    if (rs.getString("netWeight") != null) {
-                        netWeight = rs.getString("netWeight").toUpperCase();
-                        // TXT_NetWeight.setText(netWeight);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                try {
-                    if (rs.getString("finalEnteredDate") != null && rs.getString("finalEnteredTime") != null) {
-                        finaldate =
-                            rs.getString("finalEnteredDate").toUpperCase() + " " + rs.getString("finalEnteredTime");
-                        // TXT_FinealEnterDate.setText(rs.getString("finalEnteredDate").toUpperCase());
-                        // TXT_FinealEnterTime.setText(rs.getString("finalEnteredTime").toUpperCase());
-                        // TXT_FinealEnterBy.setText(rs.getString("finalEnteredBy").toUpperCase());
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                try {
-                    if (rs.getString("charge") != null) {
-                        charge = rs.getString("charge").toUpperCase();
-                        // TXT_Charge.setText(rs.getString("charge").toUpperCase());
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                try {
-                    if (rs.getString("remarks") != null) {
-                        remarks = rs.getString("remarks").toUpperCase();
-                        // TXT_RE.setText(rs.getString("CHARGE").toUpperCase());
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                try {
-                    if (rs.getString("gateEntryNumber") != null) {
-                        gateNo = rs.getString("gateEntryNumber").toUpperCase();
-                        // TXT_GateEntry.setText(gateNo);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                try {
-                    if (rs.getString("rcNo") != null) {
-                        // TXT_RC_NO.setText(rs.getString("rcNo").toUpperCase());
-
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                try {
-                    if (rs.getString("machineNo") != null) {
-                        //  TXT_Machine.setText(rs.getString("machineNo").toUpperCase());
-
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                try {
-                    if (rs.getString("subtypeDesc") != null) {
-                        vechileType = rs.getString("subtypeDesc").toUpperCase();
-                        //  txt_.setText(vechileType);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                try {
-                    if (rs.getString("product") != null) {
-                        product = rs.getString("product").toUpperCase();
-                        //  TXT_Process.setText(rs.getString("processCode").toUpperCase());
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                try {
-                    if (rs.getString("createdBy") != null) {
-                        //  TXT_CreateBy.setText(rs.getString("createdBy").toUpperCase());
-
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                try {
-                    if (rs.getString("creationDate") != null) {
-                        //  TXT_CreateDate.setText(rs.getString("creationDate").toUpperCase());
-
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                try {
-                    if (rs.getString("creationTime") != null) {
-                        //  TXT_CreateTime.setText(rs.getString("creationTime").toUpperCase());
-                        create = rs.getString("creationDate") + " " + rs.getString("creationTime");
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                try {
-                    InputStream inputStream = new FileInputStream(jasperPath);
-                    JasperReport design = (JasperReport) JRLoader.loadObject(inputStream);
-                    Map<String, Object> parameters = new HashMap<>();
-                    parameters.put("SlipNo", slipNo);
-                    parameters.put("TokenNo", tokenNo);
-                    parameters.put("GateEntry", gateNo);
-                    parameters.put("GrossWeight", grossWeight);
-                    parameters.put("TareWeight", tareWeight);
-                    parameters.put("NetWeight", netWeight);
-                    parameters.put("Party", party);
-                    parameters.put("Remarks", remarks);
-                    parameters.put("TruckNo", vechileNo);
-                    parameters.put("TruckType", vechileType);
-                    parameters.put("CreatedOn", create);
-                    parameters.put("Final", finaldate);
-                    parameters.put("Charge", charge);
-                    parameters.put("Product", product);
-                    parameters.put("Copy", "Orginal");
-                    parameters.put("M_no", rs.getString("machineNo"));
-                    // Create JasperPrint
-                    JasperPrint print = JasperFillManager.fillReport(design, parameters, new JREmptyDataSource());
-                    // Print the report
-                    //                    boolean printed =
-                    //                        print.print(print.getPages(), 0); // Print the report (this will send it to the default printer)
-                    //
-                    //                    // Check if printing was successful
-                    //                    if (printed) {
-                    //                        System.out.println("Report printed successfully!");
-                    //                    } else {
-                    //                        System.out.println("Failed to print the report.");
-                    //                    }
-
-                    // Create JasperViewer
-                    JasperViewer viewer = new JasperViewer(print, false);
-                    // Close the viewer automatically after printing
-                    SwingUtilities.invokeLater(() -> {
-                            try {
-                                Thread.sleep(4000); // Wait for 2 seconds after printing to allow printing time
-                            } catch (InterruptedException ex) {
-                                ex.printStackTrace();
-                            }
-                            viewer.dispose(); // Dispose of the viewer after printing
-                        });
-                    // Show the JasperViewer
-                    viewer.setVisible(true);
-                    resetValueAfterPrint();
-                } catch (FileNotFoundException ex) {
-                    JOptionPane.showMessageDialog(null, ex.toString(), "Message", JOptionPane.ERROR_MESSAGE);
-                } catch (JRException ex) {
-                    JOptionPane.showMessageDialog(null, ex.toString(), "Message", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("Error during API call: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
+    //    public void oncallApiVehicleSlipNo11(String slipNo) throws JSONException {
+    //        try {
+    //            // URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/printslip");
+    //            // URL url = new URL("http://10.0.6.204:7003/RestApiWeightBridge/resources/printslip");
+    //            // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/printslip");
+    //            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/printslip");
+    //            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+    //            connection.setRequestMethod("POST");
+    //            connection.setRequestProperty("Content-Type", "application/json");
+    //            connection.setRequestProperty("Accept", "application/json");
+    //            connection.setDoOutput(true);
+    //            JsonObject jsonObject = new JsonObject();
+    //            jsonObject.addProperty("slipNo", slipNo);
+    //            try (OutputStream outputStream = connection.getOutputStream()) {
+    //                byte[] input = jsonObject.toString().getBytes("utf-8");
+    //                outputStream.write(input, 0, input.length);
+    //            }
+    //            StringBuilder response = null;
+    //            try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+    //                String inputLine;
+    //                response = new StringBuilder();
+    //                while ((inputLine = in.readLine()) != null) {
+    //                    response.append(inputLine);
+    //                }
+    //            }
+    //
+    //            JSONArray jsonArray = new JSONArray(response.toString());
+    //            if (jsonArray.length() <= 0) {
+    //                JOptionPane.showMessageDialog(null, "Please Enter Valid Slip No", "Message",
+    //                                              JOptionPane.INFORMATION_MESSAGE);
+    //                return;
+    //            }
+    //
+    //            for (int i = 0; i < jsonArray.length(); i++) {
+    //                JSONObject rs = jsonArray.getJSONObject(i);
+    //                try {
+    //                    if (rs.getString("vehicleNo") != null) {
+    //                        vechileNo = rs.getString("vehicleNo").toUpperCase();
+    //                        // TXT_VechileNo.setText(vechileNo);
+    //                    }
+    //                } catch (Exception ex) {
+    //                    ex.printStackTrace();
+    //                }
+    //                try {
+    //                    if (rs.getString("slipNo") != null) {
+    //                        slipNo = rs.getString("slipNo").toUpperCase();
+    //                    }
+    //                } catch (Exception ex) {
+    //                    ex.printStackTrace();
+    //                }
+    //                try {
+    //                    if (rs.getString("tokenNo") != null) {
+    //                        tokenNo = rs.getString("tokenNo").toUpperCase();
+    //                        // TXT_TokenNo.setText(tokenNo);
+    //                    }
+    //                } catch (Exception ex) {
+    //                    ex.printStackTrace();
+    //                }
+    //                try {
+    //                    if (rs.getString("party") != null) {
+    //                        party = rs.getString("party").toUpperCase();
+    //                        // TXT_Part.setText(party);
+    //                    }
+    //                } catch (Exception ex) {
+    //                    ex.printStackTrace();
+    //                }
+    //                try {
+    //                    if (rs.getString("grossWeight") != null) {
+    //                        grossWeight = Integer.toString(rs.getInt("grossWeight"));
+    //                        // TXT_GrossWeight.setText(grossWeight);
+    //                    }
+    //                } catch (Exception ex) {
+    //                    ex.printStackTrace();
+    //                }
+    //                try {
+    //                    if (rs.getString("tereWeight") != null) {
+    //                        tareWeight = rs.getString("tereWeight").toUpperCase();
+    //                        // TXT_TareWeight.setText(tareWeight);
+    //                    }
+    //                } catch (Exception ex) {
+    //                    ex.printStackTrace();
+    //                }
+    //                try {
+    //                    if (rs.getString("netWeight") != null) {
+    //                        netWeight = rs.getString("netWeight").toUpperCase();
+    //                        // TXT_NetWeight.setText(netWeight);
+    //                    }
+    //                } catch (Exception ex) {
+    //                    ex.printStackTrace();
+    //                }
+    //                try {
+    //                    if (rs.getString("finalEnteredDate") != null && rs.getString("finalEnteredTime") != null) {
+    //                        finaldate =
+    //                            rs.getString("finalEnteredDate").toUpperCase() + " " + rs.getString("finalEnteredTime");
+    //                        // TXT_FinealEnterDate.setText(rs.getString("finalEnteredDate").toUpperCase());
+    //                        // TXT_FinealEnterTime.setText(rs.getString("finalEnteredTime").toUpperCase());
+    //                        // TXT_FinealEnterBy.setText(rs.getString("finalEnteredBy").toUpperCase());
+    //                    }
+    //                } catch (Exception ex) {
+    //                    ex.printStackTrace();
+    //                }
+    //                try {
+    //                    if (rs.getString("charge") != null) {
+    //                        charge = rs.getString("charge").toUpperCase();
+    //                        // TXT_Charge.setText(rs.getString("charge").toUpperCase());
+    //                    }
+    //                } catch (Exception ex) {
+    //                    ex.printStackTrace();
+    //                }
+    //                try {
+    //                    if (rs.getString("remarks") != null) {
+    //                        remarks = rs.getString("remarks").toUpperCase();
+    //                        // TXT_RE.setText(rs.getString("CHARGE").toUpperCase());
+    //                    }
+    //                } catch (Exception ex) {
+    //                    ex.printStackTrace();
+    //                }
+    //                try {
+    //                    if (rs.getString("gateEntryNumber") != null) {
+    //                        gateNo = rs.getString("gateEntryNumber").toUpperCase();
+    //                        // TXT_GateEntry.setText(gateNo);
+    //                    }
+    //                } catch (Exception ex) {
+    //                    ex.printStackTrace();
+    //                }
+    //                try {
+    //                    if (rs.getString("rcNo") != null) {
+    //                        // TXT_RC_NO.setText(rs.getString("rcNo").toUpperCase());
+    //
+    //                    }
+    //                } catch (Exception ex) {
+    //                    ex.printStackTrace();
+    //                }
+    //                try {
+    //                    if (rs.getString("machineNo") != null) {
+    //                        //  TXT_Machine.setText(rs.getString("machineNo").toUpperCase());
+    //
+    //                    }
+    //                } catch (Exception ex) {
+    //                    ex.printStackTrace();
+    //                }
+    //                try {
+    //                    if (rs.getString("subtypeDesc") != null) {
+    //                        vechileType = rs.getString("subtypeDesc").toUpperCase();
+    //                        //  txt_.setText(vechileType);
+    //                    }
+    //                } catch (Exception ex) {
+    //                    ex.printStackTrace();
+    //                }
+    //                try {
+    //                    if (rs.getString("product") != null) {
+    //                        product = rs.getString("product").toUpperCase();
+    //                        //  TXT_Process.setText(rs.getString("processCode").toUpperCase());
+    //                    }
+    //                } catch (Exception ex) {
+    //                    ex.printStackTrace();
+    //                }
+    //                try {
+    //                    if (rs.getString("createdBy") != null) {
+    //                        //  TXT_CreateBy.setText(rs.getString("createdBy").toUpperCase());
+    //
+    //                    }
+    //                } catch (Exception ex) {
+    //                    ex.printStackTrace();
+    //                }
+    //                try {
+    //                    if (rs.getString("creationDate") != null) {
+    //                        //  TXT_CreateDate.setText(rs.getString("creationDate").toUpperCase());
+    //
+    //                    }
+    //                } catch (Exception ex) {
+    //                    ex.printStackTrace();
+    //                }
+    //                try {
+    //                    if (rs.getString("creationTime") != null) {
+    //                        //  TXT_CreateTime.setText(rs.getString("creationTime").toUpperCase());
+    //                        create = rs.getString("creationDate") + " " + rs.getString("creationTime");
+    //                    }
+    //                } catch (Exception ex) {
+    //                    ex.printStackTrace();
+    //                }
+    //                try {
+    //                    InputStream inputStream = new FileInputStream(jasperPath);
+    //                    JasperReport design = (JasperReport) JRLoader.loadObject(inputStream);
+    //                    Map<String, Object> parameters = new HashMap<>();
+    //                    parameters.put("SlipNo", slipNo);
+    //                    parameters.put("TokenNo", tokenNo);
+    //                    parameters.put("GateEntry", gateNo);
+    //                    parameters.put("GrossWeight", grossWeight);
+    //                    parameters.put("TareWeight", tareWeight);
+    //                    parameters.put("NetWeight", netWeight);
+    //                    parameters.put("Party", party);
+    //                    parameters.put("Remarks", remarks);
+    //                    parameters.put("TruckNo", vechileNo);
+    //                    parameters.put("TruckType", vechileType);
+    //                    parameters.put("CreatedOn", create);
+    //                    parameters.put("Final", finaldate);
+    //                    parameters.put("Charge", charge);
+    //                    parameters.put("Product", product);
+    //                    parameters.put("Copy", "Orginal");
+    //                    parameters.put("M_no", rs.getString("machineNo"));
+    //                    // Create JasperPrint
+    //                    JasperPrint print = JasperFillManager.fillReport(design, parameters, new JREmptyDataSource());
+    //                    // Print the report
+    //                    //                    boolean printed =
+    //                    //                        print.print(print.getPages(), 0); // Print the report (this will send it to the default printer)
+    //                    //
+    //                    //                    // Check if printing was successful
+    //                    //                    if (printed) {
+    //                    //                        System.out.println("Report printed successfully!");
+    //                    //                    } else {
+    //                    //                        System.out.println("Failed to print the report.");
+    //                    //                    }
+    //
+    //                    // Create JasperViewer
+    //                    JasperViewer viewer = new JasperViewer(print, false);
+    //                    // Close the viewer automatically after printing
+    //                    SwingUtilities.invokeLater(() -> {
+    //                            try {
+    //                                Thread.sleep(4000); // Wait for 2 seconds after printing to allow printing time
+    //                            } catch (InterruptedException ex) {
+    //                                ex.printStackTrace();
+    //                            }
+    //                            viewer.dispose(); // Dispose of the viewer after printing
+    //                        });
+    //                    // Show the JasperViewer
+    //                    viewer.setVisible(true);
+    //                    resetValueAfterPrint();
+    //                } catch (FileNotFoundException ex) {
+    //                    JOptionPane.showMessageDialog(null, ex.toString(), "Message", JOptionPane.ERROR_MESSAGE);
+    //                } catch (JRException ex) {
+    //                    JOptionPane.showMessageDialog(null, ex.toString(), "Message", JOptionPane.ERROR_MESSAGE);
+    //                }
+    //            }
+    //        } catch (IOException e) {
+    //            System.err.println("Error during API call: " + e.getMessage());
+    //            e.printStackTrace();
+    //        }
+    //    }
 
     public void oncallApiVehicleSlipNo(String slipNo) throws JSONException {
         try {
             // URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/printslip");
             // URL url = new URL("http://10.0.6.204:7003/RestApiWeightBridge/resources/printslip");
-            // URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/printslip");
-            URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/printslip");
+            // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/printslip");
+            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/printslip");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
@@ -3435,6 +3464,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     if (rs.getString("rcNo") != null) {
                         // TXT_RC_NO.setText(rs.getString("rcNo").toUpperCase());
 
+
+
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -3442,6 +3473,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 try {
                     if (rs.getString("machineNo") != null) {
                         //  TXT_Machine.setText(rs.getString("machineNo").toUpperCase());
+
+
 
                     }
                 } catch (Exception ex) {
@@ -3467,6 +3500,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     if (rs.getString("createdBy") != null) {
                         //  TXT_CreateBy.setText(rs.getString("createdBy").toUpperCase());
 
+
+
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -3474,6 +3509,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 try {
                     if (rs.getString("creationDate") != null) {
                         //  TXT_CreateDate.setText(rs.getString("creationDate").toUpperCase());
+
+
 
                     }
                 } catch (Exception ex) {
@@ -3548,4 +3585,72 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, ex.toString(), "Message", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    public String oncallApiVehicleTypeSubCode(String subTypeName) throws JSONException {
+        // Try-catch block to handle potential IOExceptions and other exceptions
+        List<PrintSlipDetails> filteredList = null;
+        try {
+            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleCode");
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "application/json");
+            con.setRequestProperty("Accept", "application/json");
+            con.setDoOutput(true);
+
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("subTypeName", subTypeName);
+
+
+            // Convert JsonObject to JSON string
+            String jsonInputString = jsonObject.toString();
+
+            try (OutputStream os = con.getOutputStream()) {
+                byte[] input = jsonInputString.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+
+            // Read the response from the input stream
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuilder response = new StringBuilder(); // Use StringBuilder for efficient string concatenation
+            // Read the response line by line
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            // Close the BufferedReader
+            in.close();
+            // Convert the response to a string
+            String jsonResponse = response.toString();
+            System.out.println("jsonResponse--" + jsonResponse);
+            JSONArray jsonArray = new JSONArray(jsonResponse);
+            int count = jsonArray.length();
+            if (count <= 0) {
+                JOptionPane.showMessageDialog(null, "Vehicle type not maintaine", "Message",
+                                              JOptionPane.INFORMATION_MESSAGE);
+                return null;
+            }
+
+            // Loop through each element in the array (each vehicle entry)
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject rs = jsonArray.getJSONObject(i);
+                try {
+                    if (rs.getString("code") != null) {
+                        vechileCode = rs.getString("code").toUpperCase();
+                    }
+                } catch (Exception ex) {
+                }
+                try {
+                    if (rs.getString("subtype_desc") != null) {
+                    }
+                } catch (Exception ex) {
+                }
+            }
+        } catch (IOException e) {
+            // Print the exception message if an error occurs
+            System.err.println("Error during API call: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return vechileCode;
+    }
+
 }
