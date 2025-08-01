@@ -7,6 +7,7 @@ import com.bspl.bean.PrintSlipDetails;
 import com.bspl.bean.ReportDetails;
 import com.bspl.bean.ResponseData;
 import com.bspl.bean.ResponseDataVehicleDetails;
+import com.bspl.bean.VechileSubCodeDetails;
 import com.bspl.bean.VehicleTypesDetails;
 import com.bspl.bean.VehilcleDetails;
 import com.bspl.dao.RestAdapterDao;
@@ -1181,6 +1182,56 @@ public class RestAdapter {
         }
         //        Gson gson = new Gson();
         //        String jsonResponse = gson.toJson(SocietyMstDetailsList);
+        return jsonResponse;
+    }
+    
+    
+    public String getVehicleSubCodeDetails(String jsonString) {
+        Connection conn = null;
+        Statement stmt = null;
+        String query = null;
+        RestAdapterDao obj = new RestAdapterDao();
+        int count = 0;
+        VechileSubCodeDetails result = null;
+        ArrayList<VechileSubCodeDetails> listObj = new ArrayList<VechileSubCodeDetails>();
+        try {
+
+            if (jsonString == null || jsonString == "") {
+                jsonString = "Invalid Json";
+            } else {
+
+                JSONObject responseObject = new JSONObject(jsonString);
+                conn = obj.getConnection();
+                stmt = conn.createStatement();
+                query = "select code,subtype_desc,status from vehicle_subtype_master where  subtype_desc='" + responseObject.getString("subTypeName") + "'";
+                System.out.println("query--" + query);
+                ResultSet rs = stmt.executeQuery(query);
+                if (rs.next()) {
+                    result = new VechileSubCodeDetails();
+                    count++;
+                    if (rs.getString("code") != null) {
+                        result.setCode(rs.getString("code").toUpperCase());
+                    }
+                    if (rs.getString("subtype_desc") != null) {
+                        result.setSubtype_desc(rs.getString("subtype_desc").toUpperCase());
+                    }
+                   
+                    //VechileTypejComboBox.addItem(rs.getString("CODE")+"-"+rs.getString("TYPE_DESC"));
+                    listObj.add(result);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                stmt.close();
+                conn.close();
+            } catch (Exception ex) {
+
+            }
+        }
+        Gson gson = new Gson();
+        String jsonResponse = gson.toJson(listObj);
         return jsonResponse;
     }
 }
