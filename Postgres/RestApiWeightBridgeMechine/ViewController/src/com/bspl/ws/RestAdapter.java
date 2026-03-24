@@ -229,14 +229,11 @@ public class RestAdapter {
         int count = 0;
         VehilcleDetails result = null;
         ArrayList<VehilcleDetails> vehicleDetails = new ArrayList<VehilcleDetails>();
-
         try {
             conn = obj.getConnection();
             stmt = conn.createStatement();
-
             query = "SELECT * FROM vw_weighing_bridge_penddoc";
             System.out.println("query--" + query);
-
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
                 count++;
@@ -246,14 +243,11 @@ public class RestAdapter {
                 } else {
                     result.setVehicle_no("0");
                 }
-
-
                 if (rs.getString("SLIP_NO") != null) {
                     result.setSlip_no(rs.getString("SLIP_NO"));
                 } else {
                     result.setSlip_no("0");
                 }
-
                 if (rs.getString("TOKEN_NO") != null) {
                     result.setToken_no(rs.getString("TOKEN_NO"));
                 } else {
@@ -353,7 +347,6 @@ public class RestAdapter {
                 } else {
                     result.setCreation_time("0");
                 }
-
                 if (rs.getString("PROCESS_CODE") != null) {
                     result.setProcess_code(rs.getString("PROCESS_CODE"));
                 } else {
@@ -364,14 +357,11 @@ public class RestAdapter {
                 } else {
                     result.setRc_no("0");
                 }
-
                 if (rs.getString("COMP_VEH_TYPE_CODE") == null) {
                     result.setComp_veh_type_code("0");
                 } else {
                     result.setComp_veh_type_code(rs.getString("COMP_VEH_TYPE_CODE"));
                 }
-
-
                 if (rs.getString("VEH_SUBTYPE_DESC") != null) {
                     result.setVeh_subtype_desc(rs.getString("VEH_SUBTYPE_DESC"));
                 } else {
@@ -383,13 +373,18 @@ public class RestAdapter {
                 } else {
                     result.setTrolly_req("0");
                 }
-
                 if (rs.getString("ft_tere_weight") != null) {
                     result.setFt_tere_weight(rs.getString("ft_tere_weight"));
                 } else {
                     result.setFt_tere_weight("0");
                 }
-
+                
+                    String value = rs.getString("VEN_TYPE_CODE");
+                    if (value != null && !value.trim().isEmpty()) {
+                        result.setVen_type_code(value);
+                    } else {
+                        result.setVen_type_code("0");
+                    }
                 vehicleDetails.add(result);
             }
 
@@ -406,20 +401,6 @@ public class RestAdapter {
         }
         if (count <= 0) {
             //  JOptionPane.showMessageDialog(null, "Please Enter Valid Vehicle no / Slip No", "Message",  JOptionPane.INFORMATION_MESSAGE);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         }
 
 
@@ -479,7 +460,7 @@ public class RestAdapter {
             String createdBy = responseObject.getString("created_by");
             String unitCd = responseObject.getString("unit_cd");
             String wt_type = responseObject.getString("wt_type");
-
+            String maintance =responseObject.getString("maintance");
             // Print the values
             System.out.println("Slip Number: " + slipNo);
             System.out.println("Machine Number: " + machineNo);
@@ -502,6 +483,7 @@ public class RestAdapter {
             System.out.println("Remarks: " + remarks);
             System.out.println("Created By: " + createdBy);
             System.out.println("Unit Code: " + unitCd);
+            System.out.println("maintance: " + maintance);
             conn = obj.getConnection();
             try {
                 // conn.setAutoCommit(false);
@@ -520,7 +502,7 @@ public class RestAdapter {
                 System.out.println("Generated Slip Number: " + SlipNo);
                 insertQuery =
                     "INSERT INTO WEIGHING_BRIDGE (SLIP_NO,MACHINE_NO,TOKEN_NO,PROCESS_CODE,VEHICLE_NO,VEH_TYPE_CODE,RC_NO,GROSS_WEIGHT,TERE_WEIGHT,NET_WEIGHT,ENTERED_BY,FINAL_ENTERED_BY," +
-                    "TROLLEY_NO,CHARGE,CHARGE_APPLICABLE,PARTY,PRODUCT,GATE_ENTRY_NUMBER,REMARKS,CREATED_BY,UNIT_CD,wt_type) VALUES (?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?,?)";
+                    "TROLLEY_NO,CHARGE,CHARGE_APPLICABLE,PARTY,PRODUCT,GATE_ENTRY_NUMBER,REMARKS,CREATED_BY,UNIT_CD,wt_type,maintance) VALUES (?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?,?,?)";
                 preparedStatement = conn.prepareStatement(insertQuery);
                 preparedStatement.setString(1, SlipNo.toUpperCase());
                 preparedStatement.setString(2, machineNo.toUpperCase());
@@ -547,6 +529,7 @@ public class RestAdapter {
                 preparedStatement.setString(20, createdBy.toUpperCase());
                 preparedStatement.setString(21, unitCd);
                 preparedStatement.setString(22, wt_type);
+                preparedStatement.setString(23, maintance);
                 int rowsAffected = preparedStatement.executeUpdate();
                 if (rowsAffected > 0) {
                     objError.setStatusCode(200);
@@ -635,6 +618,7 @@ public class RestAdapter {
             String party = responseObject.getString("party");
             String product = responseObject.getString("product");
             String remarks = responseObject.getString("remarks");
+            String maintance = responseObject.getString("maintance");
             // Print the values
             System.out.println("Slip Number: " + slipNo);
 
@@ -654,6 +638,7 @@ public class RestAdapter {
             System.out.println("Product: " + product);
 
             System.out.println("Remarks: " + remarks);
+            System.out.println("maintance: " + maintance);
 
             conn = obj.getConnection();
             try {
@@ -665,7 +650,7 @@ public class RestAdapter {
                 String todayDateTime = currentDateTime.format(formatter1);
                 Timestamp timestamp = Timestamp.valueOf(todayDateTime);
                 String sqlInsertUpdate =
-                    "UPDATE  WEIGHING_BRIDGE set GROSS_WEIGHT=?,TERE_WEIGHT=?,NET_WEIGHT=?,FINAL_ENTERED_BY=?,FINAL_ENTERED_DATE=?,REMARKS=?, LAST_UPDATED_BY=?,LAST_UPDATE_DATE=?,CHARGE_APPLICABLE=?,CHARGE=?,VEH_TYPE_CODE=?,PARTY=?,PRODUCT=?,RC_NO=?,flag=? where SLIP_NO=? ";
+                    "UPDATE  WEIGHING_BRIDGE set GROSS_WEIGHT=?,TERE_WEIGHT=?,NET_WEIGHT=?,FINAL_ENTERED_BY=?,FINAL_ENTERED_DATE=?,REMARKS=?, LAST_UPDATED_BY=?,LAST_UPDATE_DATE=?,CHARGE_APPLICABLE=?,CHARGE=?,VEH_TYPE_CODE=?,PARTY=?,PRODUCT=?,RC_NO=?,flag=?,maintance=? where SLIP_NO=? ";
                 preparedStatement = conn.prepareStatement(sqlInsertUpdate);
                 preparedStatement.setInt(1, Integer.parseInt(grossWeight)); // PROCESS_COD
                 preparedStatement.setInt(2, Integer.parseInt(tereWeight)); // GROSS_WEIGHT
@@ -688,7 +673,8 @@ public class RestAdapter {
                     flag = "Y";
                 }
                 preparedStatement.setString(15, flag);
-                preparedStatement.setString(16, slipNo); // SLIP_NO (WHERE clause)
+                preparedStatement.setString(16, maintance);
+                preparedStatement.setString(17, slipNo); // SLIP_NO (WHERE clause)
 
 
                 int rowsAffected = preparedStatement.executeUpdate();

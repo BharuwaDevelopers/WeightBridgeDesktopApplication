@@ -15,7 +15,7 @@ public class RestAdapterDao {
         InitialContext initialContext = new InitialContext();
       //  DataSource ds = (DataSource) initialContext.lookup("java:comp/env/jdbc/APPLICATIONDBDS");
        // DataSource ds = (DataSource) initialContext.lookup("jdbc/APPLICATIONDBBWD");
-       DataSource ds = (DataSource) initialContext.lookup("jdbc/APPLICATIONDBDP1");
+        DataSource ds = (DataSource) initialContext.lookup("jdbc/APPLICATIONDBDP1");
         java.sql.Connection conn = ds.getConnection();
         return conn;
     }
