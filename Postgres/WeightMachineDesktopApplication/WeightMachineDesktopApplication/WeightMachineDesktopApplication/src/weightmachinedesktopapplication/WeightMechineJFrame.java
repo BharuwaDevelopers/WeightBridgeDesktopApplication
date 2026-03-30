@@ -82,6 +82,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     String compVechileType = "N";
     String trollyReq = "N";
     String vechileNumberFromDb = null;
+    String vechileTypeSubCode = "NA";
+    String checkGate2Flage = null;
 
     String slipNo = null, tokenNo = null, gateNo = null, grossWeight = null, tareWeight = null, netWeight =
         null, party = null, vechileNo = null, vechileType = null, create = null, finaldate = null, charge =
@@ -779,6 +781,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         TXT_FinealEnterDate = new javax.swing.JTextPane();
         TXT_Charge = new javax.swing.JTextField();
         jLabel11 = new javax.swing.JLabel();
+        ComboBoxMaintenance = new javax.swing.JComboBox();
+        jLabel18 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabel10 = new javax.swing.JLabel();
         LBL_CreateTime = new javax.swing.JLabel();
@@ -925,6 +929,10 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
         jLabel11.setText("Charge");
 
+        ComboBoxMaintenance.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "NO", "YES" }));
+
+        jLabel18.setText("Maintenance");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -948,14 +956,16 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel11)
                                     .addComponent(jLabel17)))
-                            .addComponent(LBL_GateEntry))
+                            .addComponent(LBL_GateEntry)
+                            .addComponent(jLabel18))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(TXT_GateEntry)
                             .addComponent(TXT_FinealEnterBy, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(TXT_Charge, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
-                            .addComponent(jScrollPane7))))
+                            .addComponent(TXT_Charge, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
+                            .addComponent(jScrollPane7)
+                            .addComponent(ComboBoxMaintenance, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -989,7 +999,11 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(TXT_Charge, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel11))
-                .addGap(38, 38, 38))
+                .addGap(31, 31, 31)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(ComboBoxMaintenance, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel18))
+                .addContainerGap())
         );
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
@@ -1049,6 +1063,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
         ComboBoxChargeApplied.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Yes", "No" }));
         ComboBoxChargeApplied.setSelectedIndex(1);
+        ComboBoxChargeApplied.setEnabled(false);
         ComboBoxChargeApplied.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ComboBoxChargeAppliedActionPerformed(evt);
@@ -1268,7 +1283,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         WeightBridgeJpanelLayout.setHorizontalGroup(
             WeightBridgeJpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(WeightBridgeJpanelLayout.createSequentialGroup()
-                .addContainerGap(34, Short.MAX_VALUE)
+                .addContainerGap(32, Short.MAX_VALUE)
                 .addGroup(WeightBridgeJpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(WeightBridgeJpanelLayout.createSequentialGroup()
                         .addComponent(jLabel14)
@@ -1474,7 +1489,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             return;
         }
 
-        // String value = comPoartMechineConnection("SaveBtn");
+       
                 if (comPoartMechineConnection("SaveBtn").equalsIgnoreCase("N")) {
                  String message = "Weight-bridge weight not match.";
                  JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
@@ -1558,8 +1573,17 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         }
         if (TXT_SlipNo.getText().trim().isEmpty() || TXT_SlipNo.getText().trim() == null ||
             TXT_SlipNo.getText().trim() == "" || TXT_SlipNo.getText().equalsIgnoreCase("0")) {
+            
+            if(vechileTypeSubCode.equalsIgnoreCase(vechileCode)){
+                insertdateCallApi(); 
+            }
+            else{
+                JOptionPane.showMessageDialog(null, "Please select a valid vehicle type. It does not match the gate entry details", "Message",
+                                              JOptionPane.INFORMATION_MESSAGE);
+                return;  
+            }
 
-            insertdateCallApi();
+            
         } else {
             System.out.println("compVechileType---"+compVechileType);
             if (chargeApplied.equalsIgnoreCase("N")&& compVechileType.equalsIgnoreCase("N")) {
@@ -1588,7 +1612,25 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     }
                 }
             }
-            updatedateCallApi();
+            
+            if(vechileTypeSubCode.equalsIgnoreCase(vechileCode)){
+                if(ComboBoxMaintenance.getSelectedItem().toString().equalsIgnoreCase("NO")){
+                    if(checkGate2Flage!=null)
+                    {
+                        if(checkGate2Flage.equalsIgnoreCase("NA")){
+                            JOptionPane.showMessageDialog(null, "This vehicle was not found in gate entry records.", "Message",JOptionPane.INFORMATION_MESSAGE);
+                            return;
+                        }
+                    }
+                }
+                updatedateCallApi();
+            }
+            else{
+                JOptionPane.showMessageDialog(null, "Please select a valid vehicle type. It does not match the gate entry details", "Message",
+                                              JOptionPane.INFORMATION_MESSAGE);
+                return;  
+            }
+            
         }
     }//GEN-LAST:event_BtnSubmitActionPerformed
 
@@ -1634,6 +1676,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             jsonObject.addProperty("created_by", userNamevalue.toUpperCase());
             jsonObject.addProperty("unit_cd", unitCode);
             jsonObject.addProperty("wt_type", wt_type);
+            jsonObject.addProperty("maintance", ComboBoxMaintenance.getSelectedItem().toString());
 
             try (OutputStream os = con.getOutputStream()) {
                 byte[] input = jsonObject.toString().getBytes("utf-8");
@@ -1692,6 +1735,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             jsonObject.addProperty("party", TXT_Part.getText().toUpperCase().trim());
             jsonObject.addProperty("product", TXT_Product.getText().toUpperCase().trim());
             jsonObject.addProperty("remarks", TXT_REMARKS.getText().toUpperCase());
+            jsonObject.addProperty("maintance", ComboBoxMaintenance.getSelectedItem().toString());
 
             try (OutputStream outputStream = con.getOutputStream()) {
                 byte[] bytes = jsonObject.toString().getBytes("utf-8");
@@ -2035,6 +2079,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         BtnSubmit.setEnabled(true);
         BtnGross.setEnabled(true);
         BtnTare.setEnabled(true);
+        ComboBoxMaintenance.setSelectedIndex(0);
     }
 
 
@@ -2113,6 +2158,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     private javax.swing.JButton BtnSubmit;
     private javax.swing.JButton BtnTare;
     private javax.swing.JComboBox ComboBoxChargeApplied;
+    private javax.swing.JComboBox ComboBoxMaintenance;
     private javax.swing.JLabel LBL_CreateTime;
     private javax.swing.JLabel LBL_GateEntry;
     private javax.swing.JTextField TXT_AutoWeight;
@@ -2154,6 +2200,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
@@ -2446,12 +2493,10 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
             ApiResponse apiResponse = gson.fromJson(stringBuilder.toString(), ApiResponse.class);
             List<VehicleDetails> vehicleDetailsList = apiResponse.getVehicleDetailsList();
-
             // If vehicleNo is not null, filter the list directly without using a loop
             // List<VehicleDetails> filteredList = new ArrayList<>();
             filteredList = new ArrayList<>();
             if (vechileNo != null) {
-
                 //                filteredList =
                 //                            vehicleDetailsList.stream().filter(vehicle -> vehicle.getVehicleNo().equalsIgnoreCase(vechileNo)).collect(Collectors.toList());
                 filteredList =
@@ -2460,7 +2505,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     filteredList =
                         vehicleDetailsList.stream().filter(vehicle -> vehicle.getVehicleNo().equalsIgnoreCase(vechileNo)).collect(Collectors.toList());
                 }
-
             }
             //            else {
             //                // If vehicleNo is null, you can either return the entire list or handle as needed
@@ -2475,7 +2519,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                         vehicleDetailsList.stream().filter(vehicle -> vehicle.getSlipNo().equalsIgnoreCase(slipNo)).collect(Collectors.toList());
                 }
             }
-
             //            else {
             //                filteredList = vehicleDetailsList;
             //            }
@@ -2491,6 +2534,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 return;
             }
             for (VehicleDetails vehicle : filteredList) {
+               
                 System.out.println(vehicle.getVehicleNo() + " - " + vehicle.getTokenNo());
                 if (!vehicle.getTokenNo().equalsIgnoreCase("0")) {
                     vechileNumberFromDb = vehicle.getVehicleNo();
@@ -2538,10 +2582,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         //            forPrint();
         //        }
     }
-
     String chargeApplied = "N";
     String slipNoCheck = "N";
-
     public void withoutByPassMachine(VehicleDetails vehicle) {
         if (vehicle.getVehicleNo() != null) {
             TXT_VechileNo.setText(vehicle.getVehicleNo().toUpperCase().trim());
@@ -2568,7 +2610,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             TXT_Charge.setText("0");
             compVechileType = "Y";
         }
-
         if (vehicle.getTrolly_req().equalsIgnoreCase("Y")) {
             TXT_TrollyNo.setEnabled(true);
             trollyReq = "Y";
@@ -2594,15 +2635,12 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             slipNoCheck = vehicle.getSlipNo();
             TXT_VechileNo.setEnabled(false);
         }
-
         if (!vehicle.getParty().equalsIgnoreCase("0")) {
             TXT_Part.setText(vehicle.getParty().toUpperCase());
         }
-
         if (!vehicle.getProduct().equalsIgnoreCase("0")) {
             TXT_Product.setText(vehicle.getProduct().toUpperCase());
         }
-
         if (vehicle.getGrossWeight().equalsIgnoreCase("0")) {
             TXT_GrossWeight.setText(vehicle.getGrossWeight());
         } else {
@@ -2612,7 +2650,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             }
             TXT_GrossWeight.setText(vehicle.getGrossWeight());
         }
-
         if (vehicle.getTereWeight().equalsIgnoreCase("0")) {
             TXT_TareWeight.setText(vehicle.getTereWeight());
         } else {
@@ -2641,24 +2678,19 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             } else {
                 TXT_FinealEnterBy.setText(userNamevalue);
             }
-
         }
-
         if (!vehicle.getTrolleyNo().equalsIgnoreCase("0")) {
             TXT_TrollyNo.setText(vehicle.getTrolleyNo());
         }
-
         if (vehicle.getCharge().equalsIgnoreCase("0") || vehicle.getCharge() == "0") {
             TXT_Charge.setText("0");
         } else {
             System.out.println("vehicle.getCharge()---" + vehicle.getCharge());
             TXT_Charge.setText(vehicle.getCharge());
         }
-
         if (!vehicle.getVeh_subtype_desc().equalsIgnoreCase("0")) {
             VechileTypejComboBox.setSelectedItem(vehicle.getVeh_subtype_desc());
         }
-
         if (!vehicle.getCharge_applicable().equalsIgnoreCase("0")) {
             if (vehicle.getCharge_applicable().equalsIgnoreCase("Yes") ||
                 vehicle.getCharge_applicable().equalsIgnoreCase("Y")) {
@@ -2667,27 +2699,20 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             } else {
                 chargeApplied = "N";
                 ComboBoxChargeApplied.setSelectedIndex(1);
-
             }
         }
-
-
         if (!vehicle.getRemarks().equalsIgnoreCase("0")) {
             TXT_REMARKS.setText(vehicle.getRemarks().toUpperCase());
         }
-
         if (!vehicle.getGateEntryNumber().equalsIgnoreCase("0")) {
             TXT_GateEntry.setText(vehicle.getGateEntryNumber());
         }
-
         if (!vehicle.getCreatedBy().equalsIgnoreCase("0")) {
             TXT_CreateBy.setText(vehicle.getCreatedBy());
         }
-
         if (!vehicle.getCreationDate().equalsIgnoreCase("0")) {
             TXT_CreateDate.setText(vehicle.getCreationDate());
         }
-
         if (!vehicle.getCreationTime().equalsIgnoreCase("0")) {
             TXT_CreateTime.setText(vehicle.getCreationTime());
         }
@@ -2723,11 +2748,29 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         if (TXT_SlipNo.getText() == null || TXT_SlipNo.getText().equalsIgnoreCase("0") ||
             TXT_SlipNo.getText().isEmpty() || TXT_SlipNo.getText() == "" || TXT_SlipNo.getText().equals("")) {
             VechileTypejComboBox.setEnabled(true);
-            ComboBoxChargeApplied.setEnabled(true);
+            ComboBoxChargeApplied.setEnabled(false);
         } else {
             VechileTypejComboBox.setEnabled(false);
             ComboBoxChargeApplied.setEnabled(false);
         }
+        //System.out.println("vehicle.getMaintenance()--232-"+vehicle.getMaintance());
+        if (!vehicle.getMaintance().equalsIgnoreCase("0")) {
+            if (vehicle.getMaintance().equalsIgnoreCase("Yes") ||
+                vehicle.getMaintance().equalsIgnoreCase("Y")) {
+                ComboBoxMaintenance.setSelectedIndex(1);
+            } else {
+                ComboBoxChargeApplied.setSelectedIndex(0);
+            }
+            ComboBoxMaintenance.setEnabled(false);
+        }
+        if (!vehicle.getVen_type_code().equalsIgnoreCase("0")) {
+            vechileTypeSubCode=vehicle.getVen_type_code(); 
+        }
+        if (!vehicle.getChk_gate2().equalsIgnoreCase("0")) {
+            checkGate2Flage=vehicle.getChk_gate2(); 
+        }
+        
+        
 
     }
 
@@ -2889,16 +2932,31 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         if (!vehicle.getFt_tere_weight().equalsIgnoreCase("0")) {
             ftTereWeight = vehicle.getFt_tere_weight();
         }
-
-
         if (TXT_SlipNo.getText() == null || TXT_SlipNo.getText().equalsIgnoreCase("0") ||
             TXT_SlipNo.getText().isEmpty() || TXT_SlipNo.getText() == "" || TXT_SlipNo.getText().equals("")) {
             VechileTypejComboBox.setEnabled(true);
-            ComboBoxChargeApplied.setEnabled(true);
+            ComboBoxChargeApplied.setEnabled(false);
         } else {
             VechileTypejComboBox.setEnabled(false);
             ComboBoxChargeApplied.setEnabled(false);
         }
+       // System.out.println("vehicle.getMaintenance()---"+vehicle.getMaintance());
+        if (!vehicle.getMaintance().equalsIgnoreCase("0")) {
+            if (vehicle.getMaintance().equalsIgnoreCase("Yes") ||
+                vehicle.getMaintance().equalsIgnoreCase("Y")) {
+                ComboBoxMaintenance.setSelectedIndex(1);
+            } else {
+                ComboBoxChargeApplied.setSelectedIndex(0);
+            }
+            ComboBoxMaintenance.setEnabled(false);
+        }
+        
+        if (!vehicle.getVen_type_code().equalsIgnoreCase("0")) {
+            vechileTypeSubCode=vehicle.getVen_type_code(); 
+        }else{
+            vechileTypeSubCode="NA";
+        }
+       
 
     }
 
@@ -3349,7 +3407,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 byte[] input = jsonObject.toString().getBytes("utf-8");
                 outputStream.write(input, 0, input.length);
             }
-
             StringBuilder response = null;
             try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
                 String inputLine;
@@ -3463,9 +3520,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 try {
                     if (rs.getString("rcNo") != null) {
                         // TXT_RC_NO.setText(rs.getString("rcNo").toUpperCase());
-
-
-
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -3473,9 +3527,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 try {
                     if (rs.getString("machineNo") != null) {
                         //  TXT_Machine.setText(rs.getString("machineNo").toUpperCase());
-
-
-
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -3499,9 +3550,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 try {
                     if (rs.getString("createdBy") != null) {
                         //  TXT_CreateBy.setText(rs.getString("createdBy").toUpperCase());
-
-
-
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -3509,9 +3557,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 try {
                     if (rs.getString("creationDate") != null) {
                         //  TXT_CreateDate.setText(rs.getString("creationDate").toUpperCase());
-
-
-
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();

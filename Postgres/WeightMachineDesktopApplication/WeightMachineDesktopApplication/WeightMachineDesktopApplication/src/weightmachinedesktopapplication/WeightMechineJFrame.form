@@ -128,7 +128,7 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" attributes="0">
-                  <EmptySpace pref="34" max="32767" attributes="0"/>
+                  <EmptySpace pref="32" max="32767" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <Component id="jLabel14" min="-2" max="-2" attributes="0"/>
@@ -316,14 +316,16 @@
                                       </Group>
                                   </Group>
                                   <Component id="LBL_GateEntry" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel18" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="TXT_GateEntry" max="32767" attributes="0"/>
                                   <Component id="TXT_FinealEnterBy" alignment="1" max="32767" attributes="0"/>
                                   <Component id="jScrollPane6" alignment="1" max="32767" attributes="0"/>
-                                  <Component id="TXT_Charge" alignment="0" pref="190" max="32767" attributes="0"/>
+                                  <Component id="TXT_Charge" alignment="0" pref="192" max="32767" attributes="0"/>
                                   <Component id="jScrollPane7" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="ComboBoxMaintenance" alignment="0" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -369,7 +371,12 @@
                           <Component id="TXT_Charge" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel11" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace min="-2" pref="38" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="31" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="ComboBoxMaintenance" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel18" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -471,6 +478,21 @@
             <Component class="javax.swing.JLabel" name="jLabel11">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Charge"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JComboBox" name="ComboBoxMaintenance">
+              <Properties>
+                <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                  <StringArray count="2">
+                    <StringItem index="0" value="NO"/>
+                    <StringItem index="1" value="YES"/>
+                  </StringArray>
+                </Property>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="jLabel18">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Maintenance"/>
               </Properties>
             </Component>
           </SubComponents>
@@ -723,6 +745,7 @@
                   </StringArray>
                 </Property>
                 <Property name="selectedIndex" type="int" value="1"/>
+                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ComboBoxChargeAppliedActionPerformed"/>
