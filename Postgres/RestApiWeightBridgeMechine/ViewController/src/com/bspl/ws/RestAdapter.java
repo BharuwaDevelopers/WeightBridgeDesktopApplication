@@ -385,6 +385,18 @@ public class RestAdapter {
                     } else {
                         result.setVen_type_code("0");
                     }
+                String maintance = rs.getString("maintance");
+                if (maintance != null && !maintance.trim().isEmpty()) {
+                    result.setMaintance(maintance);
+                } else {
+                    result.setMaintance("0");
+                }
+                String checkGate2Flage = rs.getString("chk_gate2");
+                if (checkGate2Flage != null && !checkGate2Flage.trim().isEmpty()) {
+                    result.setChk_gate2(checkGate2Flage);
+                } else {
+                    result.setChk_gate2("0");
+                }
                 vehicleDetails.add(result);
             }
 
