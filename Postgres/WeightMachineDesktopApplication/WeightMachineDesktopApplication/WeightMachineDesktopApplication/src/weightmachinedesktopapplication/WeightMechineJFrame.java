@@ -1489,7 +1489,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             return;
         }
 
-       
+           // Comment for QC
                 if (comPoartMechineConnection("SaveBtn").equalsIgnoreCase("N")) {
                  String message = "Weight-bridge weight not match.";
                  JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
@@ -1786,6 +1786,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     private void BtnGrossActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnGrossActionPerformed
         btnEventName = "grossBtnCall";
         wt_type = "G";
+        //For QC testing comment
         comPoartMechineConnection("GrossBtn");
         if (TXT_SlipNo.getText().trim() == null || TXT_SlipNo.getText().trim().isEmpty() ||
             TXT_SlipNo.getText().trim().equals("")) {
@@ -1804,6 +1805,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     private void BtnTareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnTareActionPerformed
         btnEventName = "tareBtnCall";
         wt_type = "T";
+        //For QC testing comment
         comPoartMechineConnection("TareBtn");
         if (TXT_SlipNo.getText() == null || TXT_SlipNo.getText().isEmpty()) {
             TXT_GrossWeight.setText("0");
@@ -1916,6 +1918,12 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_TXT_SlipNoKeyPressed
 
     private void ComboBoxChargeAppliedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboBoxChargeAppliedActionPerformed
+        
+        if(TXT_VechileNo.getText().trim()==null||TXT_VechileNo.getText().isEmpty() ){
+            JOptionPane.showMessageDialog(null, "Please Enter  First Vachile No", "Message", JOptionPane.ERROR_MESSAGE);
+            VechileTypejComboBox.setSelectedIndex(0);
+            return;
+        }
         if (compVechileType.equalsIgnoreCase("Y")) {
             ComboBoxChargeApplied.setSelectedIndex(1);
             TXT_Charge.setText("0");
@@ -2518,6 +2526,9 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     filteredList =
                         vehicleDetailsList.stream().filter(vehicle -> vehicle.getSlipNo().equalsIgnoreCase(slipNo)).collect(Collectors.toList());
                 }
+            }
+            else{
+                VechileTypejComboBox.setSelectedIndex(0);
             }
             //            else {
             //                filteredList = vehicleDetailsList;
