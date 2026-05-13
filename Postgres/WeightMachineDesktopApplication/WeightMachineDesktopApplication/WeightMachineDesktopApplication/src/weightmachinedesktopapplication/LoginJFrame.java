@@ -9,6 +9,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 
@@ -40,7 +42,7 @@ import org.json.JSONObject;
  * @author lenovo
  */
 public class LoginJFrame extends javax.swing.JFrame {
-
+static String urlValuePrefix=null;
     /** Creates new form LoginJFrame */
     public LoginJFrame() {
         initComponents();
@@ -240,7 +242,38 @@ public class LoginJFrame extends javax.swing.JFrame {
 
     private void BtnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnLoginActionPerformed
         // checkLoginDetails();
-        loginApiCall();
+      //  String url =null;
+        try {
+            File file = new File("C:/jasperfile/IPAddressConfig.txt");
+            // Check file exists
+            if (!file.exists()) {
+                System.out.println("TXT File Not Found");
+                JOptionPane.showMessageDialog(null, "TXT File Not Found", "Message", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                String url = br.readLine();
+                // Check empty file
+                if (url == null || url.trim().isEmpty()) {
+                    System.out.println("File is Empty");
+                    JOptionPane.showMessageDialog(null, "Please maintain  ip address in txt file", "Message", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                    
+                }
+                System.out.println("URL : " + url);
+                urlValuePrefix=url;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(urlValuePrefix ==null||urlValuePrefix.isEmpty()){
+            JOptionPane.showMessageDialog(null, "Please maintain ip address", "Message", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }else{
+            loginApiCall(urlValuePrefix); 
+        }
+        
     }//GEN-LAST:event_BtnLoginActionPerformed
 
     private void BtnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnExitActionPerformed
@@ -251,7 +284,36 @@ public class LoginJFrame extends javax.swing.JFrame {
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             System.out.println("Enter key pressed!");
             // checkLoginDetails();
-            loginApiCall();
+            try {
+                File file = new File("C:/jasperfile/IPAddressConfig.txt");
+                // Check file exists
+                if (!file.exists()) {
+                    System.out.println("TXT File Not Found");
+                    JOptionPane.showMessageDialog(null, "TXT File Not Found", "Message", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+                try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                    String url = br.readLine();
+                    // Check empty file
+                    if (url == null || url.trim().isEmpty()) {
+                        System.out.println("File is Empty");
+                        JOptionPane.showMessageDialog(null, "Please maintain  ip address in txt file", "Message", JOptionPane.INFORMATION_MESSAGE);
+                        return;
+                        
+                    }
+                    System.out.println("URL : " + url);
+                    urlValuePrefix=url;
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if(urlValuePrefix ==null||urlValuePrefix.isEmpty()){
+                JOptionPane.showMessageDialog(null, "Please maintain ip address", "Message", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }else{
+                loginApiCall(urlValuePrefix); 
+            }
         } // TODO add your handling code here:
     }//GEN-LAST:event_TXT_PASSKeyPressed
 
@@ -297,7 +359,7 @@ public class LoginJFrame extends javax.swing.JFrame {
     }
 
 
-    public void loginApiCall() {
+    public void loginApiCall(String url_prefix) {
         InetAddress inetAddress = null;
         if (TXT_USERNAME.getText().isEmpty() || TXT_USERNAME.getText() == null || TXT_USERNAME.getText() == "") {
             JOptionPane.showMessageDialog(null, "Please Enter User Name", "Message", JOptionPane.INFORMATION_MESSAGE);
@@ -316,8 +378,10 @@ public class LoginJFrame extends javax.swing.JFrame {
         try {
             //  URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/Login");
             // URL url = new URL("http://10.0.6.204:7003/RestApiWeightBridge/resources/Login");
-            //  URL url = new URL("http://10.0.6.170:9090/RestApiWeightBridge/resources/Login");
-            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/Login");
+            //  URL url = new URL("http://115.243.225.10:9090/RestApiWeightBridge/resources/Login");
+            String url_String=url_prefix+"RestApiWeightBridge/resources/Login";
+            URL url = new URL(url_String);
+           // URL url = new URL("http://115.243.225.10:9090/RestApiWeightBridge/resources/Login");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
@@ -367,7 +431,7 @@ public class LoginJFrame extends javax.swing.JFrame {
                     if (ipAddress.trim().equalsIgnoreCase(inetAddress.getHostAddress().toString())) {
                         System.out.println("Response Message: " + message);
                         WeightMechineJFrame weightFrame =
-                            new WeightMechineJFrame(userName, unitCode, machine_code, comport, bypass_flag);
+                            new WeightMechineJFrame(userName, unitCode, machine_code, comport, bypass_flag,url_prefix);
                         weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                         weightFrame.setSize(1200, 730);
                         weightFrame.setVisible(true);
@@ -380,13 +444,13 @@ public class LoginJFrame extends javax.swing.JFrame {
                                                       JOptionPane.INFORMATION_MESSAGE);
                     }
 
-//                         WeightMechineJFrame weightFrame =
-//                         new WeightMechineJFrame(userName, unitCode, machine_code, comport,bypass_flag);
-//                         weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-//                        weightFrame.setSize(1200, 730);
-//                        weightFrame.setVisible(true);
-//                        // super.setVisible(false);
-//                        super.dispose();
+//                                             WeightMechineJFrame weightFrame =
+//                                             new WeightMechineJFrame(userName, unitCode, machine_code, comport,bypass_flag,url_prefix);
+//                                             weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//                                            weightFrame.setSize(1200, 730);
+//                                            weightFrame.setVisible(true);
+//                                            // super.setVisible(false);
+//                                            super.dispose();
 
 
                 }

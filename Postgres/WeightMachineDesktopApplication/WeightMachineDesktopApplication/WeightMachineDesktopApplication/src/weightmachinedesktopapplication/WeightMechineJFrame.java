@@ -88,7 +88,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     String slipNo = null, tokenNo = null, gateNo = null, grossWeight = null, tareWeight = null, netWeight =
         null, party = null, vechileNo = null, vechileType = null, create = null, finaldate = null, charge =
         null, product = null, remarks = null, comport_no = null, machinecode = null, ftTereWeight = "0", bypass_flag =
-        null;
+        null,url_string=null;
 
     private JPopupMenu suggestionMenuParty;
     private JPopupMenu suggestionMenuProduct;
@@ -115,10 +115,15 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
     int[] trollyNoSelectedIndex = { -1 };
 
     /** Creates new form WeightMechineJFrame */
-    public WeightMechineJFrame(String userName, String unitCd, String machine_code, String comPort, String bypassflag) {
+    public WeightMechineJFrame(String userName, String unitCd, String machine_code, String comPort, String bypassflag,String url_prefix) {
         if (userName == null || userName.isEmpty() || userName == "") {
             userName = "E-001";
         }
+        if(url_prefix ==null||url_prefix.isEmpty()){
+            JOptionPane.showMessageDialog(null, "url not  maintain ip address", "Message", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        url_string=url_prefix;
         userNamevalue = userName;
         unitCode = unitCd;
         comport_no = comPort;
@@ -1639,8 +1644,9 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             //quality
             // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/insert");
             //Production
-            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/insert");
-
+           // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/insert");
+            String urlValue=url_string+"RestApiWeightBridge/resources/insert";
+            URL url= new URL(urlValue);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
@@ -1714,7 +1720,9 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             //quality
             // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/update");
             //prd
-            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/update");
+           // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/update");
+           String urlValue=url_string+"RestApiWeightBridge/resources/update";
+           URL url= new URL(urlValue);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
@@ -2012,7 +2020,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         }
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new WeightMechineJFrame("", "", "", "", "").setVisible(true);
+                new WeightMechineJFrame("", "", "", "", "","").setVisible(true);
             }
         });
     }
@@ -2416,9 +2424,10 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             //quality
             // URL obj = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleType?machineCode=" + machinecode);
             //prd
-            URL obj =
-                new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleType?machineCode=" + machinecode);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+           // URL obj =new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleType?machineCode=" + machinecode);
+           String urlValue=url_string+"RestApiWeightBridge/resources/vehicleType?machineCode="+machinecode+"";
+           URL url= new URL(urlValue);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
             con.setRequestProperty("User-Agent", "Mozilla/5.0");
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
@@ -2467,8 +2476,10 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         List<VehicleDetails> filteredListMachineCode = null;
         try {
             //  URL obj = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleDetails");
-            URL obj = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleDetails");
-            HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
+           // URL obj = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleDetails");
+           String urlValue=url_string+"RestApiWeightBridge/resources/vehicleDetails";
+           URL url= new URL(urlValue);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("User-Agent", "Mozilla/5.0");
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -2979,7 +2990,9 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         }
         try {
             // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/trollyDtl");
-            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/trollyDtl");
+           // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/trollyDtl");
+           String urlValue=url_string+"RestApiWeightBridge/resources/trollyDtl";
+           URL url= new URL(urlValue);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
@@ -3406,7 +3419,9 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             // URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/printslip");
             // URL url = new URL("http://10.0.6.204:7003/RestApiWeightBridge/resources/printslip");
             // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/printslip");
-            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/printslip");
+          //  URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/printslip");
+          String urlValue=url_string+"RestApiWeightBridge/resources/printslip";
+          URL url= new URL(urlValue);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
@@ -3646,7 +3661,9 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         // Try-catch block to handle potential IOExceptions and other exceptions
         List<PrintSlipDetails> filteredList = null;
         try {
-            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleCode");
+           // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/vehicleCode");
+           String urlValue=url_string+"RestApiWeightBridge/resources/vehicleCode";
+           URL url= new URL(urlValue);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");

@@ -10,8 +10,10 @@ import com.google.gson.JsonObject;
 import java.awt.event.KeyEvent;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -701,8 +703,36 @@ public class PrintSlip extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonPrintActionPerformed
 
     private void jBtnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnBackActionPerformed
-        // TODO add your handling code here:
-        WeightMechineJFrame weightFrame = new WeightMechineJFrame(user_Name,unit_Code,machine_code,comportNo,"");
+    String urlValuePrefix=null;
+    try {
+        File file = new File("C:/jasperfile/IPAddressConfig.txt");
+        // Check file exists
+        if (!file.exists()) {
+            System.out.println("TXT File Not Found");
+            JOptionPane.showMessageDialog(null, "TXT File Not Found", "Message", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String url = br.readLine();
+            // Check empty file
+            if (url == null || url.trim().isEmpty()) {
+                System.out.println("File is Empty");
+                JOptionPane.showMessageDialog(null, "Please maintain  ip address in txt file", "Message", JOptionPane.INFORMATION_MESSAGE);
+                return;
+                
+            }
+            System.out.println("URL : " + url);
+            urlValuePrefix=url;
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    if(urlValuePrefix ==null||urlValuePrefix.isEmpty()){
+        JOptionPane.showMessageDialog(null, "Please maintain ip address", "Message", JOptionPane.INFORMATION_MESSAGE);
+        return;
+    }
+        WeightMechineJFrame weightFrame = new WeightMechineJFrame(user_Name,unit_Code,machine_code,comportNo,"",urlValuePrefix);
         weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         weightFrame.setSize(1200, 730);
         weightFrame.setVisible(true);
@@ -1024,8 +1054,8 @@ public class PrintSlip extends javax.swing.JFrame {
         try {
            // URL url = new URL("http://182.16.9.100:7003/RestApiWeightBridge/resources/printslip");
             //URL url = new URL("http://10.0.6.204:7003/RestApiWeightBridge/resources/printslip");
-           // URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/printslip");
-            URL url = new URL("http://10.0.6.171:9090/RestApiWeightBridge/resources/printslip");
+           // URL url = new URL("http://115.243.225.10:9090/RestApiWeightBridge/resources/printslip");
+            URL url = new URL("http://115.243.225.10:9090/RestApiWeightBridge/resources/printslip");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");

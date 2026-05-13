@@ -28,6 +28,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 
 import javax.swing.JTable;
@@ -216,7 +217,36 @@ String unit_Code=null,machine_code=null,comportNo=null,user_Name=null,bypassflag
     }//GEN-LAST:event_BtnExportExcelActionPerformed
 
     private void jBackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBackButtonActionPerformed
-    WeightMechineJFrame weightFrame = new WeightMechineJFrame(user_Name,unit_Code,machine_code,comportNo,bypassflag);
+    String urlValuePrefix=null;
+    try {
+        File file = new File("C:/jasperfile/IPAddressConfig.txt");
+        // Check file exists
+        if (!file.exists()) {
+            System.out.println("TXT File Not Found");
+            JOptionPane.showMessageDialog(null, "TXT File Not Found", "Message", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String url = br.readLine();
+            // Check empty file
+            if (url == null || url.trim().isEmpty()) {
+                System.out.println("File is Empty");
+                JOptionPane.showMessageDialog(null, "Please maintain  ip address in txt file", "Message", JOptionPane.INFORMATION_MESSAGE);
+                return;
+                
+            }
+            System.out.println("URL : " + url);
+            urlValuePrefix=url;
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    if(urlValuePrefix ==null||urlValuePrefix.isEmpty()){
+        JOptionPane.showMessageDialog(null, "Please maintain ip address", "Message", JOptionPane.INFORMATION_MESSAGE);
+        return;
+    }
+    WeightMechineJFrame weightFrame = new WeightMechineJFrame(user_Name,unit_Code,machine_code,comportNo,bypassflag,urlValuePrefix);
     weightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     weightFrame.setSize(1200, 730);
     weightFrame.setVisible(true);
@@ -307,7 +337,7 @@ String unit_Code=null,machine_code=null,comportNo=null,user_Name=null,bypassflag
 
     public void callApiForReports() throws ProtocolException, MalformedURLException, JSONException {
         // String url = "http://10.0.6.204:7003/RestApiWeightBridge/resources/reports";
-        String url = "http://10.0.6.171:9090/RestApiWeightBridge/resources/reports";
+        String url = "http://115.243.225.10:9090/RestApiWeightBridge/resources/reports";
         //String url = "http://127.0.0.1:7101/RestApiWeightBridge/resources/reports";
         // Try-catch block to handle potential IOExceptions and other exceptions
         List<VehicleDetails> filteredList = null;
