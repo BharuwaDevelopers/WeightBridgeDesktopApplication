@@ -1579,18 +1579,18 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         if (TXT_SlipNo.getText().trim().isEmpty() || TXT_SlipNo.getText().trim() == null ||
             TXT_SlipNo.getText().trim() == "" || TXT_SlipNo.getText().equalsIgnoreCase("0")) {
             
-            insertdateCallApi(); 
+           // insertdateCallApi(); 
             
             //for tempory comment via shubham
             
-//            if(vechileTypeSubCode.equalsIgnoreCase(vechileCode)){
-//                insertdateCallApi(); 
-//            }
-//            else{
-//                JOptionPane.showMessageDialog(null, "Please select a valid vehicle type. It does not match the gate entry details", "Message",
-//                                              JOptionPane.INFORMATION_MESSAGE);
-//                return;  
-//            }
+            if(vechileTypeSubCode.equalsIgnoreCase(vechileCode)){
+                insertdateCallApi(); 
+            }
+            else{
+                JOptionPane.showMessageDialog(null, "Please select a valid vehicle type. It does not match the gate entry details", "Message",
+                                              JOptionPane.INFORMATION_MESSAGE);
+                return;  
+            }
 
             
         } else {
@@ -1621,25 +1621,25 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     }
                 }
             }
-            updatedateCallApi();
+         //   updatedateCallApi();
             
-//            if(vechileTypeSubCode.equalsIgnoreCase(vechileCode)){
-//                if(ComboBoxMaintenance.getSelectedItem().toString().equalsIgnoreCase("NO")){
-//                    if(checkGate2Flage!=null)
-//                    {
-//                        if(checkGate2Flage.equalsIgnoreCase("NA")){
-//                            JOptionPane.showMessageDialog(null, "This vehicle was not found in gate entry records.", "Message",JOptionPane.INFORMATION_MESSAGE);
-//                            return;
-//                        }
-//                    }
-//                }
-//                updatedateCallApi();
-//            }
-//            else{
-//                JOptionPane.showMessageDialog(null, "Please select a valid vehicle type. It does not match the gate entry details", "Message",
-//                                              JOptionPane.INFORMATION_MESSAGE);
-//                return;  
-//            }
+            if(vechileTypeSubCode.equalsIgnoreCase(vechileCode)){
+                if(ComboBoxMaintenance.getSelectedItem().toString().equalsIgnoreCase("NO")){
+                    if(checkGate2Flage!=null)
+                    {
+                        if(checkGate2Flage.equalsIgnoreCase("NA")){
+                            JOptionPane.showMessageDialog(null, "This vehicle was not found in gate entry records.", "Message",JOptionPane.INFORMATION_MESSAGE);
+                            return;
+                        }
+                    }
+                }
+                updatedateCallApi();
+            }
+            else{
+                JOptionPane.showMessageDialog(null, "Please select a valid vehicle type. It does not match the gate entry details", "Message",
+                                              JOptionPane.INFORMATION_MESSAGE);
+                return;  
+            }
             
         }
     }//GEN-LAST:event_BtnSubmitActionPerformed
