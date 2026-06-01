@@ -1360,7 +1360,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("DejaVu Serif Condensed", 1, 24)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Weight Bridge");
+        jLabel1.setText("Weight Bridge V1.1");
 
         BtnLogOut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/weightmachinedesktopapplication/shutdown (1).png"))); // NOI18N
         BtnLogOut.addActionListener(new java.awt.event.ActionListener() {
@@ -1374,7 +1374,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(BtnLogOut)
                 .addGap(22, 22, 22))
@@ -1494,7 +1494,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             return;
         }
 
-           // Comment for QC
+           // For QC testing comment
                 if (comPoartMechineConnection("SaveBtn").equalsIgnoreCase("N")) {
                  String message = "Weight-bridge weight not match.";
                  JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
@@ -1579,7 +1579,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         if (TXT_SlipNo.getText().trim().isEmpty() || TXT_SlipNo.getText().trim() == null ||
             TXT_SlipNo.getText().trim() == "" || TXT_SlipNo.getText().equalsIgnoreCase("0")) {
             
-           // insertdateCallApi(); 
+          //  insertdateCallApi(); 
             
             //for tempory comment via shubham
             
@@ -1621,8 +1621,8 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     }
                 }
             }
-         //   updatedateCallApi();
-            
+          //  updatedateCallApi();
+            // For Shubhma commment
             if(vechileTypeSubCode.equalsIgnoreCase(vechileCode)){
                 if(ComboBoxMaintenance.getSelectedItem().toString().equalsIgnoreCase("NO")){
                     if(checkGate2Flage!=null)
@@ -1800,7 +1800,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         btnEventName = "grossBtnCall";
         wt_type = "G";
         //For QC testing comment
-        comPoartMechineConnection("GrossBtn");
+       // comPoartMechineConnection("GrossBtn");
         if (TXT_SlipNo.getText().trim() == null || TXT_SlipNo.getText().trim().isEmpty() ||
             TXT_SlipNo.getText().trim().equals("")) {
             TXT_TareWeight.setText("0");
@@ -2561,8 +2561,19 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 return;
             }
             for (VehicleDetails vehicle : filteredList) {
-               
                 System.out.println(vehicle.getVehicleNo() + " - " + vehicle.getTokenNo());
+                System.out.println(vehicle.getVehicleNo() + " - " + vehicle.getSlipNo());
+                System.out.println(vehicle.getVehicleNo() + " - " + vehicle.getMachineNo());
+                // for Gate 3 issue
+                if (!"0".equals(vehicle.getSlipNo()) && !"0".equals(vehicle.getMachineNo())) {
+                    if (!machinecode.equalsIgnoreCase(vehicle.getMachineNo())) {
+                        String message = "Slip pending on other user";
+                        JOptionPane.showMessageDialog(null, message, "Message",JOptionPane.INFORMATION_MESSAGE);
+                        return;
+                    }
+                    break; // Exit the loop only
+                }
+                
                 if (!vehicle.getTokenNo().equalsIgnoreCase("0")) {
                     vechileNumberFromDb = vehicle.getVehicleNo();
                     System.out.println("bypass_flag---" + bypass_flag);
