@@ -2466,6 +2466,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
 
 
+
                 }
                 if (autosuggest.getVehicleNo() != null) {
                     suggestionsListVehicleNo.add(autosuggest.getVehicleNo());
@@ -2514,7 +2515,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             }
             bufferedReader.close();
             connection.disconnect();
-            
+
             Gson gson = new Gson();
             ApiResponse apiResponse = gson.fromJson(stringBuilder.toString(), ApiResponse.class);
             List<VehicleDetails> vehicleDetailsList = apiResponse.getVehicleDetailsList();
@@ -2560,7 +2561,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                             if (machinecode.equalsIgnoreCase(vehicle.getMachineNo())) {
                                 withoutByPassMachine(vehicle);
                             } else {
-                                ByPassMachine(vehicle);
+                                ByPassMachine(vehicle,bypass_flag);
                             }
                         } else {
                             withoutByPassMachine(vehicle);
@@ -2789,13 +2790,15 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
     }
 
-    public void ByPassMachine(VehicleDetails vehicle) {
+    public void ByPassMachine(VehicleDetails vehicle,String bypass_flag) {
         if (vehicle.getVehicleNo() != null && !"0".equals(vehicle.getVehicleNo())) {
             TXT_VechileNo.setText(vehicle.getVehicleNo().toUpperCase().trim());
             if (vechileNo != null) {
-                TXT_SlipNo.setEnabled(false);
-                TXT_SlipNo.setText(vehicle.getSlipNo());
-                slipNoCheck = vehicle.getSlipNo();
+                if (vehicle.getSlipNo().trim().startsWith(machinecode)&& bypass_flag.equalsIgnoreCase("Y")) {
+                    TXT_SlipNo.setEnabled(false);
+                    TXT_SlipNo.setText(vehicle.getSlipNo());
+                    slipNoCheck = vehicle.getSlipNo();
+                }
             }
         }
         if (!vehicle.getTokenNo().equalsIgnoreCase("0")) {
@@ -3025,6 +3028,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
                 if (jsonObject.getString("machine_no") != "0") {
                     // TXT_Machine.setText(jsonObject.getString("machine_no"));
+
 
 
 
@@ -3540,6 +3544,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     if (rs.getString("rcNo") != null) {
                         // TXT_RC_NO.setText(rs.getString("rcNo").toUpperCase());
 
+
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -3547,6 +3552,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 try {
                     if (rs.getString("machineNo") != null) {
                         //  TXT_Machine.setText(rs.getString("machineNo").toUpperCase());
+
 
                     }
                 } catch (Exception ex) {
@@ -3572,6 +3578,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                     if (rs.getString("createdBy") != null) {
                         //  TXT_CreateBy.setText(rs.getString("createdBy").toUpperCase());
 
+
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -3579,6 +3586,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 try {
                     if (rs.getString("creationDate") != null) {
                         //  TXT_CreateDate.setText(rs.getString("creationDate").toUpperCase());
+
 
                     }
                 } catch (Exception ex) {
