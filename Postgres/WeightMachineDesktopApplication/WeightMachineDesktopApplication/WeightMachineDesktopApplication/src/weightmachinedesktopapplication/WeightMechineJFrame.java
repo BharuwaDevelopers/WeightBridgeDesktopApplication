@@ -2467,6 +2467,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
 
 
+
                 }
                 if (autosuggest.getVehicleNo() != null) {
                     suggestionsListVehicleNo.add(autosuggest.getVehicleNo());
@@ -2532,11 +2533,17 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             }
 
             if (slipNo != null) {
-                filteredList =
-                    vehicleDetailsList.stream().filter(vehicle -> vehicle.getMachineNo().equalsIgnoreCase(machinecode)).filter(vehicle -> vehicle.getSlipNo().equalsIgnoreCase(slipNo)).collect(Collectors.toList());
-                if (filteredList.size() <= 0) {
+                if (slipNo.trim().startsWith(machinecode)) {
                     filteredList =
-                        vehicleDetailsList.stream().filter(vehicle -> vehicle.getSlipNo().equalsIgnoreCase(slipNo)).collect(Collectors.toList());
+                        vehicleDetailsList.stream().filter(vehicle -> vehicle.getMachineNo().equalsIgnoreCase(machinecode)).filter(vehicle -> vehicle.getSlipNo().equalsIgnoreCase(slipNo)).collect(Collectors.toList());
+                    if (filteredList.size() <= 0) {
+                        filteredList =
+                            vehicleDetailsList.stream().filter(vehicle -> vehicle.getSlipNo().equalsIgnoreCase(slipNo)).collect(Collectors.toList());
+                    }
+                } else {
+                    String message = "Slip pending on other user";
+                    JOptionPane.showMessageDialog(null, message, "Message", JOptionPane.INFORMATION_MESSAGE);
+                    return;
                 }
             } else {
                 VechileTypejComboBox.setSelectedIndex(0);
@@ -2561,7 +2568,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                             if (machinecode.equalsIgnoreCase(vehicle.getMachineNo())) {
                                 withoutByPassMachine(vehicle);
                             } else {
-                                ByPassMachine(vehicle,bypass_flag);
+                                ByPassMachine(vehicle, bypass_flag);
                             }
                         } else {
                             withoutByPassMachine(vehicle);
@@ -2790,11 +2797,11 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
     }
 
-    public void ByPassMachine(VehicleDetails vehicle,String bypass_flag) {
+    public void ByPassMachine(VehicleDetails vehicle, String bypass_flag) {
         if (vehicle.getVehicleNo() != null && !"0".equals(vehicle.getVehicleNo())) {
             TXT_VechileNo.setText(vehicle.getVehicleNo().toUpperCase().trim());
             if (vechileNo != null) {
-                if (vehicle.getSlipNo().trim().startsWith(machinecode)&& bypass_flag.equalsIgnoreCase("Y")) {
+                if (vehicle.getSlipNo().trim().startsWith(machinecode) && bypass_flag.equalsIgnoreCase("Y")) {
                     TXT_SlipNo.setEnabled(false);
                     TXT_SlipNo.setText(vehicle.getSlipNo());
                     slipNoCheck = vehicle.getSlipNo();
@@ -3028,6 +3035,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
 
                 if (jsonObject.getString("machine_no") != "0") {
                     // TXT_Machine.setText(jsonObject.getString("machine_no"));
+
 
 
 
@@ -3545,6 +3553,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                         // TXT_RC_NO.setText(rs.getString("rcNo").toUpperCase());
 
 
+
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -3552,6 +3561,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 try {
                     if (rs.getString("machineNo") != null) {
                         //  TXT_Machine.setText(rs.getString("machineNo").toUpperCase());
+
 
 
                     }
@@ -3579,6 +3589,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                         //  TXT_CreateBy.setText(rs.getString("createdBy").toUpperCase());
 
 
+
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -3586,6 +3597,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 try {
                     if (rs.getString("creationDate") != null) {
                         //  TXT_CreateDate.setText(rs.getString("creationDate").toUpperCase());
+
 
 
                     }
