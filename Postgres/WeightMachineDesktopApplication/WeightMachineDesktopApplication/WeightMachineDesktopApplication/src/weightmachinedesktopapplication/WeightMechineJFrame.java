@@ -2618,9 +2618,18 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
                 slipNoCheck = vehicle.getSlipNo();
             }
         }
+        
         if (!vehicle.getTokenNo().equalsIgnoreCase("0")) {
             TXT_TokenNo.setText(vehicle.getTokenNo());
         }
+        
+        if (!vehicle.getVen_type_code().equalsIgnoreCase("0")) {
+            vechileTypeSubCode = vehicle.getVen_type_code();
+        }
+        if (!vehicle.getChk_gate2().equalsIgnoreCase("0")) {
+            checkGate2Flage = vehicle.getChk_gate2();
+        }
+        
         //COMMENT UPDATE HARE
         if (vehicle.getCompVehTypeCode().equalsIgnoreCase("0")) {
             VechileTypejComboBox.setEnabled(true);
@@ -2787,14 +2796,6 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             }
             ComboBoxMaintenance.setEnabled(false);
         }
-        if (!vehicle.getVen_type_code().equalsIgnoreCase("0")) {
-            vechileTypeSubCode = vehicle.getVen_type_code();
-        }
-        if (!vehicle.getChk_gate2().equalsIgnoreCase("0")) {
-            checkGate2Flage = vehicle.getChk_gate2();
-        }
-
-
     }
 
     public void ByPassMachine(VehicleDetails vehicle, String bypass_flag) {
@@ -2811,6 +2812,12 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
         if (!vehicle.getTokenNo().equalsIgnoreCase("0")) {
             TXT_TokenNo.setText(vehicle.getTokenNo());
         }
+        if (!vehicle.getVen_type_code().equalsIgnoreCase("0")) {
+            vechileTypeSubCode = vehicle.getVen_type_code();
+        }
+        if (!vehicle.getChk_gate2().equalsIgnoreCase("0")) {
+            checkGate2Flage = vehicle.getChk_gate2();
+        } 
         //COMMENT UPDATE HARE
         if (vehicle.getCompVehTypeCode().equalsIgnoreCase("0")) {
             VechileTypejComboBox.setEnabled(true);
@@ -2975,11 +2982,7 @@ public class WeightMechineJFrame extends javax.swing.JFrame {
             ComboBoxMaintenance.setEnabled(false);
         }
 
-        if (!vehicle.getVen_type_code().equalsIgnoreCase("0")) {
-            vechileTypeSubCode = vehicle.getVen_type_code();
-        } else {
-            vechileTypeSubCode = "NA";
-        }
+       
 
 
     }
